@@ -25,6 +25,8 @@ class HomePage extends StatefulWidget {
   final dynamic customer;
   final List<Services> services;
   final List<Requests>? requests;
+  final String token;
+  final String refreshToken;
 
   final List<CostFactor> costFactor;
 
@@ -34,6 +36,8 @@ class HomePage extends StatefulWidget {
     required this.services,
     this.requests,
     required this.costFactor,
+    required this.token,
+    required this.refreshToken,
   });
 
   @override
@@ -53,14 +57,22 @@ class _HomePageState extends State<HomePage> {
         customer: widget.customer,
         services: widget.services,
         costFactors: widget.costFactor,
+        token: widget.token,
+        refreshToken: widget.refreshToken,
       ),
       ActivityPage(
         customer: widget.customer,
         costFactors: widget.costFactor,
         services: widget.services,
+        token: widget.token,
+        refreshToken: widget.refreshToken,
       ),
       NotificationPage(),
-      ProfilePage(customer: widget.customer),
+      ProfilePage(
+        customer: widget.customer,
+        token: widget.token,
+        refreshToken: widget.refreshToken,
+      ),
     ]);
   }
 
@@ -72,7 +84,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: _pages[_selectedIndex.clamp(0, _pages.length - 1)],
       bottomNavigationBar: Container(
@@ -124,12 +135,16 @@ class HomeContent extends StatefulWidget {
   final Customer customer;
   final List<Services> services;
   final List<CostFactor> costFactors;
+  final String token;
+  final String refreshToken;
 
   const HomeContent({
     super.key,
     required this.customer,
     required this.services,
     required this.costFactors,
+    required this.token,
+    required this.refreshToken,
   });
 
   @override
@@ -280,6 +295,8 @@ class _HomeContentState extends State<HomeContent> {
                         services: widget.services,
                         costFactors: widget.costFactors,
                         customer: widget.customer,
+                        token: widget.token,
+                        refreshToken: widget.refreshToken,
                       ),
                     ),
                   );
@@ -579,7 +596,7 @@ class _HomeContentState extends State<HomeContent> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${widget.customer.points[0].point}',
+                      '${widget.customer.points.isNotEmpty ? widget.customer.points.first.point : 0}',
                       style: const TextStyle(
                         fontFamily: 'Quicksand',
                         color: Colors.white,
@@ -715,6 +732,8 @@ class _HomeContentState extends State<HomeContent> {
                                 service: widget.services[index],
                                 costFactors: widget.costFactors,
                                 services: widget.services,
+                                token: widget.token,
+                                refreshToken: widget.refreshToken,
                               ),
                             ),
                           );
@@ -841,9 +860,12 @@ class _HomeContentState extends State<HomeContent> {
 
   Widget _buildServicesSection() {
     return ServiceListMenu(
-        customer: widget.customer,
-        services: widget.services,
-        costFactors: widget.costFactors);
+      customer: widget.customer,
+      services: widget.services,
+      costFactors: widget.costFactors,
+      token: widget.token,
+      refreshToken: widget.refreshToken,
+    );
   }
 
   Widget _buildRewardSection(BuildContext context) {

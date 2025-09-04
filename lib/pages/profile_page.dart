@@ -14,7 +14,13 @@ import 'package:foodapp/pages/training_helper_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final Customer customer;
-  ProfilePage({required this.customer});
+  final String token;
+  final String refreshToken;
+
+  ProfilePage(
+      {required this.customer,
+      required this.token,
+      required this.refreshToken});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -587,7 +593,7 @@ class _ProfilePageState extends State<ProfilePage> {
         final selectedIndex = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ChooseLocationPage(customer: widget.customer),
+            builder: (context) => ChooseLocationPage(customer: widget.customer, token: widget.token, refreshToken: widget.refreshToken,),
           ),
         );
         if (selectedIndex != null) {

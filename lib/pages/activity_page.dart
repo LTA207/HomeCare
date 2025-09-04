@@ -12,6 +12,7 @@ import 'package:foodapp/pages/order_detail_page.dart';
 import 'package:foodapp/pages/order_success_page.dart';
 import 'package:foodapp/pages/payment_page.dart';
 import 'package:foodapp/pages/services_order.dart';
+import 'package:foodapp/services/firebase_messaging_service.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:web_socket_channel/io.dart';
@@ -25,12 +26,16 @@ class ActivityPage extends StatefulWidget {
   final Customer customer;
   final List<CostFactor> costFactors;
   final List<Services> services;
+  final String token;
+  final String refreshToken;
 
   const ActivityPage({
     Key? key,
     required this.customer,
     required this.costFactors,
     required this.services,
+    required this.token,
+    required this.refreshToken,
   }) : super(key: key);
 
   @override
@@ -51,53 +56,71 @@ class _ActivityPageState extends State<ActivityPage>
   @override
   void initState() {
     super.initState();
-    loadRequestData();
-    loadHelperData();
-    loadRequestDetailData();
+    loadAllData();
 
     _tabController = TabController(length: 2, vsync: this);
+
+    // Đăng ký callback để lắng nghe thông báo Firebase
+    FirebaseMessagingService.setDataChangeCallback(() {
+      print('🔔 Nhận thông báo, đang refresh data...');
+      _refreshData();
+    });
   }
 
   @override
   void dispose() {
+    // Hủy đăng ký callback khi dispose
+    FirebaseMessagingService.clearDataChangeCallback();
+    _tabController.dispose();
     super.dispose();
   }
 
   Future<void> loadHelperData() async {
     var repository = DefaultRepository();
     var data = await repository.loadCleanerData();
-    setState(() {
-      helperList = data ?? [];
-    });
+    // Chỉ cập nhật data, không setState ở đây
+    helperList = data ?? [];
   }
 
   Future<void> loadRequestData() async {
     var repository = DefaultRepository();
-    var data = await repository.loadRequest();
-    setState(() {
-      requests = data ?? [];
-      requestCustomer = requests
-          .where(
-              (request) => request.customerInfo.phone == widget.customer.phone)
-          .toList();
-      isLoading = false;
-      pageKey = UniqueKey();
-      print('tải lại dữ liệu');
-    });
+    var data = await repository.loadCustomerRequest(
+        widget.customer.phone, widget.token);
+    // Chỉ cập nhật data, không setState ở đây
+    requestCustomer = data ?? [];
+    print('đã tải lại request data');
   }
 
   Future<void> loadRequestDetailData() async {
     var repository = DefaultRepository();
-    var data = await repository.loadRequestDetail();
+    var data = await repository.loadRequestDetail(widget.token);
+    // Chỉ cập nhật data, không setState ở đây
+    requestDetails = data ?? [];
+    print('đã tải lại request detail data');
+  }
+
+  // Hàm load tất cả data và chỉ setState một lần duy nhất
+  Future<void> loadAllData() async {
     setState(() {
-      requestDetails = data ?? [];
-      // requestCustomer = requests
-      //     .where((request) =>
-      // request.customerInfo.phone == widget.customer.phone)
-      //     .toList();
+      isLoading = true;
+    });
+
+    try {
+      // Chạy song song để tăng tốc độ
+      await Future.wait([
+        loadHelperData(),
+        loadRequestData(),
+        loadRequestDetailData(),
+      ]);
+    } catch (e) {
+      print('❌ Lỗi khi tải data: $e');
+    }
+
+    // Chỉ setState một lần duy nhất sau khi tất cả data đã được tải
+    setState(() {
       isLoading = false;
       pageKey = UniqueKey();
-      print('tải lại dữ liệu');
+      print('✅ Đã tải xong tất cả dữ liệu');
     });
   }
 
@@ -125,12 +148,8 @@ class _ActivityPageState extends State<ActivityPage>
   }
 
   Future<void> _refreshData() async {
-    await Future.delayed(const Duration(seconds: 2)); // Giả lập tải lại dữ liệu
-    setState(() {
-      loadRequestData();
-      loadHelperData();
-      loadRequestDetailData();
-    });
+    // Gọi trực tiếp loadAllData() thay vì setState rồi gọi loadAllData
+    await loadAllData();
   }
 
   @override
@@ -197,6 +216,8 @@ class _ActivityPageState extends State<ActivityPage>
                         helperList: helperList!,
                         requestDetail: requestDetails,
                         refreshData: loadRequestData,
+                        token: widget.token,
+                        refreshToken: widget.refreshToken,
                       )
                     : LongTerm(
                         requests: requestCustomer ?? [],
@@ -207,6 +228,8 @@ class _ActivityPageState extends State<ActivityPage>
                         helperList: helperList!,
                         refreshData: loadRequestData,
                         requestDetail: requestDetails,
+                        token: widget.token,
+                        refreshToken: widget.refreshToken,
                       ),
           ),
         ),
@@ -253,6 +276,8 @@ class OnDemand extends StatefulWidget {
   final List<Helper> helperList;
   final List<RequestDetail> requestDetail;
   final Future<void> Function() refreshData;
+  final String token;
+  final String refreshToken;
 
   const OnDemand({
     super.key,
@@ -262,7 +287,7 @@ class OnDemand extends StatefulWidget {
     required this.services,
     required this.helperList,
     required this.refreshData,
-    required this.requestDetail,
+    required this.requestDetail, required this.token, required this.refreshToken,
   });
 
   @override
@@ -348,7 +373,7 @@ class _OnDemandState extends State<OnDemand> {
 
   String getStatusInVietnamese(String status) {
     switch (status) {
-      case "notDone":
+      case "pending":
         return "Chưa tiến hành";
       case "assigned":
         return "Đã giao việc";
@@ -570,6 +595,8 @@ class _OnDemandState extends State<OnDemand> {
                       costFactors: widget.costFactors,
                       services: widget.services,
                       requestDetail: groupedDetails[request.id]!.first,
+                      token: widget.token,
+                      refreshToken: widget.refreshToken,
                     ),
                   ),
                 );
@@ -600,7 +627,8 @@ class _OnDemandState extends State<OnDemand> {
 
   @override
   Widget build(BuildContext context) {
-    print(groupedDetails);
+    print('danh sách ngắn hạn: ${widget.requestDetail}');
+    print('danh sách: ${groupedDetails}');
     return Container(
       color: const Color(0xFFF5F5F5),
       child: groupedRequests.isEmpty
@@ -681,13 +709,13 @@ class _OnDemandState extends State<OnDemand> {
                                   Container(
                                     decoration: BoxDecoration(
                                       color: _getStatusBackgroundColor(
-                                          request.status),
+                                          request.schedules.first.status),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8, vertical: 4),
                                     child: Text(
-                                      getStatusInVietnamese(request.status),
+                                      getStatusInVietnamese(request.schedules.first.status),
                                       style: TextStyle(
                                         fontFamily: 'Quicksand',
                                         color:
@@ -895,6 +923,8 @@ class _OnDemandState extends State<OnDemand> {
                                                                   .costFactors,
                                                               services: widget
                                                                   .services,
+                                                                  token: widget.token,
+                                                                  refreshToken: widget.refreshToken,
                                                             ),
                                                           ),
                                                         );
@@ -934,6 +964,8 @@ class _OnDemandState extends State<OnDemand> {
                                             services: widget.services,
                                             customer: widget.customer,
                                             costFactors: widget.costFactors,
+                                            token: widget.token,
+                                            refreshToken: widget.refreshToken,
                                           ),
                                         ),
                                       );
@@ -977,6 +1009,8 @@ class LongTerm extends StatefulWidget {
   final List<Helper> helperList;
   final List<RequestDetail> requestDetail;
   final Future<void> Function() refreshData;
+  final String token;
+  final String refreshToken;
 
   const LongTerm(
       {super.key,
@@ -986,7 +1020,7 @@ class LongTerm extends StatefulWidget {
       required this.services,
       required this.helperList,
       required this.refreshData,
-      required this.requestDetail});
+      required this.requestDetail, required this.token, required this.refreshToken});
 
   @override
   State<LongTerm> createState() => _LongTermState();
@@ -1009,17 +1043,24 @@ class _LongTermState extends State<LongTerm> {
 
     Map<String, List<RequestDetail>> detailsByScheduleId = {};
 
-    for (var reqDetail in widget.requestDetail) {
-      for (var request in longTermRequests) {
-        for (var scheduleId in request.scheduleIds) {
-          if (reqDetail.id == scheduleId) {
-            if (!detailsByScheduleId.containsKey(request.id)) {
-              detailsByScheduleId[request.id] = [];
-            }
-            detailsByScheduleId[request.id]!.add(reqDetail);
-          }
-        }
+    // for (var reqDetail in widget.requestDetail) {
+    //   for (var request in longTermRequests) {
+    //     for (var scheduleId in request.scheduleIds) {
+    //       if (reqDetail.id == scheduleId) {
+    //         if (!detailsByScheduleId.containsKey(request.id)) {
+    //           detailsByScheduleId[request.id] = [];
+    //         }
+    //         detailsByScheduleId[request.id]!.addAll(request.schedules);
+    //       }
+    //     }
+    //   }
+    // }
+
+    for (var request in longTermRequests){
+      if (!detailsByScheduleId.containsKey(request.id)) {
+        detailsByScheduleId[request.id] = [];
       }
+      detailsByScheduleId[request.id]!.addAll(request.schedules);
     }
 
     for (var request in longTermRequests) {
@@ -1084,7 +1125,7 @@ class _LongTermState extends State<LongTerm> {
 
   String getStatusInVietnamese(String status) {
     switch (status) {
-      case "notDone":
+      case "pending":
         return "Chưa tiến hành";
       case "assigned":
         return "Đã giao việc";
@@ -1476,6 +1517,8 @@ class _LongTermState extends State<LongTerm> {
                                                   widget.customer,
                                                   widget.costFactors,
                                                   widget.services,
+                                                  widget.token,
+                                                  widget.refreshToken,
                                                 );
                                               },
                                               style: ElevatedButton.styleFrom(
@@ -1528,6 +1571,8 @@ class _LongTermState extends State<LongTerm> {
                                                           services:
                                                               widget.services,
                                                           selectedTab: 1,
+                                                          token: widget.token,
+                                                          refreshToken: widget.refreshToken,
                                                         ),
                                                       ),
                                                     );
@@ -1570,6 +1615,8 @@ class _LongTermState extends State<LongTerm> {
                                             requestDetail:
                                                 groupedDetails[request.id] ??
                                                     [],
+                                            token: widget.token,
+                                            refreshToken: widget.refreshToken,
                                           ),
                                         ),
                                       );

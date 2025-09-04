@@ -1,3 +1,5 @@
+import 'package:foodapp/data/model/requestdetail.dart';
+
 class Requests {
   CustomerInfo customerInfo;
   RequestService service;
@@ -15,6 +17,7 @@ class Requests {
   num profit;
   String? helperId;
   String? startDate;
+  List<RequestDetail> schedules;
 
 
   Requests(
@@ -33,7 +36,8 @@ class Requests {
       required this.comment,
       required this.profit,
       this.helperId,
-      this.startDate});
+      this.startDate,
+      required this.schedules});
 
   factory Requests.fromJson(Map<String, dynamic> map) {
     return Requests(
@@ -62,6 +66,11 @@ class Requests {
           : Comment(review: '', loseThings: false, breakThings: false),
       // Default comment
       profit: map['profit'] ?? 0,
+      schedules: map['schedules'] != null
+          ? (map['schedules'] as List)
+              .map((e) => RequestDetail.fromJson(e))
+              .toList()
+          : [],
     );
   }
 
@@ -204,8 +213,8 @@ class RequestService {
   factory RequestService.fromJson(Map<String, dynamic> map) {
     return RequestService(
       title: map['title'] ?? '',
-      coefficientService: map['coefficient_service'],
-      coefficientOther: map['coefficient_other'],
+      coefficientService: map['coefficient_service'] ?? 0.0,
+      coefficientOther: map['coefficient_other'] ?? 0.0,
       cost: map['cost'],
     );
   }
@@ -239,10 +248,10 @@ class CustomerInfo {
 
   factory CustomerInfo.fromJson(Map<String, dynamic> map) {
     return CustomerInfo(
-        fullName: map['fullName'],
-        phone: map['phone'],
-        address: map['address'],
-        usedPoint: map['usedPoint']);
+        fullName: map['fullName'] ?? '',
+        phone: map['phone'] ?? '',
+        address: map['address'] ?? '',
+        usedPoint: map['usedPoint'] ?? 0);
   }
 
   Map<String, dynamic> toJson() {

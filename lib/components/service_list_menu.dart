@@ -8,12 +8,14 @@ class ServiceListMenu extends StatefulWidget {
   final dynamic customer;
   final List<Services> services;
   final List<CostFactor> costFactors;
+  final String token;
+  final String refreshToken;
 
   const ServiceListMenu({
     Key? key,
     required this.customer,
     required this.services,
-    required this.costFactors,
+    required this.costFactors, required this.token, required this.refreshToken,
   }) : super(key: key);
 
   @override
@@ -88,7 +90,10 @@ class _ServiceListMenuState extends State<ServiceListMenu> {
                     builder: (context) => AllServicesPage(
                         customer: widget.customer,
                         services: widget.services,
-                        costFactors: widget.costFactors),
+                        costFactors: widget.costFactors,
+                        token: widget.token,
+                        refreshToken: widget.refreshToken,
+                    ),
                   ),
                 );
               },
@@ -167,6 +172,8 @@ class _ServiceListMenuState extends State<ServiceListMenu> {
           service: widget.services[index],
           costFactors: widget.costFactors,
           services: widget.services,
+          token: widget.token,
+          refreshToken: widget.refreshToken,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(

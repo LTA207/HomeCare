@@ -35,10 +35,12 @@ class _LoginPageState extends State<LoginPage>
   late Animation<Offset> _slideAnimation;
 
   List<Requests> requestsCustomer = [];
-  List<Customer> customers = [];
+  Customer? customer;
   List<Requests> requests = [];
   List<Services> services = [];
   List<CostFactor> costFactor = [];
+  String token = '';
+  String refreshToken = '';
 
   String? phoneError;
   String? passwordError;
@@ -92,14 +94,10 @@ class _LoginPageState extends State<LoginPage>
     setState(() => isLoadingData = true);
     try {
       var repository = DefaultRepository();
-      final customerData = await repository.loadCustomer();
-      final requestData = await repository.loadRequest();
       final servicesData = await repository.loadServices();
       final costFactorData = await repository.loadCostFactor();
 
       setState(() {
-        customers = customerData ?? [];
-        requests = requestData ?? [];
         services = servicesData ?? [];
         costFactor = costFactorData ?? [];
       });
@@ -145,22 +143,29 @@ class _LoginPageState extends State<LoginPage>
       bool isValid = false;
       int customerIndex = 0;
 
-      for (int i = 0; i < customers.length; i++) {
-        if (customers[i].phone == phone && customers[i].password == password) {
-          isValid = true;
-          customerIndex = i;
-          break;
-        }
+      var repository = DefaultRepository();
+      var authData = await repository.loginCustomer(phone, password);
+      if(authData != null) {
+        token = authData.accessToken ?? '';
+        refreshToken = authData.refreshToken ?? '';
+      } else {
+        setState(() => passwordError = "Số điện thoại hoặc mật khẩu không đúng");
+        return;
       }
+
+      final customerData = await repository.loadCustomerInfo(authData.user.phone, token);
+      final requestData = await repository.loadCustomerRequest(authData.user.phone, token);
+      print('request customer: ${requestData.toString()}');
+      setState(() {
+        customer = customerData;
+        requestsCustomer = requestData ?? [];
+        isValid = true;
+      });
 
       if (isValid) {
         setState(() {
           isLoginSuccess = true;
         });
-        requestsCustomer = requests
-            .where((request) =>
-                request.customerInfo.fullName == customers[customerIndex].name)
-            .toList();
 
         // Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
@@ -168,10 +173,12 @@ class _LoginPageState extends State<LoginPage>
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) => HomePage(
-                customer: customers[customerIndex],
+                customer: customer,
                 requests: requestsCustomer,
                 services: services,
                 costFactor: costFactor,
+                token: token,
+                refreshToken: refreshToken,
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {

@@ -33,33 +33,36 @@ class _SelectLocationState extends State<SelectLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('Tỉnh/Thành phố'),
-          _buildLocationDropdown(),
-          const SizedBox(height: 16),
-          _buildSectionTitle('Quận/Huyện'),
-          _buildDistrictDropdown(),
-          const SizedBox(height: 16),
-          _buildSectionTitle('Phường/Xã'),
-          _buildWardDropdown(),
-          const SizedBox(height: 16),
-          _buildDetailedAddress(),
-        ],
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle('Tỉnh/Thành phố'),
+            _buildLocationDropdown(),
+            const SizedBox(height: 16),
+            _buildSectionTitle('Quận/Huyện'),
+            _buildDistrictDropdown(),
+            const SizedBox(height: 16),
+            _buildSectionTitle('Phường/Xã'),
+            _buildWardDropdown(),
+            const SizedBox(height: 16),
+            _buildDetailedAddress(),
+          ],
+        ),
       ),
     );
   }

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "315881569316",
-    "project_id": "homecare-demo",
-    "storage_bucket": "homecare-demo.firebasestorage.app"
+    "project_number": "18882475992",
+    "project_id": "homecare-a46a5",
+    "storage_bucket": "homecare-a46a5.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:315881569316:android:64f4e88b6d5ff6c20b2cb1",
+        "mobilesdk_app_id": "1:18882475992:android:374ca9d0839bf8273da4ad",
         "android_client_info": {
           "package_name": "com.example.testflutter"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBKwKqjEOYlxu4WY412EJxBgN64TEgLu4E"
+          "current_key": "AIzaSyD8t9lDVhEDuF6S2mJIfqMDyvOEw5KHZ2k"
         }
       ],
       "services": {

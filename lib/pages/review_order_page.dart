@@ -20,6 +20,8 @@ class ReviewOrderPage extends StatefulWidget {
   final List<CostFactor> costFactors;
   final List<Services> services;
   final Services service;
+  final String token;
+  final String refreshToken;
 
   const ReviewOrderPage({
     super.key,
@@ -28,7 +30,7 @@ class ReviewOrderPage extends StatefulWidget {
     required this.request,
     required this.costFactors,
     required this.services,
-    required this.service,
+    required this.service, required this.token, required this.refreshToken,
   });
 
   @override
@@ -674,7 +676,7 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
             onPressed: () {
               widget.request.totalCost = finalCost;
               var repository = DefaultRepository();
-              repository.sendRequest(widget.request);
+              repository.sendRequest(widget.request, widget.token);
               // Điều hướng tới OrderSuccess
               Navigator.push(
                 context,
@@ -683,6 +685,8 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
                     customer: widget.customer,
                     costFactors: widget.costFactors,
                     services: widget.services,
+                    token: widget.token,
+                    refreshToken: widget.refreshToken,
                   ),
                 ),
               );

@@ -17,7 +17,7 @@ class RequestProvider extends ChangeNotifier {
     notifyListeners();
 
     var repository = DefaultRepository();
-    var data = await repository.loadRequest();
+    var data = await repository.loadRequest('');
 
     if (!disposed) { // Kiểm tra nếu provider còn tồn tại
       _requests = data ?? [];

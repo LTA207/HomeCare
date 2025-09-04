@@ -16,6 +16,8 @@ class PaymentPage extends StatefulWidget {
   final List<CostFactor> costFactors;
   final List<Services> services;
   final RequestDetail requestDetail;
+  final String token;
+  final String refreshToken;
 
   const PaymentPage({
     super.key,
@@ -23,7 +25,7 @@ class PaymentPage extends StatefulWidget {
     required this.customer,
     required this.costFactors,
     required this.services,
-    required this.requestDetail,
+    required this.requestDetail, required this.token, required this.refreshToken,
   });
 
   @override
@@ -420,6 +422,8 @@ class _PaymentPageState extends State<PaymentPage> {
               customer: widget.customer,
               costFactors: widget.costFactors,
               services: widget.services,
+              token: widget.token,
+              refreshToken: widget.refreshToken,
             ),
         ),
       );

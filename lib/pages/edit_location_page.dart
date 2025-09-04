@@ -6,6 +6,10 @@ import '../data/repository/repository.dart';
 
 class EditLocationPage extends StatefulWidget {
   final Customer customer;
+  final Location? initialProvince;
+  final String? initialDistrict;
+  final String? initialWard;
+  final String? initialDetailedAddress;
   final Function(Location)? onProvinceSelected;
   final Function(String)? onDistrictSelected;
   final Function(String)? onWardSelected;
@@ -15,6 +19,10 @@ class EditLocationPage extends StatefulWidget {
   EditLocationPage({
     super.key,
     required this.customer,
+    this.initialProvince,
+    this.initialDistrict,
+    this.initialWard,
+    this.initialDetailedAddress,
     this.onProvinceSelected,
     this.onDistrictSelected,
     this.onWardSelected,
@@ -37,6 +45,10 @@ class _EditLocationPageState extends State<EditLocationPage> {
   @override
   void initState() {
     super.initState();
+    selectedProvince = widget.initialProvince;
+    selectedDistrict = widget.initialDistrict;
+    selectedWard = widget.initialWard;
+    detailedAddress = widget.initialDetailedAddress;
     loadData();
   }
 
@@ -92,16 +104,27 @@ class _EditLocationPageState extends State<EditLocationPage> {
               });
               widget.onDetailedAddressChanged?.call(address);
             },
+            // Truyền giá trị ban đầu cho SelectLocation nếu cần
           ),
           const Divider(height: 16, color: Colors.grey),
           ElevatedButton(
             onPressed: () {
-              widget.onAddressUpdated();
+              if (selectedProvince != null &&
+                  selectedDistrict != null &&
+                  detailedAddress != null &&
+                  detailedAddress!.isNotEmpty) {
+                Navigator.pop(context, {
+                  'province': selectedProvince,
+                  'district': selectedDistrict,
+                  'ward': selectedWard,
+                  'detailedAddress': detailedAddress,
+                });
+              }
             },
             style:
             ElevatedButton.styleFrom(backgroundColor: Colors.green),
             child:
-            const Text("Oke", style: TextStyle(color: Colors.white)),
+            const Text("Lưu", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

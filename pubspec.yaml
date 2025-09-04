@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   provider: ^6.1.2
   google_nav_bar: ^5.0.6
   curved_navigation_bar: 1.0.6  
@@ -38,7 +40,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   collection: ^1.18.0
   http: ^1.2.2
-  intl: ^0.20.1
+  intl: ^0.19.0
   percent_indicator: ^4.2.3
   awesome_dialog: ^3.2.1
   table_calendar: ^3.1.2
@@ -54,13 +56,17 @@ dependencies:
   convex_bottom_bar: ^3.2.0
   salomon_bottom_bar: ^3.3.2
   lottie: ^3.3.1
-  cached_network_image: ^3.4.1
+  cached_network_image: ^3.3.1
   flutter_staggered_animations: ^1.1.1
   path_provider: ^2.1.5
   shimmer: ^3.0.0
   dropdown_search: ^6.0.2
   web_socket_channel: ^3.0.2
-
+  shared_preferences: ^2.2.3
+  # Firebase dependencies
+  firebase_core: ^2.30.0
+  firebase_messaging: ^14.7.10
+  overlay_support: ^2.1.0
 
 
 flutter_launcher_icons:

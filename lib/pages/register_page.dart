@@ -9,6 +9,7 @@ import 'package:foodapp/pages/login_page.dart';
 import 'package:lottie/lottie.dart';
 
 import '../components/city_selected.dart';
+import '../components/spashscreen.dart';
 import '../data/model/location.dart';
 import '../data/repository/repository.dart';
 
@@ -55,7 +56,7 @@ class _RegisterPageState extends State<RegisterPage>
   Future<void> loadData() async {
     var repository = DefaultRepository();
     var dataLocation = await repository.loadLocation();
-    var dataCustomer = await repository.loadCustomer();
+    var dataCustomer = await repository.loadCustomer('');
     if (mounted) {
       setState(() {
         locations = dataLocation ?? [];
@@ -129,15 +130,15 @@ class _RegisterPageState extends State<RegisterPage>
       hasError = true;
     }
 
-    if (customers.any((customer) => customer.phone == phone)) {
-      showPopUpWarning(context, 'Số điện thoại này đã được đăng ký. Vui lòng chọn số khác');
-      return;
-    }
-
-    if (customers.any((customer) => customer.email == email)) {
-      showPopUpWarning(context, 'Địa chỉ email này đã được đăng ký. Vui lòng chọn số khác');
-      return;
-    }
+    // if (customers.any((customer) => customer.phone == phone)) {
+    //   showPopUpWarning(context, 'Số điện thoại này đã được đăng ký. Vui lòng chọn số khác');
+    //   return;
+    // }
+    //
+    // if (customers.any((customer) => customer.email == email)) {
+    //   showPopUpWarning(context, 'Địa chỉ email này đã được đăng ký. Vui lòng chọn số khác');
+    //   return;
+    // }
 
     if (!hasError && mounted) {
       var customer = Customer(
@@ -154,15 +155,34 @@ class _RegisterPageState extends State<RegisterPage>
         password: password,
         email: email,
       );
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AuthenticationPage(
-            onTap: () {},
-            customer: customer,
+      var repository = DefaultRepository();
+      var res = await repository.remoteDataSource.registerCustomer(phone, password, fullName, email, customer.addresses.first);
+      if(res!.message.contains('Đăng ký thành công')) {
+        showPopUpWarning(context, 'Đăng ký thành công. Vui lòng đăng nhập để tiếp tục');
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                SplashScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 500),
           ),
-        ),
-      );
+        );
+      } else {
+        showPopUpWarning(context, res.message);
+        return;
+      }
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => AuthenticationPage(
+      //       onTap: () {},
+      //       customer: customer,
+      //     ),
+      //   ),
+      // );
     }
 
     setState(() => isLoading = false);

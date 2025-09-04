@@ -11,6 +11,8 @@ class OrderSuccess extends StatefulWidget {
   final List<Services> services;
   final dynamic mainMessage;
   final dynamic subMessage;
+  final String token;
+  final String refreshToken;
 
   const OrderSuccess({
     super.key,
@@ -18,7 +20,7 @@ class OrderSuccess extends StatefulWidget {
     required this.costFactors,
     required this.services,
     this.mainMessage,
-    this.subMessage,
+    this.subMessage, required this.token, required this.refreshToken,
   });
 
   @override
@@ -167,6 +169,8 @@ class _OrderSuccessState extends State<OrderSuccess>
                                 customer: widget.customer,
                                 costFactor: widget.costFactors,
                                 services: widget.services,
+                                        token: widget.token,
+                                        refreshToken: widget.refreshToken,
                               ),
                               transitionsBuilder: (context, animation,
                                   secondaryAnimation, child) {

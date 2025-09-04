@@ -15,13 +15,17 @@ class ConfirmLongTermDay extends StatefulWidget {
   final Customer customer;
   final List<CostFactor> costFactors;
   final List<Services> services;
+  final String token;
+  final String refreshToken;
 
   const ConfirmLongTermDay(
       {super.key,
       required this.requests,
       required this.customer,
       required this.costFactors,
-      required this.services});
+      required this.services,
+      required this.token,
+      required this.refreshToken});
 
   @override
   State<ConfirmLongTermDay> createState() => _ConfirmLongTermDayState();
@@ -40,7 +44,7 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
   void loadData() async {
     var repository = DefaultRepository();
     var data =
-        await repository.loadRequestDetailId(widget.requests.scheduleIds);
+        await repository.loadRequestDetailId(widget.requests.scheduleIds, widget.token);
     setState(() {
       requestDetailList = data ?? [];
     });
@@ -125,14 +129,17 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => PaymentPage(
-                                          amount:
-                                              requestDetailList![index].cost ??
-                                                  500000,
-                                          customer: widget.customer,
-                                          costFactors: widget.costFactors,
-                                          services: widget.services,
-                                          requestDetail:
-                                              requestDetailList![index]),
+                                        amount:
+                                            requestDetailList![index].cost ??
+                                                500000,
+                                        customer: widget.customer,
+                                        costFactors: widget.costFactors,
+                                        services: widget.services,
+                                        requestDetail:
+                                            requestDetailList![index],
+                                        token: widget.token,
+                                        refreshToken: widget.refreshToken,
+                                      ),
                                     ),
                                   );
                                 });
@@ -215,7 +222,7 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
 
 // Function to show the dialog
 void showConfirmLongTermDayDialog(BuildContext context, Requests requests,
-    Customer customer, List<CostFactor> costFactors, List<Services> services) {
+    Customer customer, List<CostFactor> costFactors, List<Services> services, String token, String refreshToken) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -224,6 +231,8 @@ void showConfirmLongTermDayDialog(BuildContext context, Requests requests,
         customer: customer,
         costFactors: costFactors,
         services: services,
+        token: token,
+        refreshToken: refreshToken,
       );
     },
   );

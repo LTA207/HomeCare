@@ -15,6 +15,8 @@ class CustomCalendar extends StatefulWidget {
   final List<CostFactor> costFactors;
   final List<Services> services;
   final Services service;
+  final String token;
+  final String refreshToken;
 
   const CustomCalendar({
     Key? key,
@@ -25,7 +27,7 @@ class CustomCalendar extends StatefulWidget {
     required this.request,
     required this.costFactors,
     required this.services,
-    required this.service,
+    required this.service, required this.token, required this.refreshToken,
   }) : super(key: key);
 
   @override
@@ -253,6 +255,8 @@ class _CustomCalendarState extends State<CustomCalendar> {
                       costFactors: widget.costFactors,
                       services: widget.services,
                       service: widget.service,
+                      token: widget.token,
+                      refreshToken: widget.refreshToken,
                     ),
                   ),
                 );

@@ -22,6 +22,8 @@ class HelperList extends StatefulWidget {
   final bool isOnDemand;
   final List<Services> services;
   final Services service;
+  final String token;
+  final String refreshToken;
 
   const HelperList({
     super.key,
@@ -31,7 +33,7 @@ class HelperList extends StatefulWidget {
     required this.isOnDemand,
     required this.costFactors,
     required this.services,
-    required this.service,
+    required this.service, required this.token, required this.refreshToken,
   });
 
   @override
@@ -112,6 +114,8 @@ class _HelperListState extends State<HelperList> {
                       costFactors: widget.costFactors,
                       services: widget.services,
                       service: widget.service,
+                      token: widget.token,
+                      refreshToken: widget.refreshToken,
                     ),
                   ),
                 ),
@@ -270,11 +274,13 @@ class _HelperListState extends State<HelperList> {
       MaterialPageRoute(
         builder: (context) => ReviewOrderPage(
           customer: widget.customer,
-          helper: helper,
+          helper: null,
           request: widget.request,
           costFactors: widget.costFactors,
           services: widget.services,
           service: widget.service,
+          token: widget.token,
+          refreshToken: widget.refreshToken,
         ),
       ),
     );

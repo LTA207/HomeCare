@@ -48,19 +48,25 @@ class RequestDetail {
 
   factory RequestDetail.fromJson(Map<String, dynamic> map) {
     return RequestDetail(
-        id: map['_id'],
-        helperCost: map['helper_cost'],
-        helperID: map['helper_id'],
-        status: map['status'],
-        workingDate: map['workingDate'],
-        // Parsing to DateTime
-        comment: Comment.fromJson(map['comment']),
+        id: map['_id'] ?? '',
+        helperCost: map['helper_cost'] ?? 0,
+        helperID: map['helper_id'] ?? '',
+        status: map['status'] ?? '',
+        workingDate: map['workingDate'] ?? '',
+        // Parsing to DateTime with null safety
+        comment: map['comment'] != null
+            ? Comment.fromJson(map['comment'])
+            : Comment(review: '', loseThings: false, breakThings: false),
         cost: map['cost'] ?? 0,
-        startTime: DateTime.parse(map['startTime']),
-        // Parsing to DateTime
-        endTime: DateTime.parse(map['endTime']),
-        // Parsing to DateTime
-        totalCost: map['totalCost']);
+        startTime: map['startTime'] != null
+            ? DateTime.parse(map['startTime'])
+            : DateTime.now(),
+        // Parsing to DateTime with null safety
+        endTime: map['endTime'] != null
+            ? DateTime.parse(map['endTime'])
+            : DateTime.now(),
+        // Parsing to DateTime with null safety
+        totalCost: map['totalCost'] ?? 0);
   }
 
   @override

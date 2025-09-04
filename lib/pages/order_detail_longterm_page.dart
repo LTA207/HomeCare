@@ -24,6 +24,8 @@ class OrderDetailLongTermPage extends StatefulWidget {
   final List<Services> services;
   final Customer customer;
   final List<CostFactor> costFactors;
+  final String token;
+  final String refreshToken;
 
   const OrderDetailLongTermPage({
     super.key,
@@ -31,7 +33,7 @@ class OrderDetailLongTermPage extends StatefulWidget {
     required this.helpers,
     required this.services,
     required this.customer,
-    required this.costFactors, required this.request,
+    required this.costFactors, required this.request, required this.token, required this.refreshToken,
   });
 
   @override
@@ -132,6 +134,8 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                       costFactors: widget.costFactors,
                       services: widget.services,
                       requestDetail: widget.requestDetail[0],
+                      token: widget.token,
+                      refreshToken: widget.refreshToken,
                     ),
                   ),
                 );
@@ -516,6 +520,8 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                           costFactors: widget.costFactors,
                           services: widget.services,
                           requestDetail: detail,
+                          token: widget.token,
+                          refreshToken: widget.refreshToken,
                         ),
                       ),
                     );

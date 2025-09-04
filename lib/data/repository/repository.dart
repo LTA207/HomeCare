@@ -1,3 +1,4 @@
+import 'package:foodapp/data/model/Authen.dart';
 import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/F.A.Q.dart';
 import 'package:foodapp/data/model/helper.dart';
@@ -20,23 +21,27 @@ abstract interface class Repository {
 
   Future<List<Services>?> loadServices();
 
-  Future<List<Customer>?> loadCustomer();
+  Future<List<Customer>?> loadCustomer(String token);
 
-  Future<void> updateCustomer(Customer customer);
+  Future<Customer?> loadCustomerInfo(String phone, String token);
 
-  Future<List<Requests>?> loadRequest();
+  Future<void> updateCustomer(Customer customer, String token);
+
+  Future<List<Requests>?> loadRequest(String token);
+
+  Future<List<Requests>?> loadCustomerRequest(String phone, String token);
 
   Future<List<Policy>?> loadPolicy();
 
   Future<List<FAQ>?> loadFAQ();
 
-  Future<List<RequestDetail>?> loadRequestDetail();
+  Future<List<RequestDetail>?> loadRequestDetail(String token);
 
-  Future<List<RequestDetail>?> loadRequestDetailId(List<String> id);
+  Future<List<RequestDetail>?> loadRequestDetailId(List<String> id, String token);
 
   Future<List<TimeOff>?> loadTimeOff();
 
-  Future<void> sendRequest(Requests requests);
+  Future<void> sendRequest(Requests requests, String token);
 
   Future<void> canceledRequest(String id);
 
@@ -61,6 +66,10 @@ abstract interface class Repository {
       String startDate);
 
   Future<void> sendCustomerRegisterRequest(Customer customer);
+
+  Future<void> loginCustomer(String phone, String password);
+
+  Future<void> registerCustomer(String phone, String password, String fullName, String email, Addresses addresses);
 }
 
 class DefaultRepository implements Repository {
@@ -77,13 +86,18 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<List<Customer>?> loadCustomer() async {
-    return await remoteDataSource.loadCustomerData();
+  Future<List<Customer>?> loadCustomer(String token) async {
+    return await remoteDataSource.loadCustomerData(token);
   }
 
   @override
-  Future<void> updateCustomer(Customer customer) async {
-    await remoteDataSource.updateCustomerInfo(customer);
+  Future<Customer?> loadCustomerInfo(String phone, String token) async {
+    return await remoteDataSource.loadCustomerInfo(phone, token);
+  }
+
+  @override
+  Future<void> updateCustomer(Customer customer, String token) async {
+    await remoteDataSource.updateCustomerInfo(customer, token);
   }
 
   @override
@@ -92,18 +106,23 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<List<Requests>?> loadRequest() async {
-    return await remoteDataSource.loadRequestData();
+  Future<List<Requests>?> loadRequest(String token) async {
+    return await remoteDataSource.loadRequestData(token);
   }
 
   @override
-  Future<List<RequestDetail>?> loadRequestDetail() async {
-    return await remoteDataSource.loadRequestDetailData();
+  Future<List<Requests>?> loadCustomerRequest(String phone, String token) async {
+    return await remoteDataSource.loadCustomerRequest(phone, token);
   }
 
   @override
-  Future<void> sendRequest(Requests request) async {
-    await remoteDataSource.sendRequests(request);
+  Future<List<RequestDetail>?> loadRequestDetail(String token) async {
+    return await remoteDataSource.loadRequestDetailData(token);
+  }
+
+  @override
+  Future<void> sendRequest(Requests request, String token) async {
+    await remoteDataSource.sendRequests(request, token);
   }
 
   @override
@@ -172,12 +191,22 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<List<RequestDetail>?> loadRequestDetailId(List<String> id) async {
-    return await remoteDataSource.loadRequestDetailId(id);
+  Future<List<RequestDetail>?> loadRequestDetailId(List<String> id, String token) async {
+    return await remoteDataSource.loadRequestDetailId(id, token);
   }
 
   @override
   Future<void> sendCustomerRegisterRequest(Customer customer) async {
     return await remoteDataSource.sendCustomerRegisterRequest(customer);
+  }
+
+  @override
+  Future<Authen?> loginCustomer(String phone, String password) {
+    return remoteDataSource.loginCustomer(phone, password);
+  }
+
+  @override
+  Future<Authen?> registerCustomer(String phone, String password, String fullName, String email, Addresses addresses) {
+    return remoteDataSource.registerCustomer(phone, password, fullName, email, addresses);
   }
 }

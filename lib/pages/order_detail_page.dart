@@ -22,6 +22,8 @@ class OrderDetailPage extends StatefulWidget {
   final List<Services> services;
   final Customer customer;
   final List<CostFactor> costFactors;
+  final String token;
+  final String refreshToken;
 
   const OrderDetailPage({
     super.key,
@@ -29,7 +31,7 @@ class OrderDetailPage extends StatefulWidget {
     required this.helpers,
     required this.services,
     required this.customer,
-    required this.costFactors,
+    required this.costFactors, required this.token, required this.refreshToken,
   });
 
   @override
@@ -56,7 +58,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
     var repository = DefaultRepository();
     if (request.scheduleIds.isNotEmpty) {
-      var data = await repository.loadRequestDetailId(request.scheduleIds);
+      var data = await repository.loadRequestDetailId(request.scheduleIds, widget.token);
       setState(() {
         requestDetailData = data ?? [];
         isLoading = false;
@@ -93,6 +95,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('ngày bắt đầu: ${widget.request.startTime}');
+    print(_formatDate(widget.request.startTime));
+    print('trạng thái: ${widget.request.status}');
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
@@ -1153,6 +1158,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       service: reorderService,
                       costFactors: widget.costFactors,
                       services: widget.services,
+                      token: widget.token,
+                      refreshToken: widget.refreshToken,
                     ),
                   ),
                 );

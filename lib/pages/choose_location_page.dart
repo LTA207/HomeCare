@@ -3,19 +3,22 @@ import 'package:foodapp/pages/edit_location_page.dart';
 import 'package:foodapp/pages/home_page.dart';
 import '../data/model/customer.dart';
 import '../data/model/location.dart';
+import '../data/source/source.dart';
 
 class ChooseLocationPage extends StatefulWidget {
   final Customer customer;
   final Location? selectedProvince;
   final String? selectedDistrict;
   final String? detailedAddress;
+  final String token;
+  final String refreshToken;
 
   const ChooseLocationPage(
       {super.key,
       required this.customer,
       this.selectedProvince,
       this.selectedDistrict,
-      this.detailedAddress});
+      this.detailedAddress, required this.token, required this.refreshToken});
 
   @override
   _ChooseLocationPageState createState() => _ChooseLocationPageState();
@@ -45,8 +48,42 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
     });
   }
 
+  void addAddressFromResult(Map result) async {
+    setState(() {
+      widget.customer.addresses.add(Addresses(
+        province: result['province'].name,
+        district: result['district'],
+        ward: result['ward'] ?? '',
+        detailedAddress: result['detailedAddress'],
+      ));
+    });
+    await RemoteDataSource().updateCustomerInfo(widget.customer, widget.token);
+  }
+
+  void modifyAddressFromResult(int index, Map result) async {
+    print(result);
+    setState(() {
+      widget.customer.addresses[index] = Addresses(
+        province: result['province'].name,
+        district: result['district'],
+        ward: result['ward'] ?? '',
+        detailedAddress: result['detailedAddress'],
+      );
+    });
+    await RemoteDataSource().updateCustomerInfo(widget.customer, widget.token);
+  }
+
+  void setDefaultAddress(int index) async {
+    setState(() {
+      final address = widget.customer.addresses.removeAt(index);
+      widget.customer.addresses.insert(0, address);
+    });
+    await RemoteDataSource().updateCustomerInfo(widget.customer, widget.token);
+  }
+
   void _onAddressSelected(BuildContext context, int addressIndex) {
-    Navigator.pop(context, addressIndex);
+    setDefaultAddress(addressIndex);
+    Navigator.pop(context, 0); // Địa chỉ mặc định luôn ở đầu danh sách
   }
 
   @override
@@ -109,12 +146,13 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => EditLocationPage(
                   customer: widget.customer,
+                  // Không truyền giá trị ban đầu khi thêm mới
                   onProvinceSelected: (Location province) {
                     setState(() => selectedProvince = province);
                   },
@@ -124,10 +162,13 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
                   onDetailedAddressChanged: (String detailedAddress) {
                     setState(() => detailedAddressChanged = detailedAddress);
                   },
-                  onAddressUpdated: addAddress,
+                  onAddressUpdated: () {}, // Không dùng nữa
                 ),
               ),
             );
+            if (result != null) {
+              addAddressFromResult(result);
+            }
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -248,12 +289,17 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    final address = widget.customer.addresses[index];
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => EditLocationPage(
                           customer: widget.customer,
+                          initialProvince: null, // Nếu có thể lấy Location từ tên, hãy truyền vào
+                          initialDistrict: address.district,
+                          initialWard: address.ward,
+                          initialDetailedAddress: address.detailedAddress,
                           onProvinceSelected: (Location province) {
                             setState(() => selectedProvince = province);
                           },
@@ -264,10 +310,13 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
                             setState(
                                 () => detailedAddressChanged = detailedAddress);
                           },
-                          onAddressUpdated: () => modifyAddress(index),
+                          onAddressUpdated: () {}, // Không dùng nữa
                         ),
                       ),
                     );
+                    if (result != null) {
+                      modifyAddressFromResult(index, result);
+                    }
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.red,

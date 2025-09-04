@@ -63,11 +63,9 @@ class _AuthenticationPageState extends State<AuthenticationPage>
   }
 
   void login() async{
-    print("Mã xác nhận: $verificationCode"); // Debug: In mã xác nhận
+
     if (verificationCode.length == 6 &&
         verificationCode.compareTo('111111') == 0) {
-      var repository = DefaultRepository();
-      await repository.remoteDataSource.sendCustomerRegisterRequest(widget.customer);
       // Thực hiện xác thực ở đây (gửi mã lên server để kiểm tra)
       Navigator.push(
         context,

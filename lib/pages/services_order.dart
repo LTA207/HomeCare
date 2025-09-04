@@ -21,6 +21,8 @@ class ServicesOrder extends StatefulWidget {
   final List<CostFactor> costFactors;
   final List<Services> services;
   final int selectedTab; // Thêm tham số
+  final String token;
+  final String refreshToken;
 
   const ServicesOrder({
     super.key,
@@ -28,7 +30,7 @@ class ServicesOrder extends StatefulWidget {
     required this.service,
     required this.costFactors,
     required this.services,
-    this.selectedTab = 0, // Mặc định là tab 0 (Theo ngày)
+    this.selectedTab = 0, required this.token, required this.refreshToken, // Mặc định là tab 0 (Theo ngày)
   });
 
   @override
@@ -84,7 +86,7 @@ class _ServicesOrderState extends State<ServicesOrder>
   Future<void> loadData() async {
     var repository = DefaultRepository();
     var dataLocation = await repository.loadLocation();
-    var dataCustomer = await repository.loadCustomer();
+    var dataCustomer = await repository.loadCustomer('');
     var dataCoefficient = await repository.loadCoefficientService();
     if (mounted) {
       setState(() {
@@ -109,10 +111,15 @@ class _ServicesOrderState extends State<ServicesOrder>
 
   @override
   Widget build(BuildContext context) {
-    if(coefficientService!.isNotEmpty) {
-      basicCoefficient = coefficientService!.first.coefficientList
-          .firstWhere((coefficientId) => coefficientId.id == widget.service.coefficientId)
-          .value;
+    if (coefficientService!.isNotEmpty) {
+      final coefficientList = coefficientService!.first.coefficientList;
+      final coefficient = coefficientList.firstWhere(
+        (coefficientId) => coefficientId.id == widget.service.coefficientId,
+        orElse: () => coefficientList.isNotEmpty
+            ? coefficientList.first
+            : Coefficient(id: '', value: 1.0, title: '', description: '', deleted: false, status: ''),
+      );
+      basicCoefficient = coefficient.value;
     }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
@@ -260,7 +267,6 @@ class _ServicesOrderState extends State<ServicesOrder>
         child: selectedIndex == 0
             ? OnDemand(
                 locations: locations,
-                customers: customers,
                 customer: widget.customer,
                 onVisibilityChanged: (isVisible) {
                   if (!isVisible) {
@@ -319,7 +325,6 @@ class _ServicesOrderState extends State<ServicesOrder>
               )
             : LongTerm(
                 locations: locations,
-                customers: customers,
                 customer: widget.customer,
                 onVisibilityChanged: (isVisible) {
                   if (isVisible) {
@@ -494,7 +499,8 @@ class _ServicesOrderState extends State<ServicesOrder>
               deleted: false,
               comment:
                   Comment(review: '', loseThings: false, breakThings: false),
-              profit: 0, // Calculate or set profit if applicable
+              profit: 0,
+              schedules: [],
             );
             print('Request Information:');
             print('Customer Name: ${request.customerInfo.fullName}');
@@ -531,6 +537,8 @@ class _ServicesOrderState extends State<ServicesOrder>
                     costFactors: widget.costFactors,
                     services: widget.services,
                     service: widget.service,
+                    token: widget.token,
+                    refreshToken: widget.refreshToken,
                   ),
                 ),
               );
@@ -564,6 +572,8 @@ class _ServicesOrderState extends State<ServicesOrder>
                     service: widget.service,
                     // minDate: DateTime(2025, 2, 25),
                     // maxDate: DateTime(2025, 2, 26),
+                    token: widget.token,
+                    refreshToken: widget.refreshToken,
                   ),
                 ),
               );
@@ -607,7 +617,6 @@ class _ServicesOrderState extends State<ServicesOrder>
 
 class OnDemand extends StatefulWidget {
   final List<Location> locations;
-  final List<Customer> customers;
   final Customer customer;
   final Function(TimeOfDay?, TimeOfDay?)? onTimeChanged;
   final Function(Location)? onProvinceSelected;
@@ -620,7 +629,6 @@ class OnDemand extends StatefulWidget {
   const OnDemand({
     super.key,
     required this.locations,
-    required this.customers,
     required this.customer,
     this.onTimeChanged,
     this.onProvinceSelected,
@@ -823,7 +831,6 @@ class _OnDemandState extends State<OnDemand> {
 
 class LongTerm extends StatefulWidget {
   final List<Location> locations;
-  final List<Customer> customers;
   final Customer customer;
   final Function(TimeOfDay?, TimeOfDay?)? onTimeChanged;
   final Function(Location)? onProvinceSelected;
@@ -836,7 +843,6 @@ class LongTerm extends StatefulWidget {
   const LongTerm(
       {super.key,
       required this.locations,
-      required this.customers,
       this.onTimeChanged,
       this.onProvinceSelected,
       this.onDistrictSelected,
