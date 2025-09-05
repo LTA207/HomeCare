@@ -24,8 +24,7 @@ class PaymentPage extends StatefulWidget {
     required this.amount,
     required this.customer,
     required this.costFactors,
-    required this.services,
-    required this.requestDetail, required this.token, required this.refreshToken,
+    required this.services, required this.requestDetail, required this.token, required this.refreshToken,
   });
 
   @override
@@ -422,11 +421,14 @@ class _PaymentPageState extends State<PaymentPage> {
               customer: widget.customer,
               costFactors: widget.costFactors,
               services: widget.services,
-              token: widget.token,
-              refreshToken: widget.refreshToken,
+              token: "", // Add token if needed
+              refreshToken: "", // Add refresh token if needed
             ),
         ),
       );
     }
   }
+
+
+
 }

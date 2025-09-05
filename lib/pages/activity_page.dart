@@ -1,15 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:foodapp/components/Confirm_day.dart';
 import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/request.dart';
-import 'package:foodapp/pages/helper_list_page.dart';
 import 'package:foodapp/pages/order_detail_longterm_page.dart';
 import 'package:foodapp/pages/order_detail_page.dart';
-import 'package:foodapp/pages/order_success_page.dart';
 import 'package:foodapp/pages/payment_page.dart';
 import 'package:foodapp/pages/services_order.dart';
 import 'package:foodapp/services/firebase_messaging_service.dart';
@@ -89,6 +86,8 @@ class _ActivityPageState extends State<ActivityPage>
     // Chỉ cập nhật data, không setState ở đây
     requestCustomer = data ?? [];
     print('đã tải lại request data');
+    print(
+        'Yêu cầu của khách hàng: ${requestCustomer?.where((req) => req.id == '68ba7a9059afc945c946f477').toList()}');
   }
 
   Future<void> loadRequestDetailData() async {
@@ -287,7 +286,9 @@ class OnDemand extends StatefulWidget {
     required this.services,
     required this.helperList,
     required this.refreshData,
-    required this.requestDetail, required this.token, required this.refreshToken,
+    required this.requestDetail,
+    required this.token,
+    required this.refreshToken,
   });
 
   @override
@@ -296,8 +297,8 @@ class OnDemand extends StatefulWidget {
 
 class _OnDemandState extends State<OnDemand> {
   late Map<String, List<Requests>> groupedRequests;
-  Map<String, List<RequestDetail>> groupedDetails = {};
-  late IOWebSocketChannel channel;
+
+  // Map<String, List<RequestDetail>> groupedDetails = {};
 
   @override
   void initState() {
@@ -312,19 +313,19 @@ class _OnDemandState extends State<OnDemand> {
     shortTermRequests.sort((a, b) =>
         DateTime.parse(b.oderDate).compareTo(DateTime.parse(a.oderDate)));
 
-    List<RequestDetail> shortTermDetails = widget.requestDetail
-        .where((reqDetail) => shortTermRequests
-            .map((request) => request.scheduleIds.first)
-            .contains(reqDetail.id))
-        .toList();
+    // List<RequestDetail> shortTermDetails = widget.requestDetail
+    //     .where((reqDetail) => shortTermRequests
+    //         .map((request) => request.scheduleIds.first)
+    //         .contains(reqDetail.id))
+    //     .toList();
 
     for (var request in shortTermRequests) {
       String date =
           DateFormat('dd-MM-yyyy').format(DateTime.parse(request.oderDate));
 
-      groupedDetails[request.id] = shortTermDetails
-          .where((reqDetail) => reqDetail.id == request.scheduleIds.first)
-          .toList();
+      // groupedDetails[request.id] = shortTermDetails
+      //     .where((reqDetail) => reqDetail.id == request.scheduleIds.first)
+      //     .toList();
 
       if (groupedRequests.containsKey(date)) {
         groupedRequests[date]!.add(request);
@@ -332,17 +333,6 @@ class _OnDemandState extends State<OnDemand> {
         groupedRequests[date] = [request];
       }
     }
-
-    // channel = IOWebSocketChannel.connect('wss://api.homekare.site/request');
-    //
-    // channel.stream.listen((message){
-    //   final data = jsonDecode(message);
-    //
-    //   // Đổi trạng thái và thông báo ở đây
-    //   setState(() {
-    //
-    //   });
-    // });
   }
 
   String formatCurrency(double amount) {
@@ -353,16 +343,16 @@ class _OnDemandState extends State<OnDemand> {
 
   Color _getStatusBackgroundColor(String status) {
     switch (status) {
-      case 'notDone':
+      case 'pending':
         // return Color(0xFFE5FEDF); // Xanh nhạt
         return Colors.red;
       case 'assigned':
         return Color(0xFFFFF3CD); // Vàng nhạt
-      case 'processing':
+      case 'inProgress':
         return Color(0xFFD1ECF1); // Xanh dương nhạt
       case 'waitPayment':
         return Color(0xFFFFD600); // Nâu nhạt
-      case 'done':
+      case 'completed':
         return Color(0xFFD4EDDA); // Xanh lá cây nhạt
       case 'cancelled':
         return Color(0xFFF8D7DA); // Đỏ nhạt
@@ -379,9 +369,9 @@ class _OnDemandState extends State<OnDemand> {
         return "Đã giao việc";
       case "waitPayment":
         return "Chờ thanh toán";
-      case "done":
+      case "completed":
         return "Đã hoàn thành";
-      case "processing":
+      case "inProgress":
         return "Đang tiến hành";
       case "cancelled":
         return "Đã huỷ";
@@ -392,14 +382,14 @@ class _OnDemandState extends State<OnDemand> {
 
   Color _getStatusTextColor(String status) {
     switch (status) {
-      case 'notDone':
+      case 'pending':
         // return Color(0xFF2FA559); // Xanh lá cây
         return Colors.white;
       case 'assigned':
         return Color(0xFF856404); // Vàng đậm
-      case 'processing':
+      case 'inProgress':
         return Color(0xFF0C5460); // Xanh dương đậm
-      case 'done':
+      case 'completed':
         return Color(0xFF155724); // Xanh lá cây đậm
       case 'cancelled':
         return Color(0xFF721C24); // Đỏ đậm
@@ -594,7 +584,7 @@ class _OnDemandState extends State<OnDemand> {
                       customer: widget.customer,
                       costFactors: widget.costFactors,
                       services: widget.services,
-                      requestDetail: groupedDetails[request.id]!.first,
+                      requestDetail: request.schedules.first,
                       token: widget.token,
                       refreshToken: widget.refreshToken,
                     ),
@@ -627,8 +617,7 @@ class _OnDemandState extends State<OnDemand> {
 
   @override
   Widget build(BuildContext context) {
-    print('danh sách ngắn hạn: ${widget.requestDetail}');
-    print('danh sách: ${groupedDetails}');
+    print('danh sách: ${groupedRequests}');
     return Container(
       color: const Color(0xFFF5F5F5),
       child: groupedRequests.isEmpty
@@ -715,7 +704,8 @@ class _OnDemandState extends State<OnDemand> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8, vertical: 4),
                                     child: Text(
-                                      getStatusInVietnamese(request.schedules.first.status),
+                                      getStatusInVietnamese(
+                                          request.schedules.first.status),
                                       style: TextStyle(
                                         fontFamily: 'Quicksand',
                                         color:
@@ -754,23 +744,33 @@ class _OnDemandState extends State<OnDemand> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              request.service.title,
-                                              style: const TextStyle(
-                                                fontFamily: 'Quicksand',
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
+                                            Expanded(
+                                              flex: 2,
+                                              child: Text(
+                                                request.service.title,
+                                                style: const TextStyle(
+                                                  fontFamily: 'Quicksand',
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
                                               ),
                                             ),
-                                            Text(
-                                              // '${request.totalCost}₫',
-                                              formatCurrency(
-                                                  request.totalCost.toDouble()),
-                                              style: const TextStyle(
-                                                fontFamily: 'Quicksand',
-                                                fontSize: 16,
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold,
+                                            SizedBox(width: 8),
+                                            Flexible(
+                                              child: Text(
+                                                // '${request.totalCost}₫',
+                                                formatCurrency(request.totalCost
+                                                    .toDouble()),
+                                                style: const TextStyle(
+                                                  fontFamily: 'Quicksand',
+                                                  fontSize: 16,
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
                                               ),
                                             ),
                                           ],
@@ -817,12 +817,9 @@ class _OnDemandState extends State<OnDemand> {
                                   //     ),
                                   //   ),
                                   // ),
-                                  (groupedDetails[request.id]?.isNotEmpty ??
-                                              false) &&
-                                          groupedDetails[request.id]
-                                                  ?.first
-                                                  .status ==
-                                              "notDone"
+                                  // (groupedDetails[request.id]?.isNotEmpty ??
+                                  //             false) &&
+                                  request.schedules.first.status == "pending"
                                       ? ElevatedButton(
                                           onPressed: () {
                                             showCancelConfirmationDialog(
@@ -845,13 +842,7 @@ class _OnDemandState extends State<OnDemand> {
                                             ),
                                           ),
                                         )
-                                      : (groupedDetails[request.id]
-                                                      ?.isNotEmpty ??
-                                                  false) &&
-                                              groupedDetails[request.id]
-                                                      ?.first
-                                                      .status ==
-                                                  'waitPayment'
+                                      : request.status == 'waitPayment'
                                           ? ElevatedButton(
                                               onPressed: () {
                                                 _showConfirmationDialog(
@@ -874,21 +865,12 @@ class _OnDemandState extends State<OnDemand> {
                                                 ),
                                               ),
                                             )
-                                          : (groupedDetails[request.id]
-                                                          ?.isNotEmpty ??
-                                                      false) &&
-                                                  groupedDetails[request.id]
-                                                          ?.first
-                                                          .status ==
-                                                      'processing'
+                                          : request.schedules.first.status ==
+                                                  'inProgress'
                                               ? Container()
-                                              : (groupedDetails[request.id]
-                                                              ?.isNotEmpty ??
-                                                          false) &&
-                                                      groupedDetails[request.id]
-                                                              ?.first
-                                                              .status ==
-                                                          'assigned'
+                                              : request.schedules.first
+                                                          .status ==
+                                                      'assigned'
                                                   ? Container()
                                                   : ElevatedButton(
                                                       onPressed: () {
@@ -923,8 +905,10 @@ class _OnDemandState extends State<OnDemand> {
                                                                   .costFactors,
                                                               services: widget
                                                                   .services,
-                                                                  token: widget.token,
-                                                                  refreshToken: widget.refreshToken,
+                                                              token:
+                                                                  widget.token,
+                                                              refreshToken: widget
+                                                                  .refreshToken,
                                                             ),
                                                           ),
                                                         );
@@ -1020,7 +1004,9 @@ class LongTerm extends StatefulWidget {
       required this.services,
       required this.helperList,
       required this.refreshData,
-      required this.requestDetail, required this.token, required this.refreshToken});
+      required this.requestDetail,
+      required this.token,
+      required this.refreshToken});
 
   @override
   State<LongTerm> createState() => _LongTermState();
@@ -1056,7 +1042,7 @@ class _LongTermState extends State<LongTerm> {
     //   }
     // }
 
-    for (var request in longTermRequests){
+    for (var request in longTermRequests) {
       if (!detailsByScheduleId.containsKey(request.id)) {
         detailsByScheduleId[request.id] = [];
       }
@@ -1087,51 +1073,15 @@ class _LongTermState extends State<LongTerm> {
     return "${formatter.format(roundedAmount)} đ";
   }
 
-  Color _getStatusBackgroundColor(String status) {
-    switch (status) {
-      case 'notDone':
-        // return Color(0xFFE5FEDF); // Xanh nhạt
-        return Colors.red;
-      case 'assigned':
-        return Color(0xFFFFF3CD); // Vàng nhạt
-      case 'processing':
-        return Color(0xFFD1ECF1); // Xanh dương nhạt
-      case 'done':
-        return Color(0xFFD4EDDA); // Xanh lá cây nhạt
-      case 'cancelled':
-        return Color(0xFFF8D7DA); // Đỏ nhạt
-      default:
-        return Colors.red;
-    }
-  }
-
-  Color _getStatusTextColor(String status) {
-    switch (status) {
-      case 'notDone':
-        // return Color(0xFF2FA559); // Xanh lá cây
-        return Colors.white;
-      case 'assigned':
-        return Color(0xFF856404); // Vàng đậm
-      case 'processing':
-        return Color(0xFF0C5460); // Xanh dương đậm
-      case 'done':
-        return Color(0xFF155724); // Xanh lá cây đậm
-      case 'cancelled':
-        return Color(0xFF721C24); // Đỏ đậm
-      default:
-        return Colors.white; // Mặc định màu đen
-    }
-  }
-
   String getStatusInVietnamese(String status) {
     switch (status) {
       case "pending":
         return "Chưa tiến hành";
       case "assigned":
         return "Đã giao việc";
-      case "done":
+      case "completed":
         return "Đã hoàn thành";
-      case "processing":
+      case "inProgress":
         return "Đang tiến hành";
       case "cancelled":
         return "Đã huỷ";
@@ -1420,23 +1370,33 @@ class _LongTermState extends State<LongTerm> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              request.service.title,
-                                              style: const TextStyle(
-                                                fontFamily: 'Quicksand',
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
+                                            Expanded(
+                                              flex: 2,
+                                              child: Text(
+                                                request.service.title,
+                                                style: const TextStyle(
+                                                  fontFamily: 'Quicksand',
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
                                               ),
                                             ),
-                                            Text(
-                                              // '${request.totalCost}₫',
-                                              formatCurrency(
-                                                  request.totalCost.toDouble()),
-                                              style: const TextStyle(
-                                                fontFamily: 'Quicksand',
-                                                fontSize: 16,
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold,
+                                            SizedBox(width: 8),
+                                            Flexible(
+                                              child: Text(
+                                                // '${request.totalCost}₫',
+                                                formatCurrency(request.totalCost
+                                                    .toDouble()),
+                                                style: const TextStyle(
+                                                  fontFamily: 'Quicksand',
+                                                  fontSize: 16,
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
                                               ),
                                             ),
                                           ],
@@ -1484,7 +1444,7 @@ class _LongTermState extends State<LongTerm> {
                                   //   ),
                                   // ),
 
-                                  (request.status == "notDone")
+                                  (request.status == "pending")
                                       ? ElevatedButton(
                                           onPressed: () {
                                             showCancelConfirmationDialog(
@@ -1507,7 +1467,7 @@ class _LongTermState extends State<LongTerm> {
                                             ),
                                           ),
                                         )
-                                      : request.status == 'processing'
+                                      : request.status == 'inProgress'
                                           ? ElevatedButton(
                                               onPressed: () {
                                                 print(request.scheduleIds);
@@ -1572,7 +1532,8 @@ class _LongTermState extends State<LongTerm> {
                                                               widget.services,
                                                           selectedTab: 1,
                                                           token: widget.token,
-                                                          refreshToken: widget.refreshToken,
+                                                          refreshToken: widget
+                                                              .refreshToken,
                                                         ),
                                                       ),
                                                     );

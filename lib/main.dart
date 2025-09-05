@@ -132,3 +132,41 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+// void main() async{
+//   String phone = '0987654321';
+//   String fullName = 'Nguyen Van A';
+//   String password = '123456';
+//   String email = 'trongc71@gmail.com';
+//   // Addresses address = Addresses(
+//   //   province: 'Hà Nội',
+//   //   district: 'Hà Đông',
+//   //   ward: 'Phú Lãm',
+//   //   detailedAddress: 'Số 123, Đường ABC',
+//   // );
+//
+//   var repository = DefaultRepository();
+//   var data = await repository.loginCustomer(phone, password);
+//   print('Login data: ${data.toString()}');
+//   var requestData = await repository.loadCustomerRequest(phone, data!.accessToken);
+//   print('Request data: ${requestData?.first.schedules.toString()}');
+//   // var registerData = await repository.registerCustomer(
+//   //   '4795335132',
+//   //   password,
+//   //   fullName,
+//   //   email,
+//   //   Addresses(
+//   //     province: 'Hà Nội',
+//   //     district: 'Hà Đông',
+//   //     ward: 'Phú Lãm',
+//   //     detailedAddress: 'Số 123, Đường ABC',
+//   //   ),
+//   // );
+//   // print('Register data: ${registerData.toString()}');
+//   // var customerData = await repository.loadCustomerInfo(data!.user.phone, data.accessToken);
+//   // print('Customer data: ${customerData.toString()}');
+//   // var requestData = await repository.loadCustomerRequest(data.user.phone, data.accessToken);
+//   // print('Request data: ${requestData.toString()}');
+//   // var requestDetailData = await repository.loadCustomerRequest(phone, data!.accessToken);
+//   // print('Request detail data: ${requestDetailData?.first.schedules}');
+// }
