@@ -498,113 +498,138 @@ class _HomeContentState extends State<HomeContent> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Balance Section
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.account_balance_wallet_rounded,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Số dư ví',
-                        style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          color: Colors.white70,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        _isHidden ? '*********' : '500.000.000',
-                        style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          color: Colors.white,
-                          fontSize: _isHidden ? 32 : 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(
-                          _isHidden
-                              ? Icons.visibility_off_rounded
-                              : Icons.visibility_rounded,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isHidden = !_isHidden;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              // Points Section
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 1,
-                  ),
-                ),
+              Expanded(
+                flex: 2,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.stars_rounded,
-                          color: Colors.amber,
-                          size: 20,
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.account_balance_wallet_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          'hcPoints',
-                          style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            color: Colors.white70,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: const Text(
+                            'Số dư ví',
+                            style: TextStyle(
+                              fontFamily: 'Quicksand',
+                              color: Colors.white70,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${widget.customer.points.isNotEmpty ? widget.customer.points.first.point : 0}',
-                      style: const TextStyle(
-                        fontFamily: 'Quicksand',
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            _isHidden ? '*********' : '500.000.000',
+                            style: TextStyle(
+                              fontFamily: 'Quicksand',
+                              color: Colors.white,
+                              fontSize: _isHidden ? 24 : 18,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        IconButton(
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                          padding: EdgeInsets.zero,
+                          icon: Icon(
+                            _isHidden
+                                ? Icons.visibility_off_rounded
+                                : Icons.visibility_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isHidden = !_isHidden;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ],
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              // Points Section
+              Flexible(
+                flex: 1,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.stars_rounded,
+                            color: Colors.amber,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: const Text(
+                              'hcPoints',
+                              style: TextStyle(
+                                fontFamily: 'Quicksand',
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${widget.customer.points.isNotEmpty ? widget.customer.points.first.point : 0}',
+                        style: const TextStyle(
+                          fontFamily: 'Quicksand',
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -709,93 +734,88 @@ class _HomeContentState extends State<HomeContent> {
           ),
           const SizedBox(height: 12),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: actions.asMap().entries.map((entry) {
               int index = entry.key;
               var action = entry.value;
               bool isNew = (action['isNew'] as bool?) ?? false;
 
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ServicesOrder(
-                                customer: widget.customer,
-                                service: widget.services[index],
-                                costFactors: widget.costFactors,
-                                services: widget.services,
-                                token: widget.token,
-                                refreshToken: widget.refreshToken,
+              return Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ServicesOrder(
+                                  customer: widget.customer,
+                                  service: widget.services[index],
+                                  costFactors: widget.costFactors,
+                                  services: widget.services,
+                                  token: widget.token,
+                                  refreshToken: widget.refreshToken,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        icon: Icon(
-                          action['icon'] as IconData,
-                          color: Colors.green.shade700,
-                          size: 24,
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.green.shade50),
-                          padding: MaterialStateProperty.all(
-                              const EdgeInsets.all(12)),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            );
+                          },
+                          icon: Icon(
+                            action['icon'] as IconData,
+                            color: Colors.green.shade700,
+                            size: 22,
                           ),
-                        ),
-                      ),
-                      if (isNew)
-                        Positioned(
-                          top: -5,
-                          right: -10,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'Mới',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontFamily: 'Quicksand',
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.green.shade50),
+                            padding: MaterialStateProperty.all(
+                                const EdgeInsets.all(10)),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: 80,
-                    child: Text(
+                        if (isNew)
+                          Positioned(
+                            top: -5,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                'Mới',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontFamily: 'Quicksand',
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
                       action['label'] as String,
-                      // Thêm index vào label nếu cần
                       style: const TextStyle(
                         fontFamily: 'Quicksand',
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.visible,
+                      overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
+                    )
+                  ],
+                ),
               );
             }).toList(),
           ),

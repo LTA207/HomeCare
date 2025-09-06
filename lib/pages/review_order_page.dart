@@ -10,7 +10,7 @@ import 'package:foodapp/pages/paypal_test_page.dart';
 import 'package:foodapp/services/paypal_service.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
 import '../data/model/customer.dart';
 import '../data/model/request.dart';
 import '../data/model/service.dart';
@@ -51,7 +51,6 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
   num workingTime = 0;
   bool isOnDemand = true;
   bool isLoading = true;
-
 
   // Map<String, dynamic> totalCostCalculation(
   //     String date, String start, String end){

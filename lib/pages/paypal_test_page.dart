@@ -92,93 +92,72 @@ class _PayPalTestPageState extends State<PayPalTestPage> {
             children: [
               Icon(Icons.check_circle, color: Colors.green, size: 28),
               SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "Thành công!",
-                  style: TextStyle(
-                    fontFamily: 'Quicksand',
-                    fontWeight: FontWeight.w700,
-                    color: Colors.green,
-                  ),
+              Text(
+                "Thành công!",
+                style: TextStyle(
+                  fontFamily: 'Quicksand',
+                  fontWeight: FontWeight.w700,
+                  color: Colors.green,
                 ),
               ),
             ],
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Thanh toán PayPal đã được xử lý thành công!",
-                  style: const TextStyle(fontFamily: 'Quicksand'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Thanh toán PayPal đã được xử lý thành công!",
+                style: const TextStyle(fontFamily: 'Quicksand'),
+              ),
+              SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.withOpacity(0.3)),
                 ),
-                SizedBox(height: 12),
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.green.withOpacity(0.3)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Chi tiết thanh toán:',
-                        style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green[700],
-                        ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Chi tiết thanh toán:',
+                      style: TextStyle(
+                        fontFamily: 'Quicksand',
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green[700],
                       ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Số tiền: ${_formatCurrency(widget.amount.toDouble())}',
-                        style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          fontSize: 14,
-                          color: Colors.green[600],
-                        ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Số tiền: ${_formatCurrency(widget.amount.toDouble())}',
+                      style: TextStyle(
+                        fontFamily: 'Quicksand',
+                        fontSize: 14,
+                        color: Colors.green[600],
                       ),
-                      Text(
-                        'Số tiền USD: \$${PayPalService.convertVNDToUSD(widget.amount.toDouble()).toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          fontSize: 14,
-                          color: Colors.green[600],
-                        ),
+                    ),
+                    Text(
+                      'Order ID: ${params['order_id'] ?? 'N/A'}',
+                      style: TextStyle(
+                        fontFamily: 'Quicksand',
+                        fontSize: 12,
+                        color: Colors.green[600],
                       ),
-                      Text(
-                        'Order ID: ${params['order_id'] ?? 'N/A'}',
-                        style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          fontSize: 12,
-                          color: Colors.green[600],
-                        ),
+                    ),
+                    Text(
+                      'Capture ID: ${params['capture_id'] ?? 'N/A'}',
+                      style: TextStyle(
+                        fontFamily: 'Quicksand',
+                        fontSize: 12,
+                        color: Colors.green[600],
                       ),
-                      if (params['capture_id'] != null)
-                        Text(
-                          'Capture ID: ${params['capture_id']}',
-                          style: TextStyle(
-                            fontFamily: 'Quicksand',
-                            fontSize: 12,
-                            color: Colors.green[600],
-                          ),
-                        ),
-                      Text(
-                        'Môi trường: ${params['environment']?.toString().toUpperCase() ?? 'N/A'}',
-                        style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          fontSize: 12,
-                          color: Colors.green[600],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           actions: [
             ElevatedButton(
@@ -188,16 +167,12 @@ class _PayPalTestPageState extends State<PayPalTestPage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
               ),
               child: const Text(
-                "Hoàn tất",
+                "Quay lại",
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Quicksand',
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -216,79 +191,30 @@ class _PayPalTestPageState extends State<PayPalTestPage> {
             children: [
               Icon(Icons.error, color: Colors.red, size: 28),
               SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "Lỗi thanh toán",
-                  style: TextStyle(
-                    fontFamily: 'Quicksand',
-                    fontWeight: FontWeight.w700,
-                    color: Colors.red,
-                  ),
+              Text(
+                "Lỗi thanh toán",
+                style: TextStyle(
+                  fontFamily: 'Quicksand',
+                  fontWeight: FontWeight.w700,
+                  color: Colors.red,
                 ),
               ),
             ],
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  error,
-                  style: const TextStyle(fontFamily: 'Quicksand'),
-                ),
-                SizedBox(height: 12),
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Gợi ý khắc phục:',
-                        style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          fontWeight: FontWeight.w600,
-                          color: Colors.orange[700],
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        '• Kiểm tra kết nối mạng\n'
-                        '• Đảm bảo PayPal credentials đã được cấu hình\n'
-                        '• Thử lại sau vài phút\n'
-                        '• Liên hệ hỗ trợ nếu vấn đề tiếp tục',
-                        style: TextStyle(
-                          fontFamily: 'Quicksand',
-                          fontSize: 14,
-                          color: Colors.orange[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          content: Text(
+            error,
+            style: const TextStyle(fontFamily: 'Quicksand'),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Retry payment
-                Future.delayed(Duration(milliseconds: 500), () {
-                  _processPayPalPayment();
-                });
               },
               child: const Text(
                 "Thử lại",
                 style: TextStyle(
                   color: Colors.blue,
                   fontFamily: 'Quicksand',
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -302,7 +228,6 @@ class _PayPalTestPageState extends State<PayPalTestPage> {
                 style: TextStyle(
                   color: Colors.red,
                   fontFamily: 'Quicksand',
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -481,7 +406,7 @@ class _PayPalTestPageState extends State<PayPalTestPage> {
                           ),
                           SizedBox(height: 16),
                           Text(
-                            'Complete PayPal REST API Integration',
+                            'Complete PayPal API Integration',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.grey[600],
@@ -599,12 +524,11 @@ class _PayPalTestPageState extends State<PayPalTestPage> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            '1. Lấy Access Token từ PayPal OAuth\n'
-                            '2. Tạo Order với PayPal Orders API v2\n'
+                            '1. Lấy Access Token từ PayPal\n'
+                            '2. Tạo Order với PayPal API\n'
                             '3. Mở WebView cho người dùng thanh toán\n'
-                            '4. Xử lý redirect URL từ PayPal\n'
-                            '5. Capture Order để hoàn tất thanh toán\n'
-                            '6. Trả về kết quả cho ứng dụng',
+                            '4. Xử lý redirect từ PayPal\n'
+                            '5. Capture thanh toán để hoàn tất',
                             style: TextStyle(
                               fontFamily: 'Quicksand',
                               fontSize: 14,
@@ -714,32 +638,22 @@ class _PayPalTestPageState extends State<PayPalTestPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Quicksand',
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Quicksand',
+              color: Colors.grey[600],
+              fontSize: 14,
             ),
           ),
-          SizedBox(width: 8),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontFamily: 'Quicksand',
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
+          Text(
+            value,
+            style: TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

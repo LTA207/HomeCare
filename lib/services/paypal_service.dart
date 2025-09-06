@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PayPalService {
   // PayPal Configuration - Replace with your actual credentials
-  static const String _clientId = "AY1gPwrcXzQBu3lwciswxtHrO5mrnZGXO2c9Pqq96NFCk10YA2_9k3rEUozDE-DUYb6Zd1LdHdXGk_54";
-  static const String _clientSecret = "EEmS_wLYvT-wZcCMIOEK70ivMAJNuGUpcyGobCZIsp3AXC5-IZIPzjKQUQQR3pfIIa28MDC91x4SfBd2";
+  static const String _clientId = "AVaWTupcRkM4A1WhRBw-LldnJUP9woJjoa0jd2Sof3zdonijQDhMbqzAUls7ps_sUYv0D4zgDstXyQ5M";
+  static const String _clientSecret = "EM0y8Kme-tnSj05a-BC1Xu1w7urtDaOfIz54cz9ytsZyc4XtLpf7V-I1UUvwQlorFEIsl_q5uMW4xJFD";
 
   // Environment configuration
   static const bool _isSandbox = true; // Set to false for production
@@ -291,20 +290,12 @@ class PayPalService {
         Navigator.of(context).pop(); // Close loading
 
         if (captureResponse != null && captureResponse['status'] == 'COMPLETED') {
-          // Extract capture ID from response
-          String? captureId;
-          try {
-            captureId = captureResponse['purchase_units'][0]['payments']['captures'][0]['id'];
-          } catch (e) {
-            print('Could not extract capture ID: $e');
-          }
-
           // Payment successful
           onSuccess(<String, dynamic>{
             "status": "success",
             "payment_method": "paypal",
             "order_id": orderId,
-            "capture_id": captureId,
+            "capture_id": captureResponse['purchase_units'][0]['payments']['captures'][0]['id'],
             "amount": amount,
             "currency": currency,
             "environment": _isSandbox ? "sandbox" : "production",
@@ -425,29 +416,23 @@ class _PayPalWebViewState extends State<PayPalWebView> {
           onNavigationRequest: (NavigationRequest request) {
             print('PayPal WebView navigation: ${request.url}');
 
-            // Check for success URL patterns
+            // Check for success URL
             if (request.url.contains('homecare.app/payment/success') ||
-                request.url.contains('paypal.com/checkoutnow/success') ||
-                request.url.contains('paymentId=') ||
-                request.url.contains('PayerID=')) {
+                request.url.contains('paypal.com/checkoutnow/success')) {
               print('Payment approved!');
               Navigator.of(context).pop({'success': true, 'orderId': widget.orderId});
               return NavigationDecision.prevent;
             }
 
-            // Check for cancel URL patterns
+            // Check for cancel URL
             if (request.url.contains('homecare.app/payment/cancel') ||
-                request.url.contains('paypal.com/checkoutnow/cancel') ||
-                request.url.contains('cancel=true')) {
+                request.url.contains('paypal.com/checkoutnow/cancel')) {
               print('Payment cancelled by user');
               Navigator.of(context).pop({'cancelled': true});
               return NavigationDecision.prevent;
             }
 
             return NavigationDecision.navigate;
-          },
-          onWebResourceError: (WebResourceError error) {
-            print('PayPal WebView error: ${error.description}');
           },
         ),
       )
@@ -490,45 +475,27 @@ class _PayPalWebViewState extends State<PayPalWebView> {
                 ),
               ),
             ),
-          IconButton(
-            icon: Icon(Icons.refresh, color: Colors.white),
-            onPressed: () {
-              _controller.reload();
-            },
-          ),
         ],
       ),
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
           if (_isLoading)
-            Container(
-              color: Colors.white,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(color: Color(0xFF0070ba)),
-                    SizedBox(height: 16),
-                    Text(
-                      'Đang tải PayPal...',
-                      style: TextStyle(
-                        fontFamily: 'Quicksand',
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: Color(0xFF0070ba)),
+                  SizedBox(height: 16),
+                  Text(
+                    'Đang tải PayPal...',
+                    style: TextStyle(
+                      fontFamily: 'Quicksand',
+                      fontSize: 16,
+                      color: Colors.grey[600],
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Vui lòng đợi trong giây lát',
-                      style: TextStyle(
-                        fontFamily: 'Quicksand',
-                        fontSize: 14,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
         ],

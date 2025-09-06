@@ -688,7 +688,7 @@ class _OnDemandState extends State<OnDemand> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Ngày thực hiện: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(request.startTime))}',
+                                    '${DateFormat('dd/MM/yyyy').format(DateTime.parse(request.startTime))}',
                                     style: const TextStyle(
                                       fontFamily: 'Quicksand',
                                       color: Color(0xFF5B6366),
