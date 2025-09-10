@@ -125,23 +125,23 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
                               onPressed: () {
                                 setState(() {
                                   // _doneRequest(requestDetailList![index]);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => PaymentPage(
-                                        amount:
-                                            requestDetailList![index].cost ??
-                                                500000,
-                                        customer: widget.customer,
-                                        costFactors: widget.costFactors,
-                                        services: widget.services,
-                                        requestDetail:
-                                            requestDetailList![index],
-                                        token: widget.token,
-                                        refreshToken: widget.refreshToken,
-                                      ),
-                                    ),
-                                  );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) => PaymentPage(
+                                  //       amount:
+                                  //           requestDetailList![index].cost ??
+                                  //               500000,
+                                  //       customer: widget.customer,
+                                  //       costFactors: widget.costFactors,
+                                  //       services: widget.services,
+                                  //       requestDetail:
+                                  //           requestDetailList![index],
+                                  //       token: widget.token,
+                                  //       refreshToken: widget.refreshToken,
+                                  //     ),
+                                  //   ),
+                                  // );
                                 });
                               },
                               child: Text(

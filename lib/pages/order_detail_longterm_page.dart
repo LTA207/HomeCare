@@ -121,8 +121,8 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
             ),
             child: TextButton(
               onPressed: () {
-                // Navigator.pop(context);
-                // // _showPaymentDialog(context, request);
+                Navigator.pop(context);
+                // _showPaymentDialog(context, request);
                 // _doneRequest(request);
                 Navigator.push(
                   context,
@@ -510,21 +510,21 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
               if (detail.status == 'waitPayment')
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PaymentPage(
-                          amount: detail.cost ?? 0,
-                          // Tổng chi phí
-                          customer: widget.customer,
-                          costFactors: widget.costFactors,
-                          services: widget.services,
-                          requestDetail: detail,
-                          token: widget.token,
-                          refreshToken: widget.refreshToken,
-                        ),
-                      ),
-                    );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => PaymentPage(
+                    //       amount: detail.cost ?? 0,
+                    //       // Tổng chi phí
+                    //       customer: widget.customer,
+                    //       costFactors: widget.costFactors,
+                    //       services: widget.services,
+                    //       requestDetail: detail,
+                    //       token: widget.token,
+                    //       refreshToken: widget.refreshToken,
+                    //     ),
+                    //   ),
+                    // );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,

@@ -1,21 +1,14 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/pages/helper_detail_page.dart';
-import 'package:foodapp/pages/order_success_page.dart';
-import 'package:foodapp/pages/payment_page.dart';
-import 'package:foodapp/pages/paypal_test_page.dart';
-import 'package:foodapp/services/paypal_service.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
-// import 'package:webview_flutter/webview_flutter.dart';
 import '../data/model/customer.dart';
 import '../data/model/request.dart';
 import '../data/model/service.dart';
 import '../data/repository/repository.dart';
+import 'home_page.dart';
 
 class ReviewOrderPage extends StatefulWidget {
   final Customer customer;
@@ -44,8 +37,7 @@ class ReviewOrderPage extends StatefulWidget {
 }
 
 class _ReviewOrderPageState extends State<ReviewOrderPage> {
-  bool isOnlinePayment = true;
-  String selectedPaymentMethod = 'cash'; // 'cash', 'transfer', 'paypal'
+  // Remove payment-related variables
   Map<String, dynamic>? detailCost;
   List<Map<String, dynamic>?> singleDayCostData = [];
   Map<String, dynamic> costData = {};
@@ -55,176 +47,6 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
   bool isOnDemand = true;
   bool isLoading = true;
 
-  // Map<String, dynamic> totalCostCalculation(
-  //     String date, String start, String end){
-  //   List<DateTime> holidays = [
-  //     DateTime(2025, 4, 30), // Ngày Giải phóng miền Nam
-  //     DateTime(2025, 5, 1), // Quốc tế Lao động
-  //     DateTime(2025, 9, 2), // Quốc khánh
-  //     DateTime(2025, 6, 1), // Quốc tế Thiếu nhi
-  //     DateTime(2025, 7, 27), // Ngày Thương binh Liệt sĩ
-  //     DateTime(2025, 11, 20) // Ngày Nhà giáo Việt Nam
-  //   ];
-  //
-  //   List<Coefficient> otherCoefficientList = [];
-  //
-  //   // Lấy móc thời gian hành chính
-  //   DateTime time = DateTime.parse(date);
-  //   DateTime now = DateTime(time.year, time.month, time.day);
-  //   DateTime eightAM = DateTime(now.year, now.month, now.day, 8, 0, 0);
-  //   DateTime sixPM = DateTime(now.year, now.month, now.day, 18, 0, 0);
-  //
-  //   // Chuyển đổi thời gian bắt đầu cho ngày trong tương lai
-  //   DateTime startTimeNow = DateTime.parse(start);
-  //   DateTime endTimeNow = DateTime.parse(end);
-  //   DateTime startTime = DateTime(now.year, now.month, now.day,
-  //       startTimeNow.hour, startTimeNow.minute, startTimeNow.second);
-  //   DateTime endTime = DateTime(now.year, now.month, now.day, endTimeNow.hour,
-  //       endTimeNow.minute, endTimeNow.second);
-  //
-  //   // Gíá của dịch vụ
-  //   num basicPrice = widget.request.service.cost;
-  //
-  //   // Hệ số cơ bản của dịch vụ
-  //   num basicCoefficient = 0;
-  //
-  //   // Lấy hệ số cơ bản
-  //   for (var costFactor in widget.costFactors) {
-  //     if (costFactor.title.compareTo('Hệ số lương cho dịch vụ') == 0) {
-  //       basicCoefficient = costFactor.coefficientList
-  //           .firstWhere((coefficient) =>
-  //       coefficient.title.compareTo('Dịch vụ dọn dẹp') == 0)
-  //           .value;
-  //       break;
-  //     }
-  //   }
-  //
-  //   // Lọc danh sách hệ số khác
-  //   for (var costFactor in widget.costFactors) {
-  //     if (costFactor.title.compareTo('Hệ số khác') == 0) {
-  //       otherCoefficientList = costFactor.coefficientList;
-  //     }
-  //   }
-  //
-  //   num totalCost = basicPrice * basicCoefficient;
-  //   print('giá cơ bản: ${basicPrice}');
-  //   print('hệ số dịch vụ: ${basicCoefficient}');
-  //   print("giá cơ bản bình thường ${totalCost}");
-  //
-  //   // Hệ số cho ngày lễ, Tết, Noel
-  //   num holidayCoefficient = 1;
-  //   if (holidays.any((holiday) =>
-  //   holiday.month == startTime.month && holiday.day == startTime.day)) {
-  //     holidayCoefficient =
-  //         otherCoefficientList.firstWhere((e) => e.title == 'Hệ số lễ').value;
-  //   } else if (startTime.month == 12 && startTime.day == 25) {
-  //     // Noel
-  //     holidayCoefficient =
-  //         otherCoefficientList.firstWhere((e) => e.title == 'Hệ số noel').value;
-  //   } else if (startTime.month == 1 && startTime.day == 1) {
-  //     // Tết
-  //     holidayCoefficient =
-  //         otherCoefficientList.firstWhere((e) => e.title == 'Hệ số tết').value;
-  //   }
-  //
-  //   // Hệ số cho ngày cuối tuần
-  //   num weekendCoefficient = 1;
-  //   if (startTime.weekday == DateTime.saturday ||
-  //       startTime.weekday == DateTime.sunday) {
-  //     weekendCoefficient = otherCoefficientList
-  //         .firstWhere((e) => e.title == 'Hệ số làm việc ngày cuối tuần')
-  //         .value;
-  //   }
-  //
-  //   // Lấy hệ số lớn hơn giữa ngày lễ và cuối tuần
-  //   num maxCoefficient = max(holidayCoefficient, weekendCoefficient);
-  //   print('hệ số cho ngày lễ và cuối tuần ${maxCoefficient}');
-  //
-  //   // Tổng số giờ tăng ca
-  //   num otherCoefficent = 0;
-  //
-  //   // Kiểm tra ngoài giờ
-  //   num overTime = 1;
-  //   num hours = 0;
-  //   DateTime newStartTime = startTime;
-  //   DateTime newEndTime = endTime;
-  //   if (startTime.isBefore(eightAM) || endTime.isAfter(sixPM)) {
-  //     overTime = otherCoefficientList
-  //         .firstWhere((e) => e.title == 'Hệ số ngoài giờ')
-  //         .value;
-  //
-  //     // Kiểm tra nếu startTime trước 8h sáng
-  //     if (startTime.isBefore(eightAM)) {
-  //       // Thời gian chênh lệch buổi sáng
-  //       Duration startDifference = eightAM.difference(startTime);
-  //       hours += startDifference.inMinutes / 60.0;
-  //
-  //       // Cập nhật startTime mới
-  //       newStartTime = eightAM;
-  //     }
-  //
-  //     // Kiểm tra nếu endTime sau 6h tối
-  //     if (endTime.isAfter(sixPM)) {
-  //       Duration endDifference = endTime.difference(sixPM);
-  //       num endHours = endDifference.inMinutes / 60.0;
-  //       hours += endHours;
-  //
-  //       // Cập nhật newEndTime mới
-  //       newEndTime = sixPM;
-  //     }
-  //   }
-  //
-  //   // Tính toán tổng chi phí tăng ca
-  //   num workingTime = (newEndTime.difference(newStartTime).inMinutes / 60);
-  //   otherCoefficent = hours * overTime + workingTime;
-  //   print('tổng số giờ tăng ca: ${hours}');
-  //   print('hệ số tăng ca: ${overTime}');
-  //   print('thời gian bắt đầu mới: ${newStartTime}');
-  //   print('thời gian kết thúc mới: ${newEndTime}');
-  //   print(
-  //       'tổng số giờ làm trong hành chính: ${(newEndTime.difference(newStartTime).inMinutes / 60)}');
-  //
-  //   print('thời gian hệ số khác: ${otherCoefficent}');
-  //
-  //   // Nhân overtime với hệ số lớn hơn giữa ngày lễ và cuối tuần
-  //   otherCoefficent *= maxCoefficient;
-  //
-  //   print('tông chi phí: ${totalCost * otherCoefficent}');
-  //   num finalCost = totalCost * otherCoefficent;
-  //   // Tính tổng chi phí
-  //
-  //   widget.request.totalCost = finalCost;
-  //
-  //
-  //   print('jghkjjjjjjjjjjjjhjhgkkjjjkhgjkk $date');
-  //   print(detailCost?['totalCost']);
-  //
-  //   // await getDetailCost(widget.service.title, getHourMinute(start), getHourMinute(end), date);
-  //   // return {
-  //   //   'workingTime': 6,
-  //   //   'basicPrice': detailCost?['servicePrice'] ?? 0,
-  //   //   'basicCoefficient': detailCost?['HSDV'] ?? 0,
-  //   //   'overTimeCoefficient': detailCost?['HSovertime'] ?? 0,
-  //   //   'overTimeHours': detailCost?['totalOvertimeHours'] ?? 0,
-  //   //   'finalCost': detailCost?['totalCost'] ?? 0,
-  //   //   'applicationCoefficient' : detailCost?['applicableWeekendCoefficient'] ?? 0,
-  //   //   // 'overTimeCost': overTime * maxCoefficient * basicPrice * basicCoefficient,
-  //   //   'overTimeCost': detailCost?['HSovertime'] * detailCost?['applicableWeekendCoefficient'] * detailCost?['servicePrice'] * detailCost?['HSDV'] ?? 0
-  //   // };
-  //   return {
-  //     'workingTime': workingTime + hours,
-  //     'basicPrice': basicPrice,
-  //     'totalCost': totalCost,
-  //     'basicCoefficient': basicCoefficient,
-  //     'holidayCoefficient': holidayCoefficient,
-  //     'weekendCoefficient': weekendCoefficient,
-  //     'maxCoefficient': maxCoefficient,
-  //     'overTimeCoefficient': overTime,
-  //     'overTimeHours': hours,
-  //     'finalCost': finalCost.round(),
-  //     'overTimeCost': overTime * maxCoefficient * basicPrice * basicCoefficient
-  //   };
-  // }
   @override
   void initState() {
     super.initState();
@@ -670,86 +492,86 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
             //     ],
             //   ),
             // ),
-            _buildCard(
-              child: Column(
-                children: [
-                  Text('Phương thức thanh toán',
-                      style: TextStyle(
-                        fontFamily: 'Quicksand',
-                        fontSize: 16,
-                        color: Color(0xFF2E7D32),
-                        fontWeight: FontWeight.w700,
-                      )),
-                  const SizedBox(height: 12),
-                  RadioListTile(
-                    value: 'cash',
-                    groupValue: selectedPaymentMethod,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedPaymentMethod = value!;
-                        isOnlinePayment = false;
-                      });
-                    },
-                    title: const Text(
-                      'Thanh toán tiền mặt',
-                      style: TextStyle(
-                        fontFamily: 'Quicksand',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    activeColor: const Color(0xFF2E7D32),
-                  ),
-                  RadioListTile(
-                    value: 'transfer',
-                    groupValue: selectedPaymentMethod,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedPaymentMethod = value!;
-                        isOnlinePayment = true;
-                      });
-                    },
-                    title: const Text(
-                      'Chuyển khoản ngân hàng',
-                      style: TextStyle(
-                        fontFamily: 'Quicksand',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    activeColor: const Color(0xFF2E7D32),
-                  ),
-                  RadioListTile(
-                    value: 'paypal',
-                    groupValue: selectedPaymentMethod,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedPaymentMethod = value!;
-                        isOnlinePayment = true;
-                      });
-                    },
-                    title: Row(
-                      children: [
-                        Icon(Icons.payment, color: Color(0xFF0070ba), size: 24),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: const Text(
-                            'PayPal',
-                            style: TextStyle(
-                              fontFamily: 'Quicksand',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    activeColor: const Color(0xFF2E7D32),
-                  ),
-                ],
-              ),
-            ),
+            // _buildCard(
+            //   child: Column(
+            //     children: [
+            //       Text('Phương thức thanh toán',
+            //           style: TextStyle(
+            //             fontFamily: 'Quicksand',
+            //             fontSize: 16,
+            //             color: Color(0xFF2E7D32),
+            //             fontWeight: FontWeight.w700,
+            //           )),
+            //       const SizedBox(height: 12),
+            //       RadioListTile(
+            //         value: 'cash',
+            //         groupValue: selectedPaymentMethod,
+            //         onChanged: (value) {
+            //           setState(() {
+            //             selectedPaymentMethod = value!;
+            //             isOnlinePayment = false;
+            //           });
+            //         },
+            //         title: const Text(
+            //           'Thanh toán tiền mặt',
+            //           style: TextStyle(
+            //             fontFamily: 'Quicksand',
+            //             fontSize: 16,
+            //             fontWeight: FontWeight.w400,
+            //           ),
+            //         ),
+            //         activeColor: const Color(0xFF2E7D32),
+            //       ),
+            //       RadioListTile(
+            //         value: 'transfer',
+            //         groupValue: selectedPaymentMethod,
+            //         onChanged: (value) {
+            //           setState(() {
+            //             selectedPaymentMethod = value!;
+            //             isOnlinePayment = true;
+            //           });
+            //         },
+            //         title: const Text(
+            //           'Chuyển khoản ngân hàng',
+            //           style: TextStyle(
+            //             fontFamily: 'Quicksand',
+            //             fontSize: 16,
+            //             fontWeight: FontWeight.w400,
+            //           ),
+            //         ),
+            //         activeColor: const Color(0xFF2E7D32),
+            //       ),
+            //       RadioListTile(
+            //         value: 'paypal',
+            //         groupValue: selectedPaymentMethod,
+            //         onChanged: (value) {
+            //           setState(() {
+            //             selectedPaymentMethod = value!;
+            //             isOnlinePayment = true;
+            //           });
+            //         },
+            //         title: Row(
+            //           children: [
+            //             Icon(Icons.payment, color: Color(0xFF0070ba), size: 24),
+            //             const SizedBox(width: 8),
+            //             Flexible(
+            //               child: const Text(
+            //                 'PayPal',
+            //                 style: TextStyle(
+            //                   fontFamily: 'Quicksand',
+            //                   fontSize: 16,
+            //                   fontWeight: FontWeight.w400,
+            //                 ),
+            //                 overflow: TextOverflow.ellipsis,
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //         activeColor: const Color(0xFF2E7D32),
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -759,16 +581,16 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
           width: double.infinity,
           height: 54,
           child: ElevatedButton(
-            onPressed: () => _handlePayment(),
+            onPressed: () => _handleJobPosting(),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: Text(
-              _getButtonText(),
-              style: const TextStyle(
+            child: const Text(
+              "Đăng việc",
+              style: TextStyle(
                 fontFamily: 'Quicksand',
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -781,165 +603,75 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
     );
   }
 
-  String _getButtonText() {
-    switch (selectedPaymentMethod) {
-      case 'paypal':
-        return "Thanh toán PayPal";
-      case 'transfer':
-        return "Thanh toán PayPal"; // Changed to use PayPal
-      default:
-        return "Đăng việc";
-    }
-  }
-
-  void _handlePayment() {
+  void _handleJobPosting() {
     widget.request.totalCost = finalCost;
 
-    switch (selectedPaymentMethod) {
-      case 'paypal':
-        _openPayPalTestPage();
-        break;
-      case 'transfer':
-        _openPayPalTestPage(); // Changed to use PayPal test instead of bank transfer
-        break;
-      default:
-        _processCashPayment();
-        break;
-    }
-  }
-
-  void _openPayPalTestPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PayPalTestPage(
-          amount: finalCost,
-          orderDetails: widget.request.service.title ?? 'Dịch vụ HomeCare',
-        ),
-      ),
-    ).then((result) {
-      if (result == 'payment_success') {
-        _showPaymentSuccessDialog('PayPal');
-      } else if (result == 'payment_failed') {
-        _showPaymentErrorDialog('Thanh toán PayPal thất bại');
-      }
-    });
-  }
-
-  void _processCashPayment() {
     var repository = DefaultRepository();
     repository.sendRequest(widget.request, widget.token);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => OrderSuccess(
-          customer: widget.customer,
-          costFactors: widget.costFactors,
-          services: widget.services,
-          requestDetails: widget.request.schedules,
-          token: widget.token,
-          refreshToken: widget.refreshToken,
-        ),
-      ),
-    );
+    _showSuccessDialog();
   }
 
-  void _showPaymentSuccessDialog(String method) {
+  void _showSuccessDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 28),
-              SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  "Thanh toán thành công!",
-                  style: TextStyle(
-                    fontFamily: 'Quicksand',
-                    fontWeight: FontWeight.w700,
-                    color: Colors.green,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          content: Text(
-            "Thanh toán qua $method đã được xử lý thành công.\nSố tiền: ${_formatCurrency(finalCost.toDouble())}",
-            style: const TextStyle(fontFamily: 'Quicksand'),
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                _completeOrder();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-              ),
-              child: const Text(
-                "Tiếp tục",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Quicksand',
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showPaymentErrorDialog(String error) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
+          title: Column(
             children: [
-              Icon(Icons.error, color: Colors.red, size: 28),
-              SizedBox(width: 8),
+              Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 64,
+              ),
+              SizedBox(height: 16),
               Text(
-                "Lỗi thanh toán",
+                "Đăng việc thành công!",
                 style: TextStyle(
                   fontFamily: 'Quicksand',
                   fontWeight: FontWeight.w700,
-                  color: Colors.red,
+                  color: Colors.green,
+                  fontSize: 20,
                 ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
           content: Text(
-            error,
-            style: const TextStyle(fontFamily: 'Quicksand'),
+            "Yêu cầu dịch vụ của bạn đã được đăng thành công.\nChúng tôi sẽ tìm kiếm người giúp việc phù hợp cho bạn.",
+            style: const TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                "Thử lại",
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontFamily: 'Quicksand',
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                  _navigateToHome();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 12),
                 ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                "Đóng",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontFamily: 'Quicksand',
+                child: const Text(
+                  "Về trang chủ",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Quicksand',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -949,21 +681,26 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
     );
   }
 
-  void _completeOrder() {
-    var repository = DefaultRepository();
-    repository.sendRequest(widget.request, widget.token);
-
+  void _navigateToHome() {
+    // Navigate back to home page by popping all routes until the first one
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => OrderSuccess(
-          customer: widget.customer,
-          costFactors: widget.costFactors,
-          services: widget.services,
-          requestDetails: widget.request.schedules,
-          token: widget.token,
-          refreshToken: widget.refreshToken,
-        ),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            HomePage(
+              customer: widget.customer,
+              costFactor: widget.costFactors,
+              services: widget.services,
+              token: widget.token,
+              refreshToken: widget.refreshToken,
+            ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 500),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/requestdetail.dart';
 import 'package:foodapp/pages/order_success_page.dart';
+import 'package:foodapp/pages/paypal_test_page.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
@@ -24,7 +25,10 @@ class PaymentPage extends StatefulWidget {
     required this.amount,
     required this.customer,
     required this.costFactors,
-    required this.services, required this.requestDetail, required this.token, required this.refreshToken,
+    required this.services,
+    required this.requestDetail,
+    required this.token,
+    required this.refreshToken,
   });
 
   @override
@@ -52,24 +56,103 @@ class _PaymentPageState extends State<PaymentPage> {
 
   final List<Map<String, dynamic>> paymentMethods = [
     {
+      'id': 'paypal',
+      'title': 'PayPal',
+      'icon': Icons.account_balance_wallet,
+      'subtitle': 'Thanh toán qua PayPal',
+    },
+    {
       'id': 'bank',
       'title': 'Vietcombank',
-      'logo': 'lib/images/payment/vietcombank.jpg',
+      'icon': Icons.account_balance,
       'subtitle': 'Thanh toán qua Vietcombank',
     },
     {
       'id': 'momo',
       'title': 'Momo',
-      'logo': 'lib/images/payment/momo.jpg',
+      'icon': Icons.mobile_friendly,
       'subtitle': 'Thanh toán bằng Momo',
     },
     {
       'id': 'vnpay',
       'title': 'VNPay',
-      'logo': 'lib/images/payment/vnpay.jpg',
+      'icon': Icons.payment,
       'subtitle': 'Thanh toán qua VNPay',
     },
   ];
+
+  void _handlePayPalPayment() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PayPalTestPage(
+          amount: widget.amount,
+          orderDetails: 'Dịch vụ HomeCare',
+        ),
+      ),
+    ).then((result) {
+      if (!mounted) return;
+
+      if (result == 'payment_success') {
+        _doneRequest(widget.requestDetail);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderSuccess(
+              customer: widget.customer,
+              costFactors: widget.costFactors,
+              services: widget.services,
+              requestDetails: [widget.requestDetail],
+              token: widget.token,
+              refreshToken: widget.refreshToken,
+            ),
+          ),
+        );
+      } else if (result == 'payment_failed') {
+        _showPaymentErrorDialog('Thanh toán PayPal thất bại');
+      }
+    });
+  }
+
+  void _showPaymentErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          "Lỗi thanh toán",
+          style: TextStyle(
+            fontFamily: 'Quicksand',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.red,
+          ),
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            fontFamily: 'Quicksand',
+            fontSize: 16,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              "Đóng",
+              style: TextStyle(
+                fontFamily: 'Quicksand',
+                fontSize: 16,
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -185,21 +268,17 @@ class _PaymentPageState extends State<PaymentPage> {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Colors.green.withOpacity(0.1)
                       : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    method['logo'],
-                    width: 34,
-                    height: 34,
-                    fit: BoxFit.cover,
-                  ),
+                child: Icon(
+                  method['icon'],
+                  color: _getPaymentMethodColor(method['id']),
+                  size: 24,
                 ),
               ),
               const SizedBox(width: 16),
@@ -216,6 +295,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         fontFamily: 'Quicksand',
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       method['subtitle'],
                       style: TextStyle(
@@ -227,6 +307,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
               Radio(
                 value: method['id'],
                 groupValue: selectedPaymentMethod,
@@ -241,12 +322,70 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
+  Color _getPaymentMethodColor(String methodId) {
+    switch (methodId) {
+      case 'paypal':
+        return Color(0xFF0070ba);
+      case 'bank':
+        return Colors.blue[600]!;
+      case 'momo':
+        return Colors.pink[600]!;
+      case 'vnpay':
+        return Colors.red[600]!;
+      default:
+        return Colors.grey[600]!;
+    }
+  }
+
   Widget _buildPaymentDetails() {
-    if (selectedPaymentMethod == 'bank') {
+    if (selectedPaymentMethod == 'paypal') {
+      return _buildPayPalDetails();
+    } else if (selectedPaymentMethod == 'bank') {
       return _buildBankDetails();
     } else {
       return _buildQRCodeDetails();
     }
+  }
+
+  Widget _buildPayPalDetails() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              "THÔNG TIN PAYPAL",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Quicksand',
+              ),
+            ),
+            const SizedBox(height: 16),
+            Icon(
+              Icons.payment,
+              color: Color(0xFF0070ba),
+              size: 48,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Bạn sẽ được chuyển đến trang PayPal để thực hiện thanh toán an toàn",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Quicksand',
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildBankDetails() {
@@ -304,10 +443,10 @@ class _PaymentPageState extends State<PaymentPage> {
                 color: Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Image.asset(
-                "lib/images/${selectedPaymentMethod}.png",
-                height: 200,
-                width: 200,
+              child: Icon(
+                Icons.qr_code,
+                size: 120,
+                color: Colors.grey[400],
               ),
             ),
             const SizedBox(height: 16),
@@ -405,30 +544,32 @@ class _PaymentPageState extends State<PaymentPage> {
   }
 
   Future<void> _processPayment() async {
-    setState(() => isProcessing = true);
+    if (selectedPaymentMethod == 'paypal') {
+      _handlePayPalPayment();
+    } else {
+      setState(() => isProcessing = true);
 
-    await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
 
-    if (mounted) {
-      setState(() => isProcessing = false);
+      if (mounted) {
+        setState(() => isProcessing = false);
 
-      _doneRequest(widget.requestDetail);
+        _doneRequest(widget.requestDetail);
 
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //       builder: (context) => OrderSuccess(
-      //         customer: widget.customer,
-      //         costFactors: widget.costFactors,
-      //         services: widget.services,
-      //         token: "", // Add token if needed
-      //         refreshToken: "", // Add refresh token if needed
-      //       ),
-      //   ),
-      // );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderSuccess(
+              customer: widget.customer,
+              costFactors: widget.costFactors,
+              services: widget.services,
+              requestDetails: [widget.requestDetail],
+              token: widget.token,
+              refreshToken: widget.refreshToken,
+            ),
+          ),
+        );
+      }
     }
   }
-
-
-
 }
