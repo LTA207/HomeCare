@@ -414,18 +414,18 @@ class _PaymentPageState extends State<PaymentPage> {
 
       _doneRequest(widget.requestDetail);
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => OrderSuccess(
-              customer: widget.customer,
-              costFactors: widget.costFactors,
-              services: widget.services,
-              token: "", // Add token if needed
-              refreshToken: "", // Add refresh token if needed
-            ),
-        ),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //       builder: (context) => OrderSuccess(
+      //         customer: widget.customer,
+      //         costFactors: widget.costFactors,
+      //         services: widget.services,
+      //         token: "", // Add token if needed
+      //         refreshToken: "", // Add refresh token if needed
+      //       ),
+      //   ),
+      // );
     }
   }
 

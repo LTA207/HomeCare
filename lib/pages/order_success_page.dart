@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/customer.dart';
 import 'package:foodapp/data/model/service.dart';
+import 'package:foodapp/data/repository/repository.dart';
 import 'package:foodapp/pages/home_page.dart';
+import 'package:foodapp/components/review_dialog.dart';
 import 'dart:math' as math;
+
+import '../data/model/requestdetail.dart';
 
 class OrderSuccess extends StatefulWidget {
   final Customer customer;
@@ -13,6 +17,7 @@ class OrderSuccess extends StatefulWidget {
   final dynamic subMessage;
   final String token;
   final String refreshToken;
+  final List<RequestDetail> requestDetails;
 
   const OrderSuccess({
     super.key,
@@ -20,7 +25,7 @@ class OrderSuccess extends StatefulWidget {
     required this.costFactors,
     required this.services,
     this.mainMessage,
-    this.subMessage, required this.token, required this.refreshToken,
+    this.subMessage, required this.token, required this.refreshToken, required this.requestDetails,
   });
 
   @override
@@ -79,6 +84,47 @@ class _OrderSuccessState extends State<OrderSuccess>
     super.dispose();
   }
 
+  void _showReviewDialog() {
+    String? requestId = widget.requestDetails.isNotEmpty
+        ? widget.requestDetails.first.id
+        : null;
+
+    ReviewDialog.show(
+      context: context,
+      requestId: requestId,
+      token: widget.token,
+      onReviewSubmitted: () {
+        _navigateToHome();
+      },
+      onSkipped: () {
+        _navigateToHome();
+      },
+    );
+  }
+
+  void _navigateToHome() {
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            HomePage(
+              customer: widget.customer,
+              costFactor: widget.costFactors,
+              services: widget.services,
+              token: widget.token,
+              refreshToken: widget.refreshToken,
+            ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 500),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,7 +157,7 @@ class _OrderSuccessState extends State<OrderSuccess>
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.green.withOpacity(0.3),
+                                color: Colors.green.withValues(alpha: 0.3),
                                 spreadRadius: 4,
                                 blurRadius: 12,
                               ),
@@ -160,29 +206,7 @@ class _OrderSuccessState extends State<OrderSuccess>
                       const SizedBox(height: 40),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      HomePage(
-                                customer: widget.customer,
-                                costFactor: widget.costFactors,
-                                services: widget.services,
-                                        token: widget.token,
-                                        refreshToken: widget.refreshToken,
-                              ),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                );
-                              },
-                              transitionDuration:
-                                  const Duration(milliseconds: 500),
-                            ),
-                          );
+                          _showReviewDialog();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,

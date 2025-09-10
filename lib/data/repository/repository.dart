@@ -37,7 +37,8 @@ abstract interface class Repository {
 
   Future<List<RequestDetail>?> loadRequestDetail(String token);
 
-  Future<List<RequestDetail>?> loadRequestDetailId(List<String> id, String token);
+  Future<List<RequestDetail>?> loadRequestDetailId(
+      List<String> id, String token);
 
   Future<List<TimeOff>?> loadTimeOff();
 
@@ -60,16 +61,17 @@ abstract interface class Repository {
   Future<List<CoefficientOther>?> loadCoefficientService();
 
   Future<Map<String, dynamic>?> calculateCost(
-      String service,
-      String startTime,
-      String endTime,
-      String startDate);
+      String service, String startTime, String endTime, String startDate);
 
   Future<void> sendCustomerRegisterRequest(Customer customer);
 
   Future<void> loginCustomer(String phone, String password);
 
-  Future<void> registerCustomer(String phone, String password, String fullName, String email, Addresses addresses);
+  Future<void> registerCustomer(String phone, String password, String fullName,
+      String email, Addresses addresses);
+
+  Future<void> postReview(String requestId, String review, bool isLoseThings,
+      bool isBreakThings, int rating, String token);
 }
 
 class DefaultRepository implements Repository {
@@ -111,7 +113,8 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<List<Requests>?> loadCustomerRequest(String phone, String token) async {
+  Future<List<Requests>?> loadCustomerRequest(
+      String phone, String token) async {
     return await remoteDataSource.loadCustomerRequest(phone, token);
   }
 
@@ -171,13 +174,10 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<Map<String, dynamic>?> calculateCost(
-      String service,
-      String startTime,
-      String endTime,
-      String startDate) async {
-    return await remoteDataSource.calculateCost(service, startTime,
-        endTime, startDate);
+  Future<Map<String, dynamic>?> calculateCost(String service, String startTime,
+      String endTime, String startDate) async {
+    return await remoteDataSource.calculateCost(
+        service, startTime, endTime, startDate);
   }
 
   @override
@@ -191,7 +191,8 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<List<RequestDetail>?> loadRequestDetailId(List<String> id, String token) async {
+  Future<List<RequestDetail>?> loadRequestDetailId(
+      List<String> id, String token) async {
     return await remoteDataSource.loadRequestDetailId(id, token);
   }
 
@@ -206,7 +207,14 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<Authen?> registerCustomer(String phone, String password, String fullName, String email, Addresses addresses) {
-    return remoteDataSource.registerCustomer(phone, password, fullName, email, addresses);
+  Future<Authen?> registerCustomer(String phone, String password,
+      String fullName, String email, Addresses addresses) {
+    return remoteDataSource.registerCustomer(
+        phone, password, fullName, email, addresses);
+  }
+
+  @override
+  Future<void> postReview(String requestId, String review, bool isLoseThings, bool isBreakThings, int rating, String token) async{
+    return await remoteDataSource.postReview(requestId, review, isLoseThings, isBreakThings, rating, token);
   }
 }

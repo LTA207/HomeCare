@@ -70,6 +70,9 @@ abstract interface class DataSource {
 
   Future<Authen?> registerCustomer(String phone, String password, String name,
       String email, Addresses addresses);
+
+  Future<void> postReview(String id, String review, bool isLoseThings,
+      bool isBreakThings, int rating, String token);
 }
 
 class RemoteDataSource implements DataSource {
@@ -738,6 +741,40 @@ class RemoteDataSource implements DataSource {
       });
     } catch (e) {
       print('Error during registration: $e');
+      return Future.error(e);
+    }
+  }
+
+  @override
+  Future<void> postReview(String id, String review, bool isLoseThings,
+      bool isBreakThings, int rating, String token) {
+    final url = 'https://homecareapi.vercel.app/requestDetail/review';
+    final uri = Uri.parse(url);
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'token $token'
+    };
+    final body = jsonEncode({
+      "detailId": id,
+      "review": review,
+      "loseThings": isLoseThings,
+      "breakThings": isBreakThings,
+      "rating": rating
+    });
+
+    try {
+      return http.post(uri, headers: headers, body: body).then((response) {
+        if (response.statusCode == 200) {
+          if (kDebugMode) {
+            print('Comment posted successfully!');
+          }
+        } else {
+          print('Failed to post comment. Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+        }
+      });
+    } catch (e) {
+      print('Error posting comment: $e');
       return Future.error(e);
     }
   }

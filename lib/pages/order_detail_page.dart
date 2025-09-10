@@ -169,48 +169,132 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                'Mã đơn hàng: ',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontFamily: 'Quicksand',
-                  fontSize: 15,
-                ),
-              ),
-              Text(
-                '#823482342',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Quicksand',
-                ),
-              )
-            ],
+          // Mã đơn hàng - flexible layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Kiểm tra nếu màn hình nhỏ (< 350px width)
+              bool isSmallScreen = constraints.maxWidth < 350;
+
+              if (isSmallScreen) {
+                // Layout dọc cho màn hình nhỏ
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Mã đơn hàng:',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontFamily: 'Quicksand',
+                        fontSize: 15,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '#823482342',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Quicksand',
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                // Layout ngang cho màn hình lớn
+                return Row(
+                  children: [
+                    Text(
+                      'Mã đơn hàng: ',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontFamily: 'Quicksand',
+                        fontSize: 15,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '#823482342',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Quicksand',
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                'Đặt lúc: ',
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontFamily: 'Quicksand',
-                  fontSize: 14,
-                ),
-              ),
-              Text(
-                '${_formatDate(widget.request.oderDate)}',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'Quicksand',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+          const SizedBox(height: 8),
+          // Ngày đặt - flexible layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              bool isSmallScreen = constraints.maxWidth < 350;
+
+              if (isSmallScreen) {
+                // Layout dọc cho màn hình nhỏ
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Đặt lúc:',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontFamily: 'Quicksand',
+                        fontSize: 14,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '${_formatDate(widget.request.oderDate)}',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Quicksand',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                );
+              } else {
+                // Layout ngang cho màn hình lớn với wrap
+                return Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      'Đặt lúc: ',
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontFamily: 'Quicksand',
+                        fontSize: 14,
+                      ),
+                    ),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: constraints.maxWidth - 80, // Trừ đi width của label
+                      ),
+                      child: Text(
+                        '${_formatDate(widget.request.oderDate)}',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Quicksand',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
         ],
       ),
@@ -788,43 +872,51 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     required String title,
     required String subtitle,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: Colors.green, size: 22),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'Quicksand',
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.shade600,
-                  fontFamily: 'Quicksand',
-                ),
+              child: Icon(icon, color: Colors.green, size: 22),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Quicksand',
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade600,
+                      fontFamily: 'Quicksand',
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1121,7 +1213,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 color: Colors.red,
               ),
               label: const Text(
-                'Báo cáo vấn đề',
+                'Báo cáo vấn ��ề',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
