@@ -7,11 +7,9 @@ import '../data/repository/repository.dart';
 class EditLocationPage extends StatefulWidget {
   final Customer customer;
   final Location? initialProvince;
-  final String? initialDistrict;
   final String? initialWard;
   final String? initialDetailedAddress;
   final Function(Location)? onProvinceSelected;
-  final Function(String)? onDistrictSelected;
   final Function(String)? onWardSelected;
   final Function(String)? onDetailedAddressChanged;
   final Function onAddressUpdated;
@@ -20,11 +18,9 @@ class EditLocationPage extends StatefulWidget {
     super.key,
     required this.customer,
     this.initialProvince,
-    this.initialDistrict,
     this.initialWard,
     this.initialDetailedAddress,
     this.onProvinceSelected,
-    this.onDistrictSelected,
     this.onWardSelected,
     this.onDetailedAddressChanged,
     required this.onAddressUpdated,
@@ -37,7 +33,6 @@ class EditLocationPage extends StatefulWidget {
 class _EditLocationPageState extends State<EditLocationPage> {
   late List<Location> locations = [];
   Location? selectedProvince;
-  String? selectedDistrict;
   String? selectedWard;
   String? detailedAddress;
   bool isLoading = true;
@@ -46,7 +41,6 @@ class _EditLocationPageState extends State<EditLocationPage> {
   void initState() {
     super.initState();
     selectedProvince = widget.initialProvince;
-    selectedDistrict = widget.initialDistrict;
     selectedWard = widget.initialWard;
     detailedAddress = widget.initialDetailedAddress;
     loadData();
@@ -86,12 +80,6 @@ class _EditLocationPageState extends State<EditLocationPage> {
               });
               widget.onProvinceSelected?.call(province);
             },
-            onDistrictSelected: (String district) {
-              setState(() {
-                selectedDistrict = district;
-              });
-              widget.onDistrictSelected?.call(district);
-            },
             onWardSelected: (String ward) {
               setState(() {
                 selectedWard = ward;
@@ -104,18 +92,16 @@ class _EditLocationPageState extends State<EditLocationPage> {
               });
               widget.onDetailedAddressChanged?.call(address);
             },
-            // Truyền giá trị ban đầu cho SelectLocation nếu cần
           ),
           const Divider(height: 16, color: Colors.grey),
           ElevatedButton(
             onPressed: () {
               if (selectedProvince != null &&
-                  selectedDistrict != null &&
+                  selectedWard != null &&
                   detailedAddress != null &&
                   detailedAddress!.isNotEmpty) {
                 Navigator.pop(context, {
                   'province': selectedProvince,
-                  'district': selectedDistrict,
                   'ward': selectedWard,
                   'detailedAddress': detailedAddress,
                 });

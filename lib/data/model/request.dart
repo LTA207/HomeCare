@@ -51,7 +51,7 @@ class Requests {
       // Provide a default or placeholder object
       location: map['location'] != null
           ? RequestLocation.fromJson(map['location'])
-          : RequestLocation(province: '', district: '', ward: ''),
+          : RequestLocation(province: '', ward: ''),
       id: map['_id'] ?? '',
       oderDate: map['orderDate'] ?? '',
       scheduleIds: List<String>.from(map['scheduleIds'] ?? []),
@@ -171,15 +171,13 @@ class Comment {
 
 class RequestLocation {
   String province;
-  String district;
   String ward;
 
-  RequestLocation({required this.province, required this.district, required this.ward});
+  RequestLocation({required this.province, required this.ward});
 
   factory RequestLocation.fromJson(Map<String, dynamic> map) {
     return RequestLocation(
       province: map['province'] ?? '',
-      district: map['district'] ?? '',
       ward: map['ward'] ?? '',
     );
   }
@@ -187,14 +185,13 @@ class RequestLocation {
   Map<String, dynamic> toJson() {
     return {
       'province': province,
-      'district': district,
       'ward': ward,
     };
   }
 
   @override
   String toString() {
-    return 'RequestLocation{province: $province, district: $district, ward: $ward}';
+    return 'RequestLocation{province: $province, ward: $ward}';
   }
 }
 

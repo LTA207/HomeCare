@@ -43,7 +43,6 @@ class _RegisterPageState extends State<RegisterPage>
   bool isLocationLoading = true;
 
   Location? selectedProvince;
-  String? selectedDistrict;
   String? selectedWard;
   String? selectedDetailedAddress;
 
@@ -122,7 +121,6 @@ class _RegisterPageState extends State<RegisterPage>
     }
 
     if (selectedProvince == null ||
-        selectedDistrict == null ||
         selectedWard == null ||
         selectedDetailedAddress == null ||
         selectedDetailedAddress!.trim().isEmpty) {
@@ -145,7 +143,6 @@ class _RegisterPageState extends State<RegisterPage>
         addresses: [
           Addresses(
               province: selectedProvince!.name,
-              district: selectedDistrict!,
               ward: selectedWard!,
               detailedAddress: selectedDetailedAddress!)
         ],
@@ -232,12 +229,6 @@ class _RegisterPageState extends State<RegisterPage>
                     onProvinceSelected: (province) {
                       setState(() {
                         selectedProvince = province;
-                        addressError = null;
-                      });
-                    },
-                    onDistrictSelected: (district) {
-                      setState(() {
-                        selectedDistrict = district;
                         addressError = null;
                       });
                     },

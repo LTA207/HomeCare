@@ -30,7 +30,6 @@ class _EditInformationPageState extends State<EditInformationPage> {
   late TextEditingController nameController;
   late TextEditingController phoneController;
   Location? selectedProvince;
-  String? selectedDistrict;
   String? selectedWard;
   String? detailedAddress;
   int selectedAddressIndex = 0;
@@ -52,21 +51,20 @@ class _EditInformationPageState extends State<EditInformationPage> {
 
   void updateLocation() {
     if (selectedProvince == null ||
-        selectedDistrict == null ||
+        selectedWard == null ||
         detailedAddress == null) {
       print("Error: Chưa chọn đầy đủ thông tin địa chỉ.");
       return;
     }
 
     final fullAddress =
-        "$detailedAddress, $selectedDistrict, ${selectedProvince!.name}";
+        "$detailedAddress, $selectedWard, ${selectedProvince!.name}";
 
     setState(() {
       final newAddress = Addresses(
         province: selectedProvince!.name,
-        district: selectedDistrict!,
-        detailedAddress: detailedAddress!,
         ward: selectedWard!,
+        detailedAddress: detailedAddress!,
       );
 
       if (selectedAddressIndex < widget.customer.addresses.length) {
@@ -322,10 +320,9 @@ class _EditInformationPageState extends State<EditInformationPage> {
                 const Icon(Icons.location_on_outlined, color: Colors.green),
             title: Text(
               selectedProvince != null &&
-                      selectedDistrict != null &&
                       selectedWard != null &&
                       detailedAddress != null
-                  ? "$detailedAddress, $selectedWard, $selectedDistrict, ${selectedProvince!.name}"
+                  ? "$detailedAddress, $selectedWard, ${selectedProvince!.name}"
                   : (widget.customer.addresses.isNotEmpty
                       ? widget.customer.addresses[selectedAddressIndex]
                           .toString()
@@ -398,14 +395,6 @@ class _EditInformationPageState extends State<EditInformationPage> {
                   });
                 }
               },
-              onDistrictSelected: (district) {
-                if (mounted) {
-                  setState(() {
-                    selectedDistrict = district;
-                    print(district);
-                  });
-                }
-              },
               onWardSelected: (ward) {
                 if (mounted) {
                   setState(() {
@@ -447,8 +436,8 @@ class _EditInformationPageState extends State<EditInformationPage> {
           onProvinceSelected: (province) {
             selectedProvince = province;
           },
-          onDistrictSelected: (district) {
-            selectedDistrict = district;
+          onWardSelected: (ward) {
+            selectedWard = ward;
           },
           onDetailedAddressChanged: (address) {
             detailedAddress = address;
@@ -502,9 +491,8 @@ class _EditInformationPageState extends State<EditInformationPage> {
                 List<Addresses> newList = [
                   Addresses(
                     province: selectedProvince!.name,
-                    district: selectedDistrict!,
-                    detailedAddress: detailedAddress!,
                     ward: selectedWard!,
+                    detailedAddress: detailedAddress!,
                   )
                 ];
                 newList.addAll(widget.customer.addresses);

@@ -8,7 +8,7 @@ import '../data/source/source.dart';
 class ChooseLocationPage extends StatefulWidget {
   final Customer customer;
   final Location? selectedProvince;
-  final String? selectedDistrict;
+  final String? selectedWard;
   final String? detailedAddress;
   final String token;
   final String refreshToken;
@@ -17,7 +17,7 @@ class ChooseLocationPage extends StatefulWidget {
       {super.key,
       required this.customer,
       this.selectedProvince,
-      this.selectedDistrict,
+      this.selectedWard,
       this.detailedAddress, required this.token, required this.refreshToken});
 
   @override
@@ -26,15 +26,15 @@ class ChooseLocationPage extends StatefulWidget {
 
 class _ChooseLocationPageState extends State<ChooseLocationPage> {
   Location? selectedProvince;
-  String? selectedDistrict;
+  String? selectedWard;
   String? detailedAddressChanged;
 
   void addAddress() {
     setState(() {
       widget.customer.addresses.add(Addresses(
           province: selectedProvince!.name,
-          district: selectedDistrict!,
-          detailedAddress: detailedAddressChanged!, ward: ''));
+          ward: selectedWard!,
+          detailedAddress: detailedAddressChanged!));
     });
   }
 
@@ -42,8 +42,8 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
     setState(() {
       widget.customer.addresses[index] = Addresses(
         province: selectedProvince!.name,
-        district: selectedDistrict!,
-        detailedAddress: detailedAddressChanged!, ward: '',
+        ward: selectedWard!,
+        detailedAddress: detailedAddressChanged!,
       );
     });
   }
@@ -52,8 +52,7 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
     setState(() {
       widget.customer.addresses.add(Addresses(
         province: result['province'].name,
-        district: result['district'],
-        ward: result['ward'] ?? '',
+        ward: result['ward'],
         detailedAddress: result['detailedAddress'],
       ));
     });
@@ -65,8 +64,7 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
     setState(() {
       widget.customer.addresses[index] = Addresses(
         province: result['province'].name,
-        district: result['district'],
-        ward: result['ward'] ?? '',
+        ward: result['ward'],
         detailedAddress: result['detailedAddress'],
       );
     });
@@ -156,8 +154,8 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
                   onProvinceSelected: (Location province) {
                     setState(() => selectedProvince = province);
                   },
-                  onDistrictSelected: (String district) {
-                    setState(() => selectedDistrict = district);
+                  onWardSelected: (String ward) {
+                    setState(() => selectedWard = ward);
                   },
                   onDetailedAddressChanged: (String detailedAddress) {
                     setState(() => detailedAddressChanged = detailedAddress);
@@ -212,6 +210,7 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
   }
 
   Widget _buildAddressCard(int index) {
+    print(widget.customer.addresses[index].toString());
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -297,14 +296,13 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
                         builder: (context) => EditLocationPage(
                           customer: widget.customer,
                           initialProvince: null, // Nếu có thể lấy Location từ tên, hãy truyền vào
-                          initialDistrict: address.district,
                           initialWard: address.ward,
                           initialDetailedAddress: address.detailedAddress,
                           onProvinceSelected: (Location province) {
                             setState(() => selectedProvince = province);
                           },
-                          onDistrictSelected: (String district) {
-                            setState(() => selectedDistrict = district);
+                          onWardSelected: (String ward) {
+                            setState(() => selectedWard = ward);
                           },
                           onDetailedAddressChanged: (String detailedAddress) {
                             setState(

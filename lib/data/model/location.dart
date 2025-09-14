@@ -1,25 +1,28 @@
 class Location {
   String name;
-  List<District> districts;
+  String status;
+  List<Ward> wards;
 
   Location({
     required this.name,
-    required this.districts,
+    required this.status,
+    required this.wards,
   });
 
   // Hàm factory để ánh xạ từ JSON
   factory Location.fromJson(Map<String, dynamic> map) {
     return Location(
-      name: map['Name'] ?? '',
-      districts: (map['Districts'] as List<dynamic>)
-          .map((districtJson) => District.fromJson(districtJson))
+      name: map['name'] ?? '',
+      status: map['status'] ?? '',
+      wards: (map['wards'] as List<dynamic>)
+          .map((wardJson) => Ward.fromJson(wardJson))
           .toList(),
     );
   }
 
   @override
   String toString() {
-    return 'Location{name: $name, districts: $districts}';
+    return 'Location{name: $name, status: $status, wards: $wards}';
   }
 }
 
@@ -53,23 +56,20 @@ class District {
 
 class Ward {
   String name;
-  String id;
 
   Ward({
     required this.name,
-    required this.id,
   });
 
   // Hàm factory để ánh xạ từ JSON
   factory Ward.fromJson(Map<String, dynamic> map) {
     return Ward(
-      name: map['Name'] ?? '',
-      id: map['_id'] ?? '',
+      name: map['name'] ?? '',
     );
   }
 
   @override
   String toString() {
-    return 'Ward{name: $name, id: $id}';
+    return 'Ward{name: $name}';
   }
 }

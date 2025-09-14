@@ -775,7 +775,7 @@ class _OnDemandState extends State<OnDemand> {
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
-                                          '${request.customerInfo.address}, ${request.location.district}, ${request.location.province}',
+                                          '${request.customerInfo.address}, ${request.location.ward}, ${request.location.province}',
                                           style: const TextStyle(
                                             fontFamily: 'Quicksand',
                                             fontSize: 14,

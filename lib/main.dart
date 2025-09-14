@@ -114,8 +114,10 @@ class MyApp extends StatelessWidget {
 //   var repository = DefaultRepository();
 //   var data = await repository.loginCustomer(phone, password);
 //   print('Login data: ${data.toString()}');
-//   var requestData = await repository.loadCustomerRequest(phone, data!.accessToken);
-//   print('Request data: ${requestData?.first.schedules.toString()}');
+//   var locationData = await repository.loadLocation();
+//   print('Location data: ${locationData.toString()}');
+//   // var requestData = await repository.loadCustomerRequest(phone, data!.accessToken);
+//   // print('Request data: ${requestData?.first.schedules.toString()}');
 //   // var registerData = await repository.registerCustomer(
 //   //   '4795335132',
 //   //   password,

@@ -198,7 +198,7 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
                     ),
                     subtitle: Text(
                       // '${widget.customer.addresses[0].district}, ${widget.customer.addresses[0].province}',
-                      '${widget.request.location.ward}, ${widget.request.location.district}, ${widget.request.location.province}',
+                      '${widget.request.location.ward}, ${widget.request.location.province}',
                       style: const TextStyle(
                         fontFamily: 'Quicksand',
                         fontSize: 14,

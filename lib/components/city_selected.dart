@@ -4,7 +4,6 @@ import '../../data/model/location.dart';
 class SelectLocation extends StatefulWidget {
   final List<Location> locations;
   final Function(Location)? onProvinceSelected;
-  final Function(String)? onDistrictSelected;
   final Function(String)? onWardSelected;
   final Function(String) onAddressChanged;
 
@@ -12,7 +11,6 @@ class SelectLocation extends StatefulWidget {
     super.key,
     required this.locations,
     this.onProvinceSelected,
-    this.onDistrictSelected,
     this.onWardSelected,
     required this.onAddressChanged,
   });
@@ -23,11 +21,9 @@ class SelectLocation extends StatefulWidget {
 
 class _SelectLocationState extends State<SelectLocation> {
   Location? selectedLocation;
-  District? selectedDistrict;
   String? selectedWardName;
   String? detailedAddress;
 
-  List<District> districts = [];
   List<Ward> wards = [];
   String address = '';
 
@@ -53,9 +49,6 @@ class _SelectLocationState extends State<SelectLocation> {
           children: [
             _buildSectionTitle('Tỉnh/Thành phố'),
             _buildLocationDropdown(),
-            const SizedBox(height: 16),
-            _buildSectionTitle('Quận/Huyện'),
-            _buildDistrictDropdown(),
             const SizedBox(height: 16),
             _buildSectionTitle('Phường/Xã'),
             _buildWardDropdown(),
@@ -98,12 +91,10 @@ class _SelectLocationState extends State<SelectLocation> {
           onChanged: (Location? newValue) {
             setState(() {
               selectedLocation = newValue;
-              selectedDistrict = null;
               selectedWardName = null;
-              wards = [];
+              wards = newValue?.wards ?? [];
 
               if (newValue != null) {
-                districts = newValue.districts;
                 widget.onProvinceSelected?.call(newValue);
               }
             });
@@ -113,50 +104,6 @@ class _SelectLocationState extends State<SelectLocation> {
               value: location,
               child: Text(
                 location.name,
-                style: const TextStyle(
-                  fontFamily: 'Quicksand',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDistrictDropdown() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<District>(
-          value: selectedDistrict,
-          hint: _buildHintText("Chọn một quận/huyện"),
-          isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded),
-          onChanged: districts.isEmpty
-              ? null
-              : (District? newValue) {
-                  setState(() {
-                    selectedDistrict = newValue;
-                    selectedWardName = null;
-                    wards = newValue?.wards ?? [];
-
-                    if (newValue != null) {
-                      widget.onDistrictSelected?.call(newValue.name);
-                    }
-                  });
-                },
-          items: districts.map((District district) {
-            return DropdownMenuItem<District>(
-              value: district,
-              child: Text(
-                district.name,
                 style: const TextStyle(
                   fontFamily: 'Quicksand',
                   fontSize: 15,

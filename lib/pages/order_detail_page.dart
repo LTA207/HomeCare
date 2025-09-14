@@ -848,7 +848,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             icon: Icons.location_on_rounded,
             title: widget.request.customerInfo.address,
             subtitle:
-                '${widget.request.location.ward}, ${widget.request.location.district}, ${widget.request.location.province}',
+                '${widget.request.location.ward}, ${widget.request.location.province}',
           ),
           const SizedBox(height: 16),
           _buildServiceDetailItem(

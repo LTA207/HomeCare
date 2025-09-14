@@ -55,7 +55,6 @@ class _ServicesOrderState extends State<ServicesOrder>
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
   Location? selectedProvince;
-  String? selectedDistrict;
   String? selectedWard;
   String? selectedDetailedAddress;
 
@@ -271,8 +270,7 @@ class _ServicesOrderState extends State<ServicesOrder>
                 onVisibilityChanged: (isVisible) {
                   if (!isVisible) {
                     setState(() {
-                      endDate =
-                          null; // Reset endDate nếu visibility bị vô hiệu hóa
+                      endDate = null;
                     });
                     print(endDate);
                   }
@@ -290,7 +288,6 @@ class _ServicesOrderState extends State<ServicesOrder>
                   });
                 },
                 onDateChanged: (date, isStartDate) {
-                  // Handle date changes
                   setState(() {
                     if (isStartDate == 'start') {
                       selectedDate = date;
@@ -304,12 +301,6 @@ class _ServicesOrderState extends State<ServicesOrder>
                     selectedProvince = province;
                   });
                   print(province);
-                },
-                onDistrictSelected: (String district) {
-                  setState(() {
-                    selectedDistrict = district;
-                  });
-                  print(district);
                 },
                 onWardSelected: (String ward) {
                   setState(() {
@@ -349,7 +340,6 @@ class _ServicesOrderState extends State<ServicesOrder>
                   });
                 },
                 onDateChanged: (date, isStartDate) {
-                  // Handle date changes
                   setState(() {
                     if (isStartDate == 'start') {
                       selectedDate = date;
@@ -363,11 +353,6 @@ class _ServicesOrderState extends State<ServicesOrder>
                 onProvinceSelected: (Location province) {
                   setState(() {
                     selectedProvince = province;
-                  });
-                },
-                onDistrictSelected: (String district) {
-                  setState(() {
-                    selectedDistrict = district;
                   });
                 },
                 onWardSelected: (String ward) {
@@ -424,18 +409,15 @@ class _ServicesOrderState extends State<ServicesOrder>
 
             // Kiểm tra xem người dùng có chọn địa chỉ mới không
             bool isNewAddressSelected = selectedProvince != null &&
-                selectedDistrict != null &&
                 selectedWard != null &&
                 selectedDetailedAddress != null &&
                 selectedProvince!.name != widget.customer.addresses[0].province;
 
             if (isNewAddressSelected) {
-              // Tạo địa chỉ mới và thêm vào danh sách địa chỉ của khách hàng
               var newAddress = Addresses(
                 province: selectedProvince!.name,
-                district: selectedDistrict!,
-                detailedAddress: selectedDetailedAddress!,
                 ward: selectedWard!,
+                detailedAddress: selectedDetailedAddress!,
               );
               widget.customer.addresses.add(newAddress);
             }
@@ -465,17 +447,14 @@ class _ServicesOrderState extends State<ServicesOrder>
                   coefficientOther: 1.0,
                   cost: widget.service.basicPrice),
               location: (selectedProvince != null &&
-                      selectedDistrict != null &&
                       selectedWard != null &&
                       selectedDetailedAddress != null)
                   ? RequestLocation(
                       province: selectedProvince!.name,
-                      district: selectedDistrict ?? '',
-                      ward: selectedWard ?? '',
+                      ward: selectedWard!,
                     )
                   : RequestLocation(
                       province: widget.customer.addresses[0].province,
-                      district: widget.customer.addresses[0].district,
                       ward: widget.customer.addresses[0].ward),
               id: '',
               // Generate or provide an ID if required
@@ -511,7 +490,7 @@ class _ServicesOrderState extends State<ServicesOrder>
             print('Start Time: ${request.startTime}');
             print('End Time: ${request.endTime}');
             print(
-                'Location: ${request.location.province}, ${request.location.district}');
+                'Location: ${request.location.province}, ${request.location.ward}');
             print('Order Date: ${request.oderDate}');
             print('Request Type: ${request.requestType}');
             print('Total Cost: ${request.totalCost}');
@@ -620,7 +599,6 @@ class OnDemand extends StatefulWidget {
   final Customer customer;
   final Function(TimeOfDay?, TimeOfDay?)? onTimeChanged;
   final Function(Location)? onProvinceSelected;
-  final Function(String)? onDistrictSelected;
   final Function(String)? onWardSelected;
   final Function(DateTime?, String?)? onDateChanged;
   final Function(String)? onDetailedAddressChanged;
@@ -632,7 +610,6 @@ class OnDemand extends StatefulWidget {
     required this.customer,
     this.onTimeChanged,
     this.onProvinceSelected,
-    this.onDistrictSelected,
     this.onWardSelected,
     this.onDateChanged,
     this.onDetailedAddressChanged,
@@ -645,7 +622,6 @@ class OnDemand extends StatefulWidget {
 
 class _OnDemandState extends State<OnDemand> {
   Location? selectedProvince;
-  String? selectedDistrict;
   String? selectedWard;
   String? selectedDetailedAddress;
   bool isEditingLocation = false;
@@ -722,10 +698,9 @@ class _OnDemandState extends State<OnDemand> {
                       //     color: Colors.green),
                       title: Text(
                         selectedProvince != null &&
-                                selectedDistrict != null &&
                                 selectedWard != null &&
                                 selectedDetailedAddress != null
-                            ? "$selectedDetailedAddress, $selectedWard, $selectedDistrict, ${selectedProvince!.name}"
+                            ? "$selectedDetailedAddress, $selectedWard, ${selectedProvince!.name}"
                             : (widget.customer.addresses.isNotEmpty
                                 ? widget.customer.addresses[0].toString()
                                 : "Chưa có địa chỉ"),
@@ -779,14 +754,6 @@ class _OnDemandState extends State<OnDemand> {
                                 widget.onProvinceSelected!(province);
                               }
                             },
-                            onDistrictSelected: (district) {
-                              setState(() {
-                                selectedDistrict = district;
-                              });
-                              if (widget.onDistrictSelected != null) {
-                                widget.onDistrictSelected!(district);
-                              }
-                            },
                             onWardSelected: (ward) {
                               setState(() {
                                 selectedWard = ward;
@@ -805,17 +772,6 @@ class _OnDemandState extends State<OnDemand> {
                               }
                             },
                           ),
-                          // AddressType(
-                          //   onAddressChanged: (detailedAddress) {
-                          //     setState(() {
-                          //       selectedDetailedAddress = detailedAddress;
-                          //     });
-                          //     if (widget.onDetailedAddressChanged != null) {
-                          //       widget
-                          //           .onDetailedAddressChanged!(detailedAddress);
-                          //     }
-                          //   },
-                          // ),
                         ],
                       ),
                     ),
@@ -834,7 +790,6 @@ class LongTerm extends StatefulWidget {
   final Customer customer;
   final Function(TimeOfDay?, TimeOfDay?)? onTimeChanged;
   final Function(Location)? onProvinceSelected;
-  final Function(String)? onDistrictSelected;
   final Function(String)? onWardSelected;
   final Function(DateTime?, String?)? onDateChanged;
   final Function(String)? onDetailedAddressChanged;
@@ -845,7 +800,6 @@ class LongTerm extends StatefulWidget {
       required this.locations,
       this.onTimeChanged,
       this.onProvinceSelected,
-      this.onDistrictSelected,
       this.onDateChanged,
       this.onWardSelected,
       this.onDetailedAddressChanged,
@@ -858,7 +812,6 @@ class LongTerm extends StatefulWidget {
 
 class _LongTermState extends State<LongTerm> {
   Location? selectedProvince;
-  String? selectedDistrict;
   String? selectedWard;
   String? selectedDetailedAddress;
   bool isEditingLocation = false;
@@ -953,10 +906,9 @@ class _LongTermState extends State<LongTerm> {
                       //     color: Colors.green),
                       title: Text(
                         selectedProvince != null &&
-                                selectedDistrict != null &&
                                 selectedWard != null &&
                                 selectedDetailedAddress != null
-                            ? "$selectedDetailedAddress, $selectedWard, $selectedDistrict, ${selectedProvince!.name}"
+                            ? "$selectedDetailedAddress, $selectedWard, ${selectedProvince!.name}"
                             : (widget.customer.addresses.isNotEmpty
                                 ? widget.customer.addresses[0].toString()
                                 : "Chưa có địa chỉ"),
@@ -1010,14 +962,6 @@ class _LongTermState extends State<LongTerm> {
                                 widget.onProvinceSelected!(province);
                               }
                             },
-                            onDistrictSelected: (district) {
-                              setState(() {
-                                selectedDistrict = district;
-                              });
-                              if (widget.onDistrictSelected != null) {
-                                widget.onDistrictSelected!(district);
-                              }
-                            },
                             onWardSelected: (ward) {
                               setState(() {
                                 selectedWard = ward;
@@ -1036,17 +980,6 @@ class _LongTermState extends State<LongTerm> {
                               }
                             },
                           ),
-                          // AddressType(
-                          //   onAddressChanged: (detailedAddress) {
-                          //     setState(() {
-                          //       selectedDetailedAddress = detailedAddress;
-                          //     });
-                          //     if (widget.onDetailedAddressChanged != null) {
-                          //       widget
-                          //           .onDetailedAddressChanged!(detailedAddress);
-                          //     }
-                          //   },
-                          // ),
                         ],
                       ),
                     ),
@@ -1328,9 +1261,9 @@ class _LongTermState extends State<LongTerm> {
 //                       selectedProvince = province;
 //                     });
 //                   },
-//                   onDistrictSelected: (String district) {
+//                   onWardSelected: (String ward) {
 //                     setState(() {
-//                       selectedDistrict = district;
+//                       selectedWard = ward;
 //                     });
 //                   },
 //                 ),
@@ -1367,9 +1300,9 @@ class _LongTermState extends State<LongTerm> {
 //                       selectedProvince = province;
 //                     });
 //                   },
-//                   onDistrictSelected: (String district) {
+//                   onWardSelected: (String ward) {
 //                     setState(() {
-//                       selectedDistrict = district;
+//                       selectedWard = ward;
 //                     });
 //                   },
 //                 ),
@@ -1412,7 +1345,7 @@ class _LongTermState extends State<LongTerm> {
 //   final List<Customer> customers;
 //   final Function(TimeOfDay?, TimeOfDay?)? onTimeChanged;
 //   final Function(Location)? onProvinceSelected;
-//   final Function(String)? onDistrictSelected;
+//   final Function(String)? onWardSelected;
 //   final Function(DateTime?, String?)? onDateChanged;
 
 //   const ServiceOrderTab({
@@ -1422,7 +1355,7 @@ class _LongTermState extends State<LongTerm> {
 //     required this.customers,
 //     this.onTimeChanged,
 //     this.onProvinceSelected,
-//     this.onDistrictSelected,
+//     this.onWardSelected,
 //     this.onDateChanged,
 //   });
 
@@ -1432,7 +1365,7 @@ class _LongTermState extends State<LongTerm> {
 
 // class _ServiceOrderTabState extends State<ServiceOrderTab> {
 //   Location? selectedProvince;
-//   String? selectedDistrict;
+//   String? selectedWard;
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -1492,11 +1425,11 @@ class _LongTermState extends State<LongTerm> {
 //                         });
 //                         widget.onProvinceSelected?.call(province);
 //                       },
-//                       onDistrictSelected: (String district) {
+//                       onWardSelected: (String ward) {
 //                         setState(() {
-//                           selectedDistrict = district;
+//                           selectedWard = ward;
 //                         });
-//                         widget.onDistrictSelected?.call(district);
+//                         widget.onWardSelected?.call(ward);
 //                       },
 //                     ),
 //                     const SizedBox(height: 16),
