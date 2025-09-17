@@ -10,12 +10,16 @@ class ServiceListMenu extends StatefulWidget {
   final List<CostFactor> costFactors;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const ServiceListMenu({
     Key? key,
     required this.customer,
     required this.services,
-    required this.costFactors, required this.token, required this.refreshToken,
+    required this.costFactors,
+    required this.token,
+    required this.refreshToken,
+    required this.deviceToken,
   }) : super(key: key);
 
   @override
@@ -93,7 +97,7 @@ class _ServiceListMenuState extends State<ServiceListMenu> {
                         costFactors: widget.costFactors,
                         token: widget.token,
                         refreshToken: widget.refreshToken,
-                    ),
+                        deviceToken: widget.deviceToken),
                   ),
                 );
               },
@@ -174,6 +178,7 @@ class _ServiceListMenuState extends State<ServiceListMenu> {
           services: widget.services,
           token: widget.token,
           refreshToken: widget.refreshToken,
+          deviceToken: widget.deviceToken,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(

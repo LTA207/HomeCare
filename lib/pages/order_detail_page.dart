@@ -24,6 +24,7 @@ class OrderDetailPage extends StatefulWidget {
   final List<CostFactor> costFactors;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const OrderDetailPage({
     super.key,
@@ -31,7 +32,7 @@ class OrderDetailPage extends StatefulWidget {
     required this.helpers,
     required this.services,
     required this.customer,
-    required this.costFactors, required this.token, required this.refreshToken,
+    required this.costFactors, required this.token, required this.refreshToken, required this.deviceToken,
   });
 
   @override
@@ -1252,6 +1253,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       services: widget.services,
                       token: widget.token,
                       refreshToken: widget.refreshToken,
+                      deviceToken: widget.deviceToken,
                     ),
                   ),
                 );

@@ -26,6 +26,7 @@ class ActivityPage extends StatefulWidget {
   final List<Services> services;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const ActivityPage({
     Key? key,
@@ -34,6 +35,7 @@ class ActivityPage extends StatefulWidget {
     required this.services,
     required this.token,
     required this.refreshToken,
+    required this.deviceToken,
   }) : super(key: key);
 
   @override
@@ -218,6 +220,7 @@ class _ActivityPageState extends State<ActivityPage>
                         refreshData: loadRequestData,
                         token: widget.token,
                         refreshToken: widget.refreshToken,
+                        deviceToken: widget.deviceToken,
                       )
                     : LongTerm(
                         requests: requestCustomer ?? [],
@@ -230,6 +233,7 @@ class _ActivityPageState extends State<ActivityPage>
                         requestDetail: requestDetails,
                         token: widget.token,
                         refreshToken: widget.refreshToken,
+                        deviceToken: widget.deviceToken,
                       ),
           ),
         ),
@@ -278,6 +282,7 @@ class OnDemand extends StatefulWidget {
   final Future<void> Function() refreshData;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const OnDemand({
     super.key,
@@ -290,6 +295,7 @@ class OnDemand extends StatefulWidget {
     required this.requestDetail,
     required this.token,
     required this.refreshToken,
+    required this.deviceToken,
   });
 
   @override
@@ -594,6 +600,7 @@ class _OnDemandState extends State<OnDemand> {
                       requestDetail: request.schedules.first,
                       token: widget.token,
                       refreshToken: widget.refreshToken,
+                      deviceToken: widget.deviceToken,
                     ),
                   ),
                 );
@@ -907,6 +914,8 @@ class _OnDemandState extends State<OnDemand> {
                                                                   widget.token,
                                                               refreshToken: widget
                                                                   .refreshToken,
+                                                              deviceToken: widget
+                                                                  .deviceToken,
                                                             ),
                                                           ),
                                                         );
@@ -948,6 +957,7 @@ class _OnDemandState extends State<OnDemand> {
                                             costFactors: widget.costFactors,
                                             token: widget.token,
                                             refreshToken: widget.refreshToken,
+                                            deviceToken: widget.deviceToken,
                                           ),
                                         ),
                                       );
@@ -993,18 +1003,20 @@ class LongTerm extends StatefulWidget {
   final Future<void> Function() refreshData;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const LongTerm(
       {super.key,
-        required this.requests,
-        required this.customer,
-        required this.costFactors,
-        required this.services,
-        required this.helperList,
-        required this.refreshData,
-        required this.requestDetail,
-        required this.token,
-        required this.refreshToken});
+      required this.requests,
+      required this.customer,
+      required this.costFactors,
+      required this.services,
+      required this.helperList,
+      required this.refreshData,
+      required this.requestDetail,
+      required this.token,
+      required this.refreshToken,
+      required this.deviceToken});
 
   @override
   State<LongTerm> createState() => _LongTermState();
@@ -1049,7 +1061,7 @@ class _LongTermState extends State<LongTerm> {
 
     for (var request in longTermRequests) {
       String startDate =
-      DateFormat('dd-MM-yyyy').format(DateTime.parse(request.oderDate));
+          DateFormat('dd-MM-yyyy').format(DateTime.parse(request.oderDate));
 
       var matchedRequestDetails = detailsByScheduleId[request.id] ?? [];
 
@@ -1229,386 +1241,386 @@ class _LongTermState extends State<LongTerm> {
       color: const Color(0xFFF5F5F5),
       child: groupedRequests.isEmpty
           ? const Center(
-        child: Text(
-          "Không có yêu cầu dài hạn",
-          style: TextStyle(
-            fontFamily: 'Quicksand',
-            fontSize: 16,
-            color: Colors.grey,
-          ),
-        ),
-      )
-          : ListView.builder(
-        padding: const EdgeInsets.all(10),
-        itemCount: groupedRequests.length,
-        itemBuilder: (context, index) {
-          final entry = groupedRequests.entries.elementAt(index);
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              Transform.translate(
-                offset: const Offset(-10, 0),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 12,
-                  ),
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(8),
-                      bottomRight: Radius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    entry.key, // Ngày bắt đầu
-                    style: const TextStyle(
-                      fontFamily: 'Quicksand',
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              child: Text(
+                "Không có yêu cầu dài hạn",
+                style: TextStyle(
+                  fontFamily: 'Quicksand',
+                  fontSize: 16,
+                  color: Colors.grey,
                 ),
               ),
-              const SizedBox(height: 10),
-              ...entry.value.map((request) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(10),
+              itemCount: groupedRequests.length,
+              itemBuilder: (context, index) {
+                final entry = groupedRequests.entries.elementAt(index);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Transform.translate(
+                      offset: const Offset(-10, 0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 12,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(8),
+                            bottomRight: Radius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          entry.key, // Ngày bắt đầu
+                          style: const TextStyle(
+                            fontFamily: 'Quicksand',
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Từ: ${DateFormat('dd/MM/yyyy').format(
-                                  DateTime.parse(request.startTime))}',
-                              style: const TextStyle(
-                                fontFamily: 'Quicksand',
-                                color: Color(0xFF5B6366),
-                                fontSize: 14,
-                              ),
+                    ),
+                    const SizedBox(height: 10),
+                    ...entry.value.map((request) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-                            Text(
-                              'Đến: ${DateFormat('dd/MM/yyyy').format(
-                                  DateTime.parse(request.endTime))}',
-                              style: const TextStyle(
-                                fontFamily: 'Quicksand',
-                                color: Color(0xFF5B6366),
-                                fontSize: 14,
-                              ),
-                            ),
-
-                            // Container(
-                            //   decoration: BoxDecoration(
-                            //     color: _getStatusBackgroundColor(
-                            //       request.status,
-                            //     ),
-                            //     borderRadius: BorderRadius.circular(8),
-                            //   ),
-                            //   padding: const EdgeInsets.symmetric(
-                            //     horizontal: 8,
-                            //     vertical: 4,
-                            //   ),
-                            //   child: Text(
-                            //     getStatusInVietnamese(
-                            //       request.status,
-                            //     ),
-                            //     style: TextStyle(
-                            //       fontFamily: 'Quicksand',
-                            //       color:
-                            //           _getStatusTextColor(request.status),
-                            //       fontSize: 14,
-                            //       fontWeight: FontWeight.bold,
-                            //     ),
-                            //   ),
-                            // ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade50,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.cleaning_services_rounded,
-                                color: Colors.green,
-                                size: 32,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          request.service.title,
-                                          style: const TextStyle(
-                                            fontFamily: 'Quicksand',
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                      SizedBox(width: 8),
-                                      Flexible(
-                                        child: Text(
-                                          // '${request.totalCost}₫',
-                                          formatCurrency(request.totalCost
-                                              .toDouble()),
-                                          style: const TextStyle(
-                                            fontFamily: 'Quicksand',
-                                            fontSize: 16,
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
+                                children: [
                                   Text(
-                                    request.customerInfo.address,
+                                    'Từ: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(request.startTime))}',
                                     style: const TextStyle(
                                       fontFamily: 'Quicksand',
+                                      color: Color(0xFF5B6366),
                                       fontSize: 14,
-                                      color: Colors.grey,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
+                                  ),
+                                  Text(
+                                    'Đến: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(request.endTime))}',
+                                    style: const TextStyle(
+                                      fontFamily: 'Quicksand',
+                                      color: Color(0xFF5B6366),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+
+                                  // Container(
+                                  //   decoration: BoxDecoration(
+                                  //     color: _getStatusBackgroundColor(
+                                  //       request.status,
+                                  //     ),
+                                  //     borderRadius: BorderRadius.circular(8),
+                                  //   ),
+                                  //   padding: const EdgeInsets.symmetric(
+                                  //     horizontal: 8,
+                                  //     vertical: 4,
+                                  //   ),
+                                  //   child: Text(
+                                  //     getStatusInVietnamese(
+                                  //       request.status,
+                                  //     ),
+                                  //     style: TextStyle(
+                                  //       fontFamily: 'Quicksand',
+                                  //       color:
+                                  //           _getStatusTextColor(request.status),
+                                  //       fontSize: 14,
+                                  //       fontWeight: FontWeight.bold,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.shade50,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Icon(
+                                      Icons.cleaning_services_rounded,
+                                      color: Colors.green,
+                                      size: 32,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              flex: 2,
+                                              child: Text(
+                                                request.service.title,
+                                                style: const TextStyle(
+                                                  fontFamily: 'Quicksand',
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Flexible(
+                                              child: Text(
+                                                // '${request.totalCost}₫',
+                                                formatCurrency(request.totalCost
+                                                    .toDouble()),
+                                                style: const TextStyle(
+                                                  fontFamily: 'Quicksand',
+                                                  fontSize: 16,
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          request.customerInfo.address,
+                                          style: const TextStyle(
+                                            fontFamily: 'Quicksand',
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            // InkWell(
-                            //   onTap: () {
-                            //     Navigator.push(
-                            //       context,
-                            //       MaterialPageRoute(
-                            //         builder: (context) => OrderDetailPage(
-                            //           request: request,
-                            //         ),
-                            //       ),
-                            //     );
-                            //   },
-                            //   child: const Text(
-                            //     "Chi tiết",
-                            //     style: TextStyle(
-                            //       fontFamily: 'Quicksand',
-                            //       fontSize: 14,
-                            //       color: Colors.green,
-                            //       fontWeight: FontWeight.bold,
-                            //     ),
-                            //   ),
-                            // ),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // InkWell(
+                                  //   onTap: () {
+                                  //     Navigator.push(
+                                  //       context,
+                                  //       MaterialPageRoute(
+                                  //         builder: (context) => OrderDetailPage(
+                                  //           request: request,
+                                  //         ),
+                                  //       ),
+                                  //     );
+                                  //   },
+                                  //   child: const Text(
+                                  //     "Chi tiết",
+                                  //     style: TextStyle(
+                                  //       fontFamily: 'Quicksand',
+                                  //       fontSize: 14,
+                                  //       color: Colors.green,
+                                  //       fontWeight: FontWeight.bold,
+                                  //     ),
+                                  //   ),
+                                  // ),
 
-                            (request.status == "pending")
-                                ? ElevatedButton(
-                              onPressed: () {
-                                showCancelConfirmationDialog(
-                                    context, request);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red[100],
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                "Huỷ yêu cầu",
-                                style: TextStyle(
-                                  fontFamily: 'Quicksand',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            )
-                                : request.status == 'inProgress'
-                                ? ElevatedButton(
-                              onPressed: () {
-                                print(request.scheduleIds);
-                                showConfirmLongTermDayDialog(
-                                  context,
-                                  request,
-                                  widget.customer,
-                                  widget.costFactors,
-                                  widget.services,
-                                  widget.token,
-                                  widget.refreshToken,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                "Thanh toán",
-                                style: TextStyle(
-                                  fontFamily: 'Quicksand',
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            )
-                                : request.status == 'assigned'
-                                ? Container()
-                                : ElevatedButton(
-                              onPressed: () {
-                                var matchingServices =
-                                widget.services
-                                    .where((service) =>
-                                request.service
-                                    .title ==
-                                    service.title)
-                                    .toList();
+                                  (request.status == "pending")
+                                      ? ElevatedButton(
+                                          onPressed: () {
+                                            showCancelConfirmationDialog(
+                                                context, request);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red[100],
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            "Huỷ yêu cầu",
+                                            style: TextStyle(
+                                              fontFamily: 'Quicksand',
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        )
+                                      : request.status == 'inProgress'
+                                          ? ElevatedButton(
+                                              onPressed: () {
+                                                print(request.scheduleIds);
+                                                showConfirmLongTermDayDialog(
+                                                  context,
+                                                  request,
+                                                  widget.customer,
+                                                  widget.costFactors,
+                                                  widget.services,
+                                                  widget.token,
+                                                  widget.refreshToken,
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.blue,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                "Thanh toán",
+                                                style: TextStyle(
+                                                  fontFamily: 'Quicksand',
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            )
+                                          : request.status == 'assigned'
+                                              ? Container()
+                                              : ElevatedButton(
+                                                  onPressed: () {
+                                                    var matchingServices =
+                                                        widget.services
+                                                            .where((service) =>
+                                                                request.service
+                                                                    .title ==
+                                                                service.title)
+                                                            .toList();
 
-                                Services reorderService =
-                                matchingServices
-                                    .isNotEmpty
-                                    ? matchingServices
-                                    .first
-                                    : widget
-                                    .services[0];
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        ServicesOrder(
-                                          customer:
-                                          widget.customer,
-                                          service:
-                                          reorderService,
-                                          costFactors: widget
-                                              .costFactors,
-                                          services:
-                                          widget.services,
-                                          selectedTab: 1,
-                                          token: widget.token,
-                                          refreshToken: widget
-                                              .refreshToken,
+                                                    Services reorderService =
+                                                        matchingServices
+                                                                .isNotEmpty
+                                                            ? matchingServices
+                                                                .first
+                                                            : widget
+                                                                .services[0];
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ServicesOrder(
+                                                          customer:
+                                                              widget.customer,
+                                                          service:
+                                                              reorderService,
+                                                          costFactors: widget
+                                                              .costFactors,
+                                                          services:
+                                                              widget.services,
+                                                          selectedTab: 1,
+                                                          token: widget.token,
+                                                          refreshToken: widget
+                                                              .refreshToken,
+                                                          deviceToken: widget.deviceToken
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.grey.shade300,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    "Đặt lại",
+                                                    style: TextStyle(
+                                                      fontFamily: 'Quicksand',
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black87,
+                                                    ),
+                                                  ),
+                                                ),
+                                  const SizedBox(width: 10),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              OrderDetailLongTermPage(
+                                            request: request,
+                                            helpers: widget.helperList,
+                                            services: widget.services,
+                                            costFactors: widget.costFactors,
+                                            customer: widget.customer,
+                                            requestDetail:
+                                                groupedDetails[request.id] ??
+                                                    [],
+                                            token: widget.token,
+                                            refreshToken: widget.refreshToken,
+                                            deviceToken: widget.deviceToken
+                                          ),
                                         ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      "Xem chi tiết",
+                                      style: TextStyle(
+                                        fontFamily: 'Quicksand',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
-                                );
-                              },
-                              style:
-                              ElevatedButton.styleFrom(
-                                backgroundColor:
-                                Colors.grey.shade300,
-                                shape:
-                                RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(
-                                      8),
-                                ),
+                                ],
                               ),
-                              child: const Text(
-                                "Đặt lại",
-                                style: TextStyle(
-                                  fontFamily: 'Quicksand',
-                                  fontSize: 14,
-                                  fontWeight:
-                                  FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        OrderDetailLongTermPage(
-                                          request: request,
-                                          helpers: widget.helperList,
-                                          services: widget.services,
-                                          costFactors: widget.costFactors,
-                                          customer: widget.customer,
-                                          requestDetail:
-                                          groupedDetails[request.id] ??
-                                              [],
-                                          token: widget.token,
-                                          refreshToken: widget.refreshToken,
-                                        ),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                "Xem chi tiết",
-                                style: TextStyle(
-                                  fontFamily: 'Quicksand',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
+                      );
+                    }).toList(),
+                  ],
                 );
-              }).toList(),
-            ],
-          );
-        },
-      ),
+              },
+            ),
     );
   }
 }

@@ -24,6 +24,7 @@ class HelperList extends StatefulWidget {
   final Services service;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const HelperList({
     super.key,
@@ -33,7 +34,7 @@ class HelperList extends StatefulWidget {
     required this.isOnDemand,
     required this.costFactors,
     required this.services,
-    required this.service, required this.token, required this.refreshToken,
+    required this.service, required this.token, required this.refreshToken, required this.deviceToken,
   });
 
   @override
@@ -116,6 +117,7 @@ class _HelperListState extends State<HelperList> {
                       service: widget.service,
                       token: widget.token,
                       refreshToken: widget.refreshToken,
+                      deviceToken: widget.deviceToken,
                     ),
                   ),
                 ),
@@ -281,6 +283,7 @@ class _HelperListState extends State<HelperList> {
           service: widget.service,
           token: widget.token,
           refreshToken: widget.refreshToken,
+          deviceToken: widget.deviceToken,
         ),
       ),
     );

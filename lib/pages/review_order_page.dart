@@ -19,6 +19,7 @@ class ReviewOrderPage extends StatefulWidget {
   final Services service;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const ReviewOrderPage({
     super.key,
@@ -30,6 +31,7 @@ class ReviewOrderPage extends StatefulWidget {
     required this.service,
     required this.token,
     required this.refreshToken,
+    required this.deviceToken,
   });
 
   @override
@@ -686,14 +688,14 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            HomePage(
-              customer: widget.customer,
-              costFactor: widget.costFactors,
-              services: widget.services,
-              token: widget.token,
-              refreshToken: widget.refreshToken,
-            ),
+        pageBuilder: (context, animation, secondaryAnimation) => HomePage(
+          customer: widget.customer,
+          costFactor: widget.costFactors,
+          services: widget.services,
+          token: widget.token,
+          refreshToken: widget.refreshToken,
+          deviceToken: widget.deviceToken,
+        ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: animation,

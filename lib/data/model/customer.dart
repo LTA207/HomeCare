@@ -83,8 +83,12 @@ class Addresses {
 
   factory Addresses.fromJson(Map<String, dynamic> map) {
     return Addresses(
-      province: map['province'] ?? '',
-      ward: map['ward'] ?? '',
+      province: map['province'] is String
+          ? map['province'] ?? ''
+          : (map['province'] is Map ? map['province']['name'] ?? '' : ''),
+      ward: map['ward'] is String
+          ? map['ward'] ?? ''
+          : (map['ward'] is Map ? map['ward']['name'] ?? '' : ''),
       detailedAddress: map['detailAddress'] ?? '',
     );
   }

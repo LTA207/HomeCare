@@ -27,6 +27,7 @@ class HomePage extends StatefulWidget {
   final List<Requests>? requests;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   final List<CostFactor> costFactor;
 
@@ -38,6 +39,7 @@ class HomePage extends StatefulWidget {
     required this.costFactor,
     required this.token,
     required this.refreshToken,
+    required this.deviceToken,
   });
 
   @override
@@ -59,6 +61,7 @@ class _HomePageState extends State<HomePage> {
         costFactors: widget.costFactor,
         token: widget.token,
         refreshToken: widget.refreshToken,
+        deviceToken: widget.deviceToken,
       ),
       ActivityPage(
         customer: widget.customer,
@@ -66,12 +69,14 @@ class _HomePageState extends State<HomePage> {
         services: widget.services,
         token: widget.token,
         refreshToken: widget.refreshToken,
+        deviceToken: widget.deviceToken,
       ),
       NotificationPage(),
       ProfilePage(
         customer: widget.customer,
         token: widget.token,
         refreshToken: widget.refreshToken,
+        deviceToken: widget.deviceToken,
       ),
     ]);
   }
@@ -137,6 +142,7 @@ class HomeContent extends StatefulWidget {
   final List<CostFactor> costFactors;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const HomeContent({
     super.key,
@@ -145,6 +151,7 @@ class HomeContent extends StatefulWidget {
     required this.costFactors,
     required this.token,
     required this.refreshToken,
+    required this.deviceToken,
   });
 
   @override
@@ -297,6 +304,7 @@ class _HomeContentState extends State<HomeContent> {
                         customer: widget.customer,
                         token: widget.token,
                         refreshToken: widget.refreshToken,
+                        deviceToken: widget.deviceToken,
                       ),
                     ),
                   );
@@ -759,6 +767,7 @@ class _HomeContentState extends State<HomeContent> {
                                   services: widget.services,
                                   token: widget.token,
                                   refreshToken: widget.refreshToken,
+                                  deviceToken: widget.deviceToken,
                                 ),
                               ),
                             );
@@ -885,6 +894,7 @@ class _HomeContentState extends State<HomeContent> {
       costFactors: widget.costFactors,
       token: widget.token,
       refreshToken: widget.refreshToken,
+      deviceToken: widget.deviceToken,
     );
   }
 

@@ -26,6 +26,7 @@ class OrderDetailLongTermPage extends StatefulWidget {
   final List<CostFactor> costFactors;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const OrderDetailLongTermPage({
     super.key,
@@ -33,7 +34,11 @@ class OrderDetailLongTermPage extends StatefulWidget {
     required this.helpers,
     required this.services,
     required this.customer,
-    required this.costFactors, required this.request, required this.token, required this.refreshToken,
+    required this.costFactors,
+    required this.request,
+    required this.token,
+    required this.refreshToken,
+    required this.deviceToken,
   });
 
   @override
@@ -136,6 +141,7 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                       requestDetail: widget.requestDetail[0],
                       token: widget.token,
                       refreshToken: widget.refreshToken,
+                      deviceToken: widget.deviceToken,
                     ),
                   ),
                 );
@@ -166,7 +172,7 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
       case 'processing':
         return Color(0xFF0C5460);
       case 'waitPayment':
-        return Colors.blue;// Xanh dương đậm
+        return Colors.blue; // Xanh dương đậm
       case 'done':
         return Color(0xFF155724); // Xanh lá cây đậm
       case 'cancelled':

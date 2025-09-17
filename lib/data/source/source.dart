@@ -73,6 +73,8 @@ abstract interface class DataSource {
 
   Future<void> postReview(String id, String review, bool isLoseThings,
       bool isBreakThings, int rating, String token);
+
+  Future<void> registerDeviceToken(String phone, String deviceToken);
 }
 
 class RemoteDataSource implements DataSource {
@@ -775,6 +777,35 @@ class RemoteDataSource implements DataSource {
       });
     } catch (e) {
       print('Error posting comment: $e');
+      return Future.error(e);
+    }
+  }
+
+  @override
+  Future<void> registerDeviceToken(String phone, String deviceToken) {
+    const url = 'https://homecareapi.vercel.app/notifications/register';
+    final uri = Uri.parse(url);
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      "phone": phone,
+      "token": deviceToken,
+      "deviceType": 'android'
+    });
+
+    try {
+      return http.post(uri, headers: headers, body: body).then((response) {
+        if (response.statusCode == 200) {
+          if (kDebugMode) {
+            print('Device token registered successfully!');
+          }
+        } else {
+          print(
+              'Failed to register device token. Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+        }
+      });
+    } catch (e) {
+      print('Error registering device token: $e');
       return Future.error(e);
     }
   }

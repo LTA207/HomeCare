@@ -31,6 +31,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  String deviceToken = '';
 
   // Kiểm tra và khởi tạo Firebase an toàn
   try {
@@ -56,6 +57,10 @@ void main() async {
 
     // Tạo token mới
     String? newToken = await FirebaseMessaging.instance.getToken();
+    if (newToken == null) {
+      throw Exception("Token mới trả về null");
+    }
+    deviceToken = newToken;
     print("🔥 FCM TOKEN MỚI:");
     print(newToken);
     print("📋 Copy token này và dùng trong Firebase Console");
@@ -77,7 +82,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => RequestProvider()),
       ],
-      child: const MyApp(),
+      child: MyApp(deviceToken: deviceToken,),
     ),
   );
 }
@@ -85,7 +90,8 @@ void main() async {
 
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String deviceToken;
+  const MyApp({super.key, required this.deviceToken});
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +99,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: context.watch<ThemeProvider>().themeData,
-        home: const SplashScreen(),
+        home: SplashScreen(deviceToken: deviceToken,),
       ),
     );
   }

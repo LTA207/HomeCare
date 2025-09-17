@@ -71,7 +71,7 @@ class _AuthenticationPageState extends State<AuthenticationPage>
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
-              SplashScreen(),
+              SplashScreen(deviceToken: '',),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },

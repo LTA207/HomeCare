@@ -8,7 +8,9 @@ import 'package:foodapp/pages/profile_page.dart';
 import 'package:foodapp/test_page.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final String deviceToken;
+
+  const SplashScreen({super.key, required this.deviceToken});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -63,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             LoginOrRegister(
-          key: const ValueKey("LoginOrRegister"),
+          key: const ValueKey("LoginOrRegister"), deviceToken: widget.deviceToken,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(

@@ -9,12 +9,16 @@ class AllServicesPage extends StatelessWidget {
   final List<CostFactor> costFactors;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const AllServicesPage({
     Key? key,
     required this.customer,
     required this.services,
-    required this.costFactors, required this.token, required this.refreshToken,
+    required this.costFactors,
+    required this.token,
+    required this.refreshToken,
+    required this.deviceToken,
   }) : super(key: key);
 
   final List<Map<String, dynamic>> categories = const [
@@ -300,6 +304,7 @@ class AllServicesPage extends StatelessWidget {
           services: services,
           token: token,
           refreshToken: refreshToken,
+          deviceToken: deviceToken,
         ),
       ),
     );

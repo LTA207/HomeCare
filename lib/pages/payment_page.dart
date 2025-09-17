@@ -19,6 +19,7 @@ class PaymentPage extends StatefulWidget {
   final RequestDetail requestDetail;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const PaymentPage({
     super.key,
@@ -29,6 +30,7 @@ class PaymentPage extends StatefulWidget {
     required this.requestDetail,
     required this.token,
     required this.refreshToken,
+    required this.deviceToken,
   });
 
   @override
@@ -106,6 +108,7 @@ class _PaymentPageState extends State<PaymentPage> {
               requestDetails: [widget.requestDetail],
               token: widget.token,
               refreshToken: widget.refreshToken,
+              deviceToken: widget.deviceToken,
             ),
           ),
         );
@@ -291,7 +294,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight:
-                        isSelected ? FontWeight.w700 : FontWeight.w500,
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
                         fontFamily: 'Quicksand',
                       ),
                     ),
@@ -521,22 +524,22 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
             child: isProcessing
                 ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            )
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
                 : Text(
-              "Thanh toán ${formatCurrency(widget.amount)}",
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'Quicksand',
-              ),
-            ),
+                    "Thanh toán ${formatCurrency(widget.amount)}",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Quicksand',
+                    ),
+                  ),
           ),
         ),
       ),
@@ -566,6 +569,7 @@ class _PaymentPageState extends State<PaymentPage> {
               requestDetails: [widget.requestDetail],
               token: widget.token,
               refreshToken: widget.refreshToken,
+              deviceToken: widget.deviceToken,
             ),
           ),
         );

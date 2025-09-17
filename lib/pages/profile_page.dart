@@ -16,11 +16,13 @@ class ProfilePage extends StatefulWidget {
   final Customer customer;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   ProfilePage(
       {required this.customer,
       required this.token,
-      required this.refreshToken});
+      required this.refreshToken,
+      required this.deviceToken});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -146,7 +148,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     Navigator.pop(context);
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      MaterialPageRoute(
+                          builder: (context) => LoginPage(
+                                deviceToken: widget.deviceToken,
+                              )),
                     );
                   },
                   child: Text(
@@ -273,7 +278,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(
+                      builder: (context) => LoginPage(
+                            deviceToken: widget.deviceToken,
+                          )),
                 );
               },
               child: Text(
@@ -593,7 +601,11 @@ class _ProfilePageState extends State<ProfilePage> {
         final selectedIndex = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ChooseLocationPage(customer: widget.customer, token: widget.token, refreshToken: widget.refreshToken,),
+            builder: (context) => ChooseLocationPage(
+              customer: widget.customer,
+              token: widget.token,
+              refreshToken: widget.refreshToken,
+            ),
           ),
         );
         if (selectedIndex != null) {

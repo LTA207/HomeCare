@@ -18,6 +18,7 @@ class OrderSuccess extends StatefulWidget {
   final String token;
   final String refreshToken;
   final List<RequestDetail> requestDetails;
+  final String deviceToken;
 
   const OrderSuccess({
     super.key,
@@ -25,7 +26,11 @@ class OrderSuccess extends StatefulWidget {
     required this.costFactors,
     required this.services,
     this.mainMessage,
-    this.subMessage, required this.token, required this.refreshToken, required this.requestDetails,
+    this.subMessage,
+    required this.token,
+    required this.refreshToken,
+    required this.requestDetails,
+    required this.deviceToken,
   });
 
   @override
@@ -106,14 +111,14 @@ class _OrderSuccessState extends State<OrderSuccess>
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            HomePage(
-              customer: widget.customer,
-              costFactor: widget.costFactors,
-              services: widget.services,
-              token: widget.token,
-              refreshToken: widget.refreshToken,
-            ),
+        pageBuilder: (context, animation, secondaryAnimation) => HomePage(
+          customer: widget.customer,
+          costFactor: widget.costFactors,
+          services: widget.services,
+          token: widget.token,
+          refreshToken: widget.refreshToken,
+          deviceToken: widget.deviceToken,
+        ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: animation,

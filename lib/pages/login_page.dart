@@ -13,10 +13,11 @@ import '../data/repository/repository.dart';
 
 class LoginPage extends StatefulWidget {
   final void Function()? onTap;
+  final String deviceToken;
 
   const LoginPage({
     super.key,
-    this.onTap,
+    this.onTap, required this.deviceToken,
   });
 
   @override
@@ -153,6 +154,7 @@ class _LoginPageState extends State<LoginPage>
         return;
       }
 
+      await repository.registerDeviceToken(authData.user.phone, widget.deviceToken);
       final customerData = await repository.loadCustomerInfo(authData.user.phone, token);
       final requestData = await repository.loadCustomerRequest(authData.user.phone, token);
       print('request customer: ${requestData.toString()}');
@@ -179,6 +181,7 @@ class _LoginPageState extends State<LoginPage>
                 costFactor: costFactor,
                 token: token,
                 refreshToken: refreshToken,
+                deviceToken: widget.deviceToken,
               ),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {

@@ -23,6 +23,7 @@ class ServicesOrder extends StatefulWidget {
   final int selectedTab; // Thêm tham số
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const ServicesOrder({
     super.key,
@@ -30,7 +31,7 @@ class ServicesOrder extends StatefulWidget {
     required this.service,
     required this.costFactors,
     required this.services,
-    this.selectedTab = 0, required this.token, required this.refreshToken, // Mặc định là tab 0 (Theo ngày)
+    this.selectedTab = 0, required this.token, required this.refreshToken, required this.deviceToken, // Mặc định là tab 0 (Theo ngày)
   });
 
   @override
@@ -518,6 +519,7 @@ class _ServicesOrderState extends State<ServicesOrder>
                     service: widget.service,
                     token: widget.token,
                     refreshToken: widget.refreshToken,
+                    deviceToken: widget.deviceToken,
                   ),
                 ),
               );
@@ -553,6 +555,7 @@ class _ServicesOrderState extends State<ServicesOrder>
                     // maxDate: DateTime(2025, 2, 26),
                     token: widget.token,
                     refreshToken: widget.refreshToken,
+                    deviceToken: widget.deviceToken,
                   ),
                 ),
               );

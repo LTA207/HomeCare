@@ -72,6 +72,8 @@ abstract interface class Repository {
 
   Future<void> postReview(String requestId, String review, bool isLoseThings,
       bool isBreakThings, int rating, String token);
+
+  Future<void> registerDeviceToken(String phone, String deviceToken);
 }
 
 class DefaultRepository implements Repository {
@@ -216,5 +218,10 @@ class DefaultRepository implements Repository {
   @override
   Future<void> postReview(String requestId, String review, bool isLoseThings, bool isBreakThings, int rating, String token) async{
     return await remoteDataSource.postReview(requestId, review, isLoseThings, isBreakThings, rating, token);
+  }
+
+  @override
+  Future<void> registerDeviceToken(String phone, String deviceToken) async{
+    return await remoteDataSource.registerDeviceToken(phone, deviceToken);
   }
 }

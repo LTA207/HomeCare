@@ -6,9 +6,11 @@ import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/service.dart';
 
 class LoginOrRegister extends StatefulWidget {
+  final String deviceToken;
 
   const LoginOrRegister({
     super.key,
+    required this.deviceToken,
   });
 
   @override
@@ -33,6 +35,7 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
           ? LoginPage(
               key: const ValueKey('LoginPage'),
               onTap: togglePages,
+              deviceToken: widget.deviceToken,
             )
           : RegisterPage(
               key: const ValueKey('RegisterPage'),
