@@ -16,6 +16,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import '../data/model/requestdetail.dart';
 import '../data/repository/repository.dart';
+import 'order_detail_page.dart';
 
 class OrderDetailLongTermPage extends StatefulWidget {
   final Requests request;
@@ -286,21 +287,42 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.green))
-          : SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          : ListView.builder(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              itemCount: widget.requestDetail.length + 2, // +2 for header and title
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Column(
                     children: [
                       _buildOrderStatusCard(),
                       const SizedBox(height: 16),
-                      _buildScheduleCardsSection(),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Lịch làm việc',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Quicksand',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                     ],
-                  ),
-                ),
-              ),
+                  );
+                } else if (index <= widget.requestDetail.length) {
+                  final detailIndex = index - 1;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _buildScheduleCard(widget.requestDetail[detailIndex]),
+                  );
+                } else {
+                  // Last item - bottom spacing
+                  return const SizedBox(height: 100);
+                }
+              },
             ),
       bottomNavigationBar: _allStatusDone()
           ? BottomAppBar(
@@ -330,7 +352,7 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                 ),
               ),
             )
-          : null, // Không hiển thị nếu chưa hoàn thành
+          : null,
     );
   }
 
@@ -400,49 +422,9 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
     );
   }
 
-  Widget _buildScheduleCardsSection() {
-    if (widget.requestDetail.isEmpty) {
-      return Center(
-        child: Text(
-          'Không có lịch làm việc nào',
-          style: TextStyle(
-            color: Colors.grey.shade700,
-            fontFamily: 'Quicksand',
-            fontSize: 16,
-          ),
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Lịch làm việc',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            fontFamily: 'Quicksand',
-          ),
-        ),
-        const SizedBox(height: 12),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: widget.requestDetail.length,
-          itemBuilder: (context, index) {
-            return _buildScheduleCard(widget.requestDetail[index]);
-          },
-        ),
-      ],
-    );
-  }
-
   Widget _buildScheduleCard(RequestDetail detail) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -510,69 +492,104 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (detail.status == 'waitPayment')
-                ElevatedButton(
-                  onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => PaymentPage(
-                    //       amount: detail.cost ?? 0,
-                    //       // Tổng chi phí
-                    //       customer: widget.customer,
-                    //       costFactors: widget.costFactors,
-                    //       services: widget.services,
-                    //       requestDetail: detail,
-                    //       token: widget.token,
-                    //       refreshToken: widget.refreshToken,
-                    //     ),
-                    //   ),
-                    // );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    minimumSize: const Size(160, 40),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Thanh toán',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Quicksand',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: const Size(160, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Xem chi tiết',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'Quicksand',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              // Kiểm tra điều kiện 'waitPayment' và hiển thị button "Thanh toán"
-            ],
-          ),
+          _buildButtonsForDetail(detail),
         ],
       ),
+    );
+  }
+
+  Widget _buildButtonsForDetail(RequestDetail detail) {
+    List<Widget> buttons = [];
+
+    // Thanh toán button for waitPayment status
+    if (detail.status == 'waitPayment') {
+      buttons.add(
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentPage(
+                    amount: detail.cost ?? 0,
+                    customer: widget.customer,
+                    costFactors: widget.costFactors,
+                    services: widget.services,
+                    requestDetail: detail,
+                    token: widget.token,
+                    refreshToken: widget.refreshToken,
+                    deviceToken: widget.deviceToken,
+                  ),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              minimumSize: const Size(0, 40),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'Thanh toán',
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Quicksand',
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      buttons.add(const SizedBox(width: 12));
+    }
+
+    // Xem chi tiết button (always present)
+    buttons.add(
+      Expanded(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OrderDetailPage(
+                  request: widget.request,
+                  helpers: widget.helpers,
+                  services: widget.services,
+                  customer: widget.customer,
+                  costFactors: widget.costFactors,
+                  token: widget.token,
+                  refreshToken: widget.refreshToken,
+                  deviceToken: widget.deviceToken,
+                  requestDetail: detail,
+                ),
+              ),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            minimumSize: const Size(0, 40),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text(
+            'Xem chi tiết',
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'Quicksand',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return Row(
+      children: buttons,
     );
   }
 }

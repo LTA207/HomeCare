@@ -621,6 +621,161 @@ class _OnDemandState extends State<OnDemand> {
     );
   }
 
+  Widget buildActionButtons(Requests request) {
+    List<Widget> buttons = [];
+
+    // Nút bên trái (Huỷ yêu cầu / Thanh toán / Đặt lại)
+    if (request.schedules.first.status == "pending") {
+      buttons.add(
+        ElevatedButton(
+          onPressed: () {
+            showCancelConfirmationDialog(context, request);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red[100],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text(
+            "Huỷ yêu cầu",
+            style: TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
+          ),
+        ),
+      );
+    } else if (request.status == 'waitPayment') {
+      buttons.add(
+        ElevatedButton(
+          onPressed: () {
+            _showConfirmationDialog(context, request);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text(
+            "Thanh toán",
+            style: TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    } else if (request.schedules.first.status != 'assigned' &&
+        request.schedules.first.status != 'inProgress') {
+      buttons.add(
+        ElevatedButton(
+          onPressed: () {
+            var matchingServices = widget.services
+                .where((service) => request.service.title == service.title)
+                .toList();
+
+            Services reorderService = matchingServices.isNotEmpty
+                ? matchingServices.first
+                : widget.services[0];
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ServicesOrder(
+                  customer: widget.customer,
+                  service: reorderService,
+                  costFactors: widget.costFactors,
+                  services: widget.services,
+                  token: widget.token,
+                  refreshToken: widget.refreshToken,
+                  deviceToken: widget.deviceToken,
+                ),
+              ),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey[300],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text(
+            "Đặt lại",
+            style: TextStyle(
+              fontFamily: 'Quicksand',
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Nút "Xem chi tiết"
+    final detailButton = ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderDetailPage(
+              request: request,
+              helpers: widget.helperList,
+              services: widget.services,
+              customer: widget.customer,
+              costFactors: widget.costFactors,
+              token: widget.token,
+              refreshToken: widget.refreshToken,
+              deviceToken: widget.deviceToken,
+              requestDetail: request.schedules.first,
+            ),
+          ),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      child: const Text(
+        "Xem chi tiết",
+        style: TextStyle(
+          fontFamily: 'Quicksand',
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+    );
+
+    // Nếu chỉ có 1 nút → Expanded
+    if (buttons.isEmpty) {
+      return Row(
+        children: [
+          Expanded(child: detailButton),
+        ],
+      );
+    }
+
+    // Nếu có 2 nút → spaceBetween
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        buttons.first,
+        const SizedBox(width: 10),
+        detailButton,
+      ],
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     print('danh sách: ${groupedRequests}');
@@ -797,189 +952,7 @@ class _OnDemandState extends State<OnDemand> {
                                 ],
                               ),
                               const SizedBox(height: 12),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // InkWell(
-                                  //   onTap: () {
-                                  //     Navigator.push(
-                                  //       context,
-                                  //       MaterialPageRoute(
-                                  //         builder: (context) => OrderDetailPage(
-                                  //           request: request,
-                                  //         ),
-                                  //       ),
-                                  //     );
-                                  //   },
-                                  //   child: const Text(
-                                  //     "Chi tiết",
-                                  //     style: TextStyle(
-                                  //       fontFamily: 'Quicksand',
-                                  //       fontSize: 14,
-                                  //       color: Colors.green,
-                                  //       fontWeight: FontWeight.bold,
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  // (groupedDetails[request.id]?.isNotEmpty ??
-                                  //             false) &&
-                                  request.schedules.first.status == "pending"
-                                      ? ElevatedButton(
-                                          onPressed: () {
-                                            showCancelConfirmationDialog(
-                                                context, request);
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.red[100],
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            "Huỷ yêu cầu",
-                                            style: TextStyle(
-                                              fontFamily: 'Quicksand',
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        )
-                                      : request.status == 'waitPayment'
-                                          ? ElevatedButton(
-                                              onPressed: () {
-                                                _showConfirmationDialog(
-                                                    context, request);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.blue,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                              ),
-                                              child: const Text(
-                                                "Thanh toán",
-                                                style: TextStyle(
-                                                  fontFamily: 'Quicksand',
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            )
-                                          : request.schedules.first.status ==
-                                                  'inProgress'
-                                              ? Container()
-                                              : request.schedules.first
-                                                          .status ==
-                                                      'assigned'
-                                                  ? Container()
-                                                  : ElevatedButton(
-                                                      onPressed: () {
-                                                        var matchingServices =
-                                                            widget.services
-                                                                .where((service) =>
-                                                                    request
-                                                                        .service
-                                                                        .title ==
-                                                                    service
-                                                                        .title)
-                                                                .toList();
-
-                                                        Services
-                                                            reorderService =
-                                                            matchingServices
-                                                                    .isNotEmpty
-                                                                ? matchingServices
-                                                                    .first
-                                                                : widget
-                                                                    .services[0];
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                ServicesOrder(
-                                                              customer: widget
-                                                                  .customer,
-                                                              service:
-                                                                  reorderService,
-                                                              costFactors: widget
-                                                                  .costFactors,
-                                                              services: widget
-                                                                  .services,
-                                                              token:
-                                                                  widget.token,
-                                                              refreshToken: widget
-                                                                  .refreshToken,
-                                                              deviceToken: widget
-                                                                  .deviceToken,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            Colors.grey[300],
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
-                                                        ),
-                                                      ),
-                                                      child: const Text(
-                                                        "Đặt lại",
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'Quicksand',
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black87,
-                                                        ),
-                                                      ),
-                                                    ),
-                                  const SizedBox(width: 10),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => OrderDetailPage(
-                                            request: request,
-                                            helpers: widget.helperList,
-                                            services: widget.services,
-                                            customer: widget.customer,
-                                            costFactors: widget.costFactors,
-                                            token: widget.token,
-                                            refreshToken: widget.refreshToken,
-                                            deviceToken: widget.deviceToken,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      "Xem chi tiết",
-                                      style: TextStyle(
-                                        fontFamily: 'Quicksand',
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              buildActionButtons(request),
                             ],
                           ),
                         ),

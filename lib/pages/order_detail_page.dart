@@ -4,11 +4,11 @@ import 'package:foodapp/data/model/customer.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/service.dart';
 import 'package:foodapp/pages/center_support_page.dart';
-import 'package:foodapp/pages/feedback_complaint_page.dart';
 import 'package:foodapp/pages/payment_detail_page.dart';
 import 'package:foodapp/pages/rating_page.dart';
 import 'package:foodapp/pages/services_order.dart';
 import 'package:foodapp/pages/support_page.dart';
+import 'package:foodapp/components/review_dialog.dart';
 import 'package:intl/intl.dart';
 import '../data/model/request.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -25,6 +25,7 @@ class OrderDetailPage extends StatefulWidget {
   final String token;
   final String refreshToken;
   final String deviceToken;
+  final RequestDetail requestDetail;
 
   const OrderDetailPage({
     super.key,
@@ -32,7 +33,11 @@ class OrderDetailPage extends StatefulWidget {
     required this.helpers,
     required this.services,
     required this.customer,
-    required this.costFactors, required this.token, required this.refreshToken, required this.deviceToken,
+    required this.costFactors,
+    required this.token,
+    required this.refreshToken,
+    required this.deviceToken,
+    required this.requestDetail,
   });
 
   @override
@@ -44,6 +49,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   final List<Helper> requestHelpers = [];
   bool isLoading = true;
   double promotion = 5000;
+  bool hasReviewed = false;
 
   @override
   void initState() {
@@ -59,7 +65,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
     var repository = DefaultRepository();
     if (request.scheduleIds.isNotEmpty) {
-      var data = await repository.loadRequestDetailId(request.scheduleIds, widget.token);
+      var data = await repository.loadRequestDetailId(
+          request.scheduleIds, widget.token);
       setState(() {
         requestDetailData = data ?? [];
         isLoading = false;
@@ -278,7 +285,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     ),
                     ConstrainedBox(
                       constraints: BoxConstraints(
-                        maxWidth: constraints.maxWidth - 80, // Trừ đi width của label
+                        maxWidth:
+                            constraints.maxWidth - 80, // Trừ đi width của label
                       ),
                       child: Text(
                         '${_formatDate(widget.request.oderDate)}',
@@ -1200,38 +1208,45 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => FeedbackComplaintsPage()),
-                );
-              },
-              icon: const Icon(
-                Icons.report_problem_outlined,
-                color: Colors.red,
-              ),
-              label: const Text(
-                'Báo cáo vấn ��ề',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Quicksand',
+          if (!hasReviewed && widget.request.status == 'completed') ...[
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  ReviewDialog.show(
+                    context: context,
+                    requestId: widget.requestDetail.id,
+                    token: widget.token,
+                    onReviewSubmitted: () {
+                      setState(() {
+                        hasReviewed = true;
+                      });
+                    },
+                  );
+                },
+                icon: const Icon(
+                  Icons.feedback,
+                  color: Colors.green,
                 ),
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.red.shade700,
-                side: BorderSide(color: Colors.red.shade700),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                label: const Text(
+                  'Đánh giá',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Quicksand',
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.green.shade700,
+                  side: BorderSide(color: Colors.green.shade700),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
+            const SizedBox(width: 16),
+          ],
           Expanded(
             child: ElevatedButton.icon(
               onPressed: () {
