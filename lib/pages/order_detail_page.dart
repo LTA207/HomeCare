@@ -101,9 +101,29 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         .format(dateTime);
   }
 
+  // Xóa map hình ảnh minh họa (có thể comment hoặc xóa)
+  // final Map<String, String> _timelineImages = {
+  //   'ordered': 'assets/timeline/ordered.png',
+  //   'assigned': 'assets/timeline/assigned.png',
+  //   'inProgress': 'assets/timeline/inprogress.png',
+  //   'waitPayment': 'assets/timeline/waitpayment.png',
+  //   'completed': 'assets/timeline/completed.png',
+  //   'cancelled': 'assets/timeline/cancelled.png',
+  // };
+
+  // Add this map for timeline icons
+  final Map<String, IconData> _timelineIcons = {
+    'ordered': Icons.shopping_cart,
+    'assigned': Icons.verified_user,
+    'inProgress': Icons.hourglass_top,
+    'waitPayment': Icons.payment,
+    'completed': Icons.check_circle,
+    'cancelled': Icons.cancel,
+  };
+
   @override
   Widget build(BuildContext context) {
-    print('ngày bắt đầu: ${widget.request.startTime}');
+    print('ngày bắt đầu: ${widget.request.schedules.first.startTime}');
     print(_formatDate(widget.request.startTime));
     print('trạng thái: ${widget.request.status}');
     return Scaffold(
@@ -311,8 +331,39 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   Widget _buildTimelineView() {
-    // Lấy trạng thái từ widget.request (có thể thay đổi tùy theo dữ liệu của bạn)
     String orderStatus = widget.request.status;
+
+    final steps = [
+      {'title': 'Đã đặt đơn', 'key': 'ordered'},
+      {'title': 'Đã xác nhận', 'key': 'assigned'},
+      {'title': 'Đang thực hiện', 'key': 'inProgress'},
+      {'title': 'Chờ thanh toán', 'key': 'waitPayment'},
+      {'title': 'Đã hoàn thành', 'key': 'completed'},
+    ];
+
+    int activeStep = 0;
+    switch (orderStatus) {
+      case 'ordered':
+        activeStep = 0;
+        break;
+      case 'assigned':
+        activeStep = 1;
+        break;
+      case 'inProgress':
+        activeStep = 2;
+        break;
+      case 'waitPayment':
+        activeStep = 3;
+        break;
+      case 'completed':
+        activeStep = 4;
+        break;
+      case 'cancelled':
+        activeStep = -1;
+        break;
+      default:
+        activeStep = 0;
+    }
 
     return Container(
       width: double.infinity,
@@ -340,79 +391,45 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             ),
           ),
           const SizedBox(height: 16),
-          _buildTimelineItem(
-            title: 'Đã đặt đơn',
-            time: _formatDate(widget.request.oderDate),
-            isActive: true,
-            isFirst: true,
-          ),
-          if (orderStatus == 'assigned') ...[
+          if (orderStatus != 'cancelled') ...[
+            // Normal timeline
+            for (int i = 0; i < steps.length; i++)
+              _buildTimelineItem(
+                title: steps[i]['title']!,
+                time: i == 0
+                    ? _formatDate(widget.request.oderDate)
+                    : (i <= activeStep
+                        ? 'Hoàn thành'
+                        : 'Đang chờ'),
+                isActive: i <= activeStep,
+                isFirst: i == 0,
+                isLast: i == steps.length - 1,
+                iconData: _timelineIcons[steps[i]['key']!]!,
+              ),
+          ] else ...[
+            // Cancelled timeline
             _buildTimelineItem(
-              title: 'Đã xác nhận',
-              time: 'Hoàn thành',
+              title: 'Đã đặt đơn',
+              time: _formatDate(widget.request.oderDate),
               isActive: true,
+              isFirst: true,
+              iconData: _timelineIcons['ordered']!,
             ),
-            _buildTimelineItem(
-              title: 'Đang thực hiện',
-              time: 'Đang chờ',
-              isActive: false,
-            ),
-            _buildTimelineItem(
-              title: 'Đã hoàn thành',
-              time: 'Đang chờ',
-              isActive: false,
-              isLast: true,
-            ),
-          ],
-          if (orderStatus == 'processing') ...[
-            _buildTimelineItem(
-              title: 'Đã xác nhận',
-              time: 'Hoàn thành',
-              isActive: true,
-            ),
-            _buildTimelineItem(
-              title: 'Đang thực hiện',
-              time: 'Hoàn thành',
-              isActive: true,
-            ),
-            _buildTimelineItem(
-              title: 'Đã hoàn thành',
-              time: 'Đang chờ',
-              isActive: false,
-              isLast: true,
-            ),
-          ],
-          if (orderStatus == 'done') ...[
-            _buildTimelineItem(
-              title: 'Đã xác nhận',
-              time: 'Hoàn thành',
-              isActive: true,
-            ),
-            _buildTimelineItem(
-              title: 'Đang thực hiện',
-              time: 'Hoàn thành',
-              isActive: true,
-            ),
-            _buildTimelineItem(
-              title: 'Đã hoàn thành',
-              time: 'Hoàn thành',
-              isActive: true,
-              isLast: true,
-            ),
-          ],
-          if (orderStatus == 'cancelled')
             _buildTimelineItem(
               title: 'Đơn bị huỷ',
               time: 'Đã huỷ',
               isActive: true,
               isLast: true,
               isCancelled: true,
+              iconData: _timelineIcons['cancelled']!,
             ),
+          ],
         ],
       ),
     );
   }
 
+  // Sửa hàm _buildTimelineItem: bỏ imagePath, bỏ widget Image.asset
   Widget _buildTimelineItem({
     required String title,
     required String time,
@@ -420,77 +437,130 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     bool isFirst = false,
     bool isLast = false,
     bool isCancelled = false,
+    required IconData iconData,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 30,
-          child: Column(
-            children: [
-              Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: isCancelled
-                      ? Colors.red
-                      : (isActive ? Colors.green : Colors.grey.shade300),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isCancelled
-                        ? Colors.red.shade100
-                        : (isActive ? Colors.green.shade100 : Colors.white),
-                    width: 3,
+    Color circleColor = isCancelled
+        ? Colors.red
+        : (isActive ? Colors.green : Colors.grey.shade300);
+    Color borderColor = isCancelled
+        ? Colors.red.shade100
+        : (isActive ? Colors.green.shade100 : Colors.white);
+    Color lineColor = isCancelled
+        ? Colors.red
+        : (isActive ? Colors.green : Colors.grey.shade300);
+    Color titleColor = isCancelled
+        ? Colors.red
+        : (isActive ? Colors.black : Colors.grey);
+    Color timeColor = isCancelled
+        ? Colors.red
+        : (isActive ? Colors.green : Colors.grey);
+
+    double iconScale = (isActive || isCancelled) ? 1.2 : 1.0;
+    double opacity = isActive || isCancelled ? 1.0 : 0.7;
+
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 400),
+      opacity: opacity,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 30,
+            child: Column(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: circleColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: borderColor,
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      if (isActive || isCancelled)
+                        BoxShadow(
+                          color: circleColor.withOpacity(0.3),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
+                    ],
+                  ),
+                  child: AnimatedScale(
+                    scale: iconScale,
+                    duration: const Duration(milliseconds: 400),
+                    child: Icon(
+                      iconData,
+                      color: isActive || isCancelled ? Colors.white : Colors.grey,
+                      size: 16,
+                    ),
                   ),
                 ),
-                child: isActive || isCancelled
-                    ? const Icon(Icons.check, color: Colors.white, size: 12)
-                    : null,
-              ),
-              if (!isLast)
-                Container(
-                  width: 2,
-                  height: 40,
-                  color: isCancelled
-                      ? Colors.red
-                      : (isActive ? Colors.green : Colors.grey.shade300),
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                ),
-            ],
+                if (!isLast)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
+                    width: 2,
+                    height: 40,
+                    color: lineColor,
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                  ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: isCancelled
-                      ? Colors.red
-                      : (isActive ? Colors.black : Colors.grey),
-                  fontFamily: 'Quicksand',
-                ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              decoration: BoxDecoration(
+                color: isActive
+                    ? Colors.green.withOpacity(0.05)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  if (isActive)
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                time,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isCancelled
-                      ? Colors.red
-                      : (isActive ? Colors.green : Colors.grey),
-                  fontFamily: 'Quicksand',
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 400),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: titleColor,
+                      fontFamily: 'Quicksand',
+                    ),
+                    child: Text(title),
+                  ),
+                  const SizedBox(height: 4),
+                  AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 400),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: timeColor,
+                      fontFamily: 'Quicksand',
+                    ),
+                    child: Text(time),
+                  ),
+                  SizedBox(height: isLast ? 0 : 20),
+                ],
               ),
-              SizedBox(height: isLast ? 0 : 20),
-            ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

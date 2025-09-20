@@ -103,6 +103,8 @@ class _ActivityPageState extends State<ActivityPage>
 
   // Hàm load tất cả data và chỉ setState một lần duy nhất
   Future<void> loadAllData() async {
+    if (!mounted) return;
+
     setState(() {
       isLoading = true;
     });
@@ -119,11 +121,13 @@ class _ActivityPageState extends State<ActivityPage>
     }
 
     // Chỉ setState một lần duy nhất sau khi tất cả data đã được tải
-    setState(() {
-      isLoading = false;
-      pageKey = UniqueKey();
-      print('✅ Đã tải xong tất cả dữ liệu');
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+        pageKey = UniqueKey();
+        print('Đã tải xong tất cả dữ liệu');
+      });
+    }
   }
 
   String formatCurrency(double amount) {
@@ -137,15 +141,19 @@ class _ActivityPageState extends State<ActivityPage>
   void _onTabSelected(int index) {
     if (selectedIndex == index) return;
 
+    if (!mounted) return;
+
     setState(() {
       isLoading = true;
     });
 
     Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() {
-        selectedIndex = index;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          selectedIndex = index;
+          isLoading = false;
+        });
+      }
     });
   }
 
@@ -1402,8 +1410,7 @@ class _LongTermState extends State<LongTerm> {
                               ),
                               const SizedBox(height: 12),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   // InkWell(
                                   //   onTap: () {
