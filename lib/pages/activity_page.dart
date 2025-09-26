@@ -608,7 +608,7 @@ class _OnDemandState extends State<OnDemand> {
                       requestDetail: request.schedules.first,
                       token: widget.token,
                       refreshToken: widget.refreshToken,
-                      deviceToken: widget.deviceToken,
+                      deviceToken: widget.deviceToken, request: request,
                     ),
                   ),
                 );

@@ -142,7 +142,7 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                       requestDetail: widget.requestDetail[0],
                       token: widget.token,
                       refreshToken: widget.refreshToken,
-                      deviceToken: widget.deviceToken,
+                      deviceToken: widget.deviceToken, request: request,
                     ),
                   ),
                 );
@@ -316,7 +316,7 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                   final detailIndex = index - 1;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: _buildScheduleCard(widget.requestDetail[detailIndex]),
+                    child: _buildScheduleCard(widget.requestDetail[detailIndex], widget.request),
                   );
                 } else {
                   // Last item - bottom spacing
@@ -422,7 +422,7 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
     );
   }
 
-  Widget _buildScheduleCard(RequestDetail detail) {
+  Widget _buildScheduleCard(RequestDetail detail, Requests request) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -492,13 +492,13 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
             ],
           ),
           const SizedBox(height: 12),
-          _buildButtonsForDetail(detail),
+          _buildButtonsForDetail(detail, request),
         ],
       ),
     );
   }
 
-  Widget _buildButtonsForDetail(RequestDetail detail) {
+  Widget _buildButtonsForDetail(RequestDetail detail, Requests request) {
     List<Widget> buttons = [];
 
     // Thanh toán button for waitPayment status
@@ -518,7 +518,7 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                     requestDetail: detail,
                     token: widget.token,
                     refreshToken: widget.refreshToken,
-                    deviceToken: widget.deviceToken,
+                    deviceToken: widget.deviceToken, request: request,
                   ),
                 ),
               );

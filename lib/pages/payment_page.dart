@@ -17,6 +17,7 @@ class PaymentPage extends StatefulWidget {
   final List<CostFactor> costFactors;
   final List<Services> services;
   final RequestDetail requestDetail;
+  final Requests request;
   final String token;
   final String refreshToken;
   final String deviceToken;
@@ -30,7 +31,7 @@ class PaymentPage extends StatefulWidget {
     required this.requestDetail,
     required this.token,
     required this.refreshToken,
-    required this.deviceToken,
+    required this.deviceToken, required this.request,
   });
 
   @override
@@ -41,9 +42,9 @@ class _PaymentPageState extends State<PaymentPage> {
   String selectedPaymentMethod = "bank";
   bool isProcessing = false;
 
-  void _doneRequest(RequestDetail request) {
+  void _doneRequest(Requests request) {
     var repository = DefaultRepository();
-    repository.doneConfirmRequest(request.id);
+    repository.doneConfirmRequest(request.id, widget.token);
     print(request.id);
     setState(() {
       request.status = "done";
@@ -96,7 +97,7 @@ class _PaymentPageState extends State<PaymentPage> {
       if (!mounted) return;
 
       if (result == 'payment_success') {
-        _doneRequest(widget.requestDetail);
+        _doneRequest(widget.request);
 
         Navigator.pushReplacement(
           context,
@@ -557,7 +558,7 @@ class _PaymentPageState extends State<PaymentPage> {
       if (mounted) {
         setState(() => isProcessing = false);
 
-        _doneRequest(widget.requestDetail);
+        _doneRequest(widget.request);
 
         Navigator.pushReplacement(
           context,

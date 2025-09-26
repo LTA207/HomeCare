@@ -46,9 +46,9 @@ abstract interface class Repository {
 
   Future<void> canceledRequest(String id);
 
-  Future<void> payRequest(String id);
+  Future<void> payRequest(String id, String token);
 
-  Future<void> doneConfirmRequest(String id);
+  Future<void> doneConfirmRequest(String id, String token);
 
   Future<void> sendMessage(String phone);
 
@@ -166,13 +166,13 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<void> payRequest(String id) async {
-    return await remoteDataSource.paymentRequest(id);
+  Future<void> payRequest(String id, String token) async {
+    return await remoteDataSource.paymentRequest(id, token);
   }
 
   @override
-  Future<void> doneConfirmRequest(String id) async {
-    return await remoteDataSource.paymentRequest(id);
+  Future<void> doneConfirmRequest(String id, String token) async {
+    return await remoteDataSource.paymentRequest(id, token);
   }
 
   @override

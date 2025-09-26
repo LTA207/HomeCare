@@ -50,14 +50,6 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
     });
   }
 
-  void _doneRequest(RequestDetail requestDetail) {
-    var repository = DefaultRepository();
-    repository.doneConfirmRequest(requestDetail.id);
-    setState(() {
-      requestDetail.status = 'done';
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
