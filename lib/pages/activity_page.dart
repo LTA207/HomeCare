@@ -1064,20 +1064,56 @@ class _LongTermState extends State<LongTerm> {
     return "${formatter.format(roundedAmount)} đ";
   }
 
+  Color _getStatusBackgroundColor(String status) {
+    switch (status) {
+      case 'pending':
+        return Colors.red;
+      case 'assigned':
+        return Color(0xFFFFF3CD); // Vàng nhạt
+      case 'inProgress':
+        return Color(0xFFD1ECF1); // Xanh dương nhạt
+      case 'waitPayment':
+        return Color(0xFFFFD600); // Nâu nhạt
+      case 'completed':
+        return Color(0xFFD4EDDA); // Xanh lá cây nhạt
+      case 'cancelled':
+        return Color(0xFFF8D7DA); // Đỏ nhạt
+      default:
+        return Colors.red;
+    }
+  }
+
   String getStatusInVietnamese(String status) {
     switch (status) {
       case "pending":
-        return "Chưa tiến hành";
+        return "Đã đặt đơn";
       case "assigned":
-        return "Đã giao việc";
+        return "Đã xác nhận";
       case "completed":
         return "Đã hoàn thành";
       case "inProgress":
-        return "Đang tiến hành";
+        return "Đang thực hiện";
       case "cancelled":
         return "Đã huỷ";
       default:
         return "Không xác định";
+    }
+  }
+
+  Color _getStatusTextColor(String status) {
+    switch (status) {
+      case 'pending':
+        return Colors.white;
+      case 'assigned':
+        return Color(0xFF856404); // Vàng đậm
+      case 'inProgress':
+        return Color(0xFF0C5460); // Xanh dương đậm
+      case 'completed':
+        return Color(0xFF155724); // Xanh lá cây đậm
+      case 'cancelled':
+        return Color(0xFF721C24); // Đỏ đậm
+      default:
+        return Colors.white; // Mặc định màu đen
     }
   }
 
@@ -1457,7 +1493,7 @@ class _LongTermState extends State<LongTerm> {
                                             ),
                                           ),
                                         )
-                                      : request.status == 'inProgress'
+                                      : request.status == 'waitPayment'
                                           ? ElevatedButton(
                                               onPressed: () {
                                                 print(request.scheduleIds);
@@ -1469,6 +1505,7 @@ class _LongTermState extends State<LongTerm> {
                                                   widget.services,
                                                   widget.token,
                                                   widget.refreshToken,
+                                                  widget.deviceToken,
                                                 );
                                               },
                                               style: ElevatedButton.styleFrom(
@@ -1488,9 +1525,9 @@ class _LongTermState extends State<LongTerm> {
                                                 ),
                                               ),
                                             )
-                                          : request.status == 'assigned'
-                                              ? Container()
-                                              : ElevatedButton(
+                                          : request.status != 'assigned' &&
+                                                  request.status != 'inProgress'
+                                              ? ElevatedButton(
                                                   onPressed: () {
                                                     var matchingServices =
                                                         widget.services
@@ -1550,7 +1587,8 @@ class _LongTermState extends State<LongTerm> {
                                                       color: Colors.black87,
                                                     ),
                                                   ),
-                                                ),
+                                                )
+                                              : Container(),
                                   const SizedBox(width: 10),
                                   ElevatedButton(
                                     onPressed: () {

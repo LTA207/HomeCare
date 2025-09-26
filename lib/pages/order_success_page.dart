@@ -76,6 +76,8 @@ class _OrderSuccessState extends State<OrderSuccess>
     ),
   );
 
+  bool _hasReviewed = false; // Thêm flag để theo dõi trạng thái đánh giá
+
   @override
   void initState() {
     super.initState();
@@ -99,9 +101,15 @@ class _OrderSuccessState extends State<OrderSuccess>
       requestId: requestId,
       token: widget.token,
       onReviewSubmitted: () {
+        setState(() {
+          _hasReviewed = true;
+        });
         _navigateToHome();
       },
       onSkipped: () {
+        setState(() {
+          _hasReviewed = true;
+        });
         _navigateToHome();
       },
     );
@@ -210,9 +218,7 @@ class _OrderSuccessState extends State<OrderSuccess>
                       ),
                       const SizedBox(height: 40),
                       ElevatedButton(
-                        onPressed: () {
-                          _showReviewDialog();
-                        },
+                        onPressed: _hasReviewed ? _navigateToHome : _showReviewDialog,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           padding: const EdgeInsets.symmetric(
@@ -222,8 +228,8 @@ class _OrderSuccessState extends State<OrderSuccess>
                           ),
                           elevation: 4,
                         ),
-                        child: const Text(
-                          "Về Trang Chủ",
+                        child: Text(
+                          _hasReviewed ? "Về Trang Chủ" : "Đánh Giá & Về Trang Chủ",
                           style: TextStyle(
                             fontFamily: 'Quicksand',
                             fontSize: 18,

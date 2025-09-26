@@ -120,7 +120,10 @@ class _ReviewDialogState extends State<ReviewDialog> {
           ),
         );
 
+        // Close dialog first, then call callback
+        Navigator.of(context).pop();
         widget.onReviewSubmitted?.call();
+
       } catch (e) {
         print('Error submitting review: $e');
 
@@ -152,6 +155,10 @@ class _ReviewDialogState extends State<ReviewDialog> {
           duration: Duration(seconds: 2),
         ),
       );
+
+      // Close dialog and call callback even if no request ID
+      Navigator.of(context).pop();
+      widget.onReviewSubmitted?.call();
     }
   }
 
@@ -322,7 +329,6 @@ class _ReviewDialogState extends State<ReviewDialog> {
         ElevatedButton(
           onPressed: () {
             _submitReview();
-            Navigator.of(context).pop();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
@@ -344,4 +350,3 @@ class _ReviewDialogState extends State<ReviewDialog> {
     );
   }
 }
-

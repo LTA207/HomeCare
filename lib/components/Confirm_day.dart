@@ -17,6 +17,7 @@ class ConfirmLongTermDay extends StatefulWidget {
   final List<Services> services;
   final String token;
   final String refreshToken;
+  final String deviceToken;
 
   const ConfirmLongTermDay(
       {super.key,
@@ -25,7 +26,8 @@ class ConfirmLongTermDay extends StatefulWidget {
       required this.costFactors,
       required this.services,
       required this.token,
-      required this.refreshToken});
+      required this.refreshToken,
+      required this.deviceToken});
 
   @override
   State<ConfirmLongTermDay> createState() => _ConfirmLongTermDayState();
@@ -33,7 +35,6 @@ class ConfirmLongTermDay extends StatefulWidget {
 
 class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
   List<RequestDetail>? requestDetailList;
-  bool isAllFinish = false;
 
   @override
   void initState() {
@@ -89,10 +90,6 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
                     return Container();
                   }
 
-                  final scheduleDate = DateTime.parse(schedule.workingDate);
-                  // final isDateValid = scheduleDate.isBefore(currentDate) ||
-                  //     scheduleDate.isAtSameMomentAs(currentDate);
-
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Row(
@@ -110,65 +107,27 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
                             ),
                           ),
                         ),
-                        if (requestDetailList![index].status == 'waitPayment')
-                          Flexible(
-                            flex: 1,
-                            child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  // _doneRequest(requestDetailList![index]);
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => PaymentPage(
-                                  //       amount:
-                                  //           requestDetailList![index].cost ??
-                                  //               500000,
-                                  //       customer: widget.customer,
-                                  //       costFactors: widget.costFactors,
-                                  //       services: widget.services,
-                                  //       requestDetail:
-                                  //           requestDetailList![index],
-                                  //       token: widget.token,
-                                  //       refreshToken: widget.refreshToken,
-                                  //     ),
-                                  //   ),
-                                  // );
-                                });
-                              },
-                              child: Text(
-                                'Xác nhận và thanh toán',
-                                style: TextStyle(
-                                  fontFamily: 'Quicksand',
-                                  fontSize: screenWidth > 600 ? 16 : 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.red,
-                                  decoration: TextDecoration.underline,
-                                  decorationThickness: 2.0,
-                                  decorationColor: Colors.red,
-                                ),
-                              ),
-                            ),
-                          )
-                        else
-                          Flexible(
-                            flex: 1,
-                            child: Text(
-                              requestDetailList?[index].status == 'done'
-                                  ? 'Đã thanh toán'
-                                  : 'Chưa tiến hành',
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontFamily: 'Quicksand',
-                                fontSize: screenWidth > 600 ? 16 : 14,
-                                fontWeight: FontWeight.w600,
-                                color:
-                                    requestDetailList![index].status == 'done'
-                                        ? Colors.green
-                                        : Colors.grey,
-                              ),
+                        Flexible(
+                          flex: 1,
+                          child: Text(
+                            requestDetailList?[index].status == 'completed'
+                                ? 'Đã hoàn thành'
+                                : requestDetailList?[index].status == 'waitPayment'
+                                    ? 'Chờ thanh toán'
+                                    : 'Chưa tiến hành',
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontFamily: 'Quicksand',
+                              fontSize: screenWidth > 600 ? 16 : 14,
+                              fontWeight: FontWeight.w600,
+                              color: requestDetailList![index].status == 'completed'
+                                  ? Colors.green
+                                  : requestDetailList![index].status == 'waitPayment'
+                                      ? Colors.orange
+                                      : Colors.grey,
                             ),
                           ),
+                        ),
                       ],
                     ),
                   );
@@ -176,7 +135,7 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
               ),
             ),
             const SizedBox(height: 16),
-            // OK button
+            // Payment button
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -190,14 +149,26 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
                   ),
                 ),
                 onPressed: () {
-                  print(isAllFinish);
-                  for (var requesDetail in requestDetailList!) {
-                    print("tình trạng ${requesDetail.status}");
-                  }
                   Navigator.of(context).pop(); // Close the dialog
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentPage(
+                        amount: widget.requests.totalCost,
+                        customer: widget.customer,
+                        costFactors: widget.costFactors,
+                        services: widget.services,
+                        requestDetail: widget.requests.schedules.first,
+                        request: widget.requests,
+                        token: widget.token,
+                        refreshToken: widget.refreshToken,
+                        deviceToken: widget.deviceToken,
+                      ),
+                    ),
+                  );
                 },
                 child: Text(
-                  isAllFinish ? 'Tiến hành thanh toán' : 'OK',
+                  'Tiến hành thanh toán',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white,
@@ -214,7 +185,7 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
 
 // Function to show the dialog
 void showConfirmLongTermDayDialog(BuildContext context, Requests requests,
-    Customer customer, List<CostFactor> costFactors, List<Services> services, String token, String refreshToken) {
+    Customer customer, List<CostFactor> costFactors, List<Services> services, String token, String refreshToken, String deviceToken) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -225,6 +196,7 @@ void showConfirmLongTermDayDialog(BuildContext context, Requests requests,
         services: services,
         token: token,
         refreshToken: refreshToken,
+        deviceToken: deviceToken,
       );
     },
   );
