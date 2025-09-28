@@ -10,6 +10,7 @@ import 'package:foodapp/data/model/coefficient.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/location.dart';
 import 'package:foodapp/data/model/message.dart';
+import 'package:foodapp/data/model/payment_response.dart';
 import 'package:foodapp/data/model/requestdetail.dart';
 
 import 'package:http/http.dart' as http;
@@ -75,6 +76,8 @@ abstract interface class DataSource {
       bool isBreakThings, int rating, String token);
 
   Future<void> registerDeviceToken(String phone, String deviceToken);
+
+  Future<PaymentResponse?> getPaymentLink(String requestId);
 }
 
 class RemoteDataSource implements DataSource {
@@ -806,6 +809,33 @@ class RemoteDataSource implements DataSource {
       });
     } catch (e) {
       print('Error registering device token: $e');
+      return Future.error(e);
+    }
+  }
+
+  @override
+  Future<PaymentResponse?> getPaymentLink(String requestId) {
+    final url = 'https://homecareapi.vercel.app/payment/create-payment-link';
+    final uri = Uri.parse(url);
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({"requestId": requestId});
+    
+    try {
+      return http.post(uri, headers: headers, body: body).then((response) {
+        if (response.statusCode == 200) {
+          final bodyContent = utf8.decode(response.bodyBytes);
+          final Map<String, dynamic> paymentMap = jsonDecode(bodyContent);
+          final PaymentResponse paymentResponse = PaymentResponse.fromJson(paymentMap);
+          return paymentResponse;
+        } else {
+          print(
+              'Failed to create payment link. Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+          return Future.error('Failed to create payment link');
+        }
+      });
+    } catch (e) {
+      print('Error creating payment link: $e');
       return Future.error(e);
     }
   }

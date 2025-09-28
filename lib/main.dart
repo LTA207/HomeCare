@@ -110,6 +110,7 @@ class MyApp extends StatelessWidget {
 //   String fullName = 'Nguyen Van A';
 //   String password = '123456';
 //   String email = 'trongc71@gmail.com';
+//   String requestId = "68b82aa004156d82fcf4b453";
 //   // Addresses address = Addresses(
 //   //   province: 'Hà Nội',
 //   //   district: 'Hà Đông',
@@ -120,7 +121,7 @@ class MyApp extends StatelessWidget {
 //   var repository = DefaultRepository();
 //   var data = await repository.loginCustomer(phone, password);
 //   print('Login data: ${data.toString()}');
-//   var locationData = await repository.loadLocation();
+//   var locationData = await repository.getPaymentLink(requestId);
 //   print('Location data: ${locationData.toString()}');
 //   // var requestData = await repository.loadCustomerRequest(phone, data!.accessToken);
 //   // print('Request data: ${requestData?.first.schedules.toString()}');

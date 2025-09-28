@@ -5,6 +5,7 @@ import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/customer.dart';
 import 'package:foodapp/data/model/message.dart';
 import 'package:foodapp/data/model/Policy.dart';
+import 'package:foodapp/data/model/payment_response.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/requestdetail.dart';
 
@@ -74,6 +75,8 @@ abstract interface class Repository {
       bool isBreakThings, int rating, String token);
 
   Future<void> registerDeviceToken(String phone, String deviceToken);
+
+  Future<PaymentResponse?> getPaymentLink(String requestId);
 }
 
 class DefaultRepository implements Repository {
@@ -223,5 +226,10 @@ class DefaultRepository implements Repository {
   @override
   Future<void> registerDeviceToken(String phone, String deviceToken) async{
     return await remoteDataSource.registerDeviceToken(phone, deviceToken);
+  }
+
+  @override
+  Future<PaymentResponse?> getPaymentLink(String requestId) async{
+    return await remoteDataSource.getPaymentLink(requestId);
   }
 }
