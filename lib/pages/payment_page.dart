@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/requestdetail.dart';
+import 'package:foodapp/data/model/payment_response.dart';
 import 'package:foodapp/pages/order_success_page.dart';
 import 'package:foodapp/pages/paypal_test_page.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../data/model/customer.dart';
 import '../data/model/service.dart';
@@ -31,7 +33,8 @@ class PaymentPage extends StatefulWidget {
     required this.requestDetail,
     required this.token,
     required this.refreshToken,
-    required this.deviceToken, required this.request,
+    required this.deviceToken,
+    required this.request,
   });
 
   @override
@@ -41,6 +44,7 @@ class PaymentPage extends StatefulWidget {
 class _PaymentPageState extends State<PaymentPage> {
   String selectedPaymentMethod = "bank";
   bool isProcessing = false;
+  PaymentResponse? paymentResponse;
 
   void _doneRequest(Requests request) {
     var repository = DefaultRepository();
@@ -71,10 +75,10 @@ class _PaymentPageState extends State<PaymentPage> {
       'subtitle': 'Thanh toán qua Vietcombank',
     },
     {
-      'id': 'momo',
-      'title': 'Momo',
-      'icon': Icons.mobile_friendly,
-      'subtitle': 'Thanh toán bằng Momo',
+      'id': 'payos',
+      'title': 'PayOS',
+      'icon': Icons.qr_code_scanner,
+      'subtitle': 'Thanh toán qua PayOS',
     },
     {
       'id': 'vnpay',
@@ -156,6 +160,88 @@ class _PaymentPageState extends State<PaymentPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _loadPaymentInfo() async {
+    try {
+      final repository = DefaultRepository();
+      final response = await repository.getPaymentLink(widget.request.id);
+      if (mounted) {
+        setState(() {
+          paymentResponse = response;
+        });
+      }
+    } catch (e) {
+      print('Error loading payment info: $e');
+      if (mounted) {
+        _showPaymentErrorDialog('Không thể tải thông tin thanh toán PayOS');
+      }
+    }
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _loadPaymentInfo();
+  }
+
+  Future<void> _processPayment() async {
+    if (selectedPaymentMethod == 'paypal') {
+      _handlePayPalPayment();
+    } else if (selectedPaymentMethod == 'payos') {
+      if (paymentResponse != null) {
+        setState(() => isProcessing = true);
+
+        // Simulate payment processing
+        await Future.delayed(const Duration(seconds: 3));
+
+        if (mounted) {
+          setState(() => isProcessing = false);
+          _doneRequest(widget.request);
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderSuccess(
+                customer: widget.customer,
+                costFactors: widget.costFactors,
+                services: widget.services,
+                requestDetails: [widget.requestDetail],
+                token: widget.token,
+                refreshToken: widget.refreshToken,
+                deviceToken: widget.deviceToken,
+              ),
+            ),
+          );
+        }
+      } else {
+        _showPaymentErrorDialog('Thông tin thanh toán PayOS chưa sẵn sàng');
+      }
+    } else {
+      setState(() => isProcessing = true);
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (mounted) {
+        setState(() => isProcessing = false);
+        _doneRequest(widget.request);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderSuccess(
+              customer: widget.customer,
+              costFactors: widget.costFactors,
+              services: widget.services,
+              requestDetails: [widget.requestDetail],
+              token: widget.token,
+              refreshToken: widget.refreshToken,
+              deviceToken: widget.deviceToken,
+            ),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -332,8 +418,8 @@ class _PaymentPageState extends State<PaymentPage> {
         return Color(0xFF0070ba);
       case 'bank':
         return Colors.blue[600]!;
-      case 'momo':
-        return Colors.pink[600]!;
+      case 'payos':
+        return Colors.orange[600]!;
       case 'vnpay':
         return Colors.red[600]!;
       default:
@@ -346,6 +432,8 @@ class _PaymentPageState extends State<PaymentPage> {
       return _buildPayPalDetails();
     } else if (selectedPaymentMethod == 'bank') {
       return _buildBankDetails();
+    } else if (selectedPaymentMethod == 'payos') {
+      return _buildPayOSDetails();
     } else {
       return _buildQRCodeDetails();
     }
@@ -416,6 +504,107 @@ class _PaymentPageState extends State<PaymentPage> {
             _buildDetailRow("Số tài khoản", "1022681467"),
             _buildDetailRow("Ngân hàng", "Vietcombank"),
             _buildDetailRow("Chi nhánh", "PGD Son Tinh"),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPayOSDetails() {
+    if (paymentResponse == null) {
+      return Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              const Text(
+                "THÔNG TIN PAYOS",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'Quicksand',
+                ),
+              ),
+              const SizedBox(height: 16),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              const Text(
+                "Đang tải thông tin thanh toán...",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                  fontFamily: 'Quicksand',
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const Text(
+              "THÔNG TIN PAYOS",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Quicksand',
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildDetailRow("Tên tài khoản", paymentResponse!.accountName),
+            _buildDetailRow("Số tài khoản", paymentResponse!.accountNumber),
+            _buildDetailRow("Mã đơn hàng", paymentResponse!.orderCode),
+            _buildDetailRow("Trạng thái", paymentResponse!.status),
+            _buildDetailRow("Số tiền", paymentResponse!.formattedAmount),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Column(
+                children: [
+                  const Text(
+                    "QR Code Thanh toán",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Quicksand',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  QrImageView(
+                    data: paymentResponse!.qrCode,
+                    version: QrVersions.auto,
+                    size: 200.0,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "Quét mã QR để thanh toán",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontFamily: 'Quicksand',
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -545,36 +734,5 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
       ),
     );
-  }
-
-  Future<void> _processPayment() async {
-    if (selectedPaymentMethod == 'paypal') {
-      _handlePayPalPayment();
-    } else {
-      setState(() => isProcessing = true);
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        setState(() => isProcessing = false);
-
-        _doneRequest(widget.request);
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OrderSuccess(
-              customer: widget.customer,
-              costFactors: widget.costFactors,
-              services: widget.services,
-              requestDetails: [widget.requestDetail],
-              token: widget.token,
-              refreshToken: widget.refreshToken,
-              deviceToken: widget.deviceToken,
-            ),
-          ),
-        );
-      }
-    }
   }
 }
