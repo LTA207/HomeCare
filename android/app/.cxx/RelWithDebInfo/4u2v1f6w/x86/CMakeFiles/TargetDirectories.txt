@@ -1,0 +1,2 @@
+C:/Users/Dell Vostro 3400/AndroidStudioProjects/HomeCareV5/android/app/.cxx/RelWithDebInfo/4u2v1f6w/x86/CMakeFiles/edit_cache.dir
+C:/Users/Dell Vostro 3400/AndroidStudioProjects/HomeCareV5/android/app/.cxx/RelWithDebInfo/4u2v1f6w/x86/CMakeFiles/rebuild_cache.dir

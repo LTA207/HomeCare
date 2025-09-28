@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "C:\\vscode\\Flutter\\flutter_windows_3.24.0-stable\\flutter\\packages\\flutter_tools\\gradle\\src\\main\\groovy\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\Dell Vostro 3400\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "C:\\Users\\Dell Vostro 3400\\AndroidStudioProjects\\HomeCareV5\\android\\app\\.cxx\\RelWithDebInfo\\4u2v1f6w\\x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\Dell Vostro 3400\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "C:\\Users\\Dell Vostro 3400\\AndroidStudioProjects\\HomeCareV5\\android\\app\\.cxx\\RelWithDebInfo\\4u2v1f6w\\x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

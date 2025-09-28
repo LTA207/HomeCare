@@ -68,7 +68,7 @@ dependencies:
   firebase_messaging: ^14.7.10
   overlay_support: ^2.1.0
   # PayPal payment integration
-  url_launcher: ^6.2.2
+  url_launcher: ^6.3.2
   webview_flutter: ^4.13.0
 
 
