@@ -208,7 +208,7 @@ class _ServicesOrderState extends State<ServicesOrder>
 
                         SizedBox(width: 8),
                         Text(
-                          formatCurrency(widget.service.basicPrice.toDouble() * basicCoefficient.toDouble()),
+                          formatCurrency(widget.service.basicPrice.toDouble()),
                           style: TextStyle(
                             fontFamily: 'Quicksand',
                             fontSize: 18,
