@@ -543,7 +543,7 @@ class _OnDemandState extends State<OnDemand> {
 
   void _cancelRequest(Requests request) {
     var repository = DefaultRepository();
-    repository.canceledRequest(request.id);
+    repository.canceledRequest(request.id, widget.token);
     setState(() {
       request.status = "cancelled";
     });

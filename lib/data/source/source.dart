@@ -44,7 +44,7 @@ abstract interface class DataSource {
 
   Future<void> sendRequests(Requests requests, String token);
 
-  Future<void> cancelRequest(String id);
+  Future<void> cancelRequest(String id, String token);
 
   Future<void> paymentRequest(String id, String token);
 
@@ -440,10 +440,10 @@ class RemoteDataSource implements DataSource {
   }
 
   @override
-  Future<void> cancelRequest(String id) async {
-    final url = 'https://homecareapi.vercel.app/cancel';
+  Future<void> cancelRequest(String id, String token) async {
+    final url = 'https://homecareapi.vercel.app/request/cancel';
     final uri = Uri.parse(url);
-    final headers = {'Content-Type': 'application/json'};
+    final headers = {'Content-Type': 'application/json', 'Authorization': 'token $token'};
     final body = jsonEncode({'id': id});
     try {
       final response = await http.post(uri, headers: headers, body: body);

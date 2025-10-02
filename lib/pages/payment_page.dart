@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/request.dart';
@@ -179,10 +180,37 @@ class _PaymentPageState extends State<PaymentPage> {
     }
   }
 
+  void _listenForFCMNotifications() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (selectedPaymentMethod == 'payos' && message.data['status'] == 'completed') {
+        if (mounted) {
+          setState(() => isProcessing = false);
+          _doneRequest(widget.request);
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderSuccess(
+                customer: widget.customer,
+                costFactors: widget.costFactors,
+                services: widget.services,
+                requestDetails: [widget.requestDetail],
+                token: widget.token,
+                refreshToken: widget.refreshToken,
+                deviceToken: widget.deviceToken,
+              ),
+            ),
+          );
+        }
+      }
+    });
+  }
+
   @override
   initState() {
     super.initState();
     _loadPaymentInfo();
+    _listenForFCMNotifications();
   }
 
   Future<void> _processPayment() async {
@@ -197,7 +225,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
         if (mounted) {
           setState(() => isProcessing = false);
-          _doneRequest(widget.request);
+          // _doneRequest(widget.request);
 
           Navigator.pushReplacement(
             context,

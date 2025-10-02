@@ -28,11 +28,11 @@ class ServiceListMenu extends StatefulWidget {
 
 class _ServiceListMenuState extends State<ServiceListMenu> {
   final servicesInfo = <Map<String, dynamic>>[
-    {'icon': Icons.cleaning_services, 'label': 'Dọn nhà'},
-    {'icon': Icons.child_care, 'label': 'Chăm sóc bé'},
-    {'icon': Icons.elderly, 'label': 'Chăm sóc người già'},
-    {'icon': Icons.pregnant_woman, 'label': 'Chăm sóc sản phụ'},
-    {'icon': Icons.medical_services, 'label': 'Nuôi bệnh'},
+    {'icon': Icons.local_hospital, 'label': 'Chăm sóc bệnh nhân'},
+    {'icon': Icons.dining, 'label': 'Nấu ăn tại nhà'},
+    {'icon': Icons.child_care, 'label': 'Chăm sóc trẻ em'},
+    {'icon': Icons.cleaning_services, 'label': 'Dọn dẹp nhà cửa'},
+    {'icon': Icons.elderly, 'label': 'Chăm sóc người cao tuổi'},
     {'icon': Icons.school, 'label': 'Đưa đón bé'},
     {'icon': Icons.restaurant, 'label': 'Nấu ăn'},
     {'icon': Icons.cleaning_services_outlined, 'label': 'Vệ sinh phòng'},

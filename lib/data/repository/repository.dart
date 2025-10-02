@@ -45,7 +45,7 @@ abstract interface class Repository {
 
   Future<void> sendRequest(Requests requests, String token);
 
-  Future<void> canceledRequest(String id);
+  Future<void> canceledRequest(String id, String token);
 
   Future<void> payRequest(String id, String token);
 
@@ -164,8 +164,8 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<void> canceledRequest(String id) async {
-    return await remoteDataSource.cancelRequest(id);
+  Future<void> canceledRequest(String id, String token) async {
+    return await remoteDataSource.cancelRequest(id, token);
   }
 
   @override
