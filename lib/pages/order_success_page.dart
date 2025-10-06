@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/customer.dart';
 import 'package:foodapp/data/model/service.dart';
-import 'package:foodapp/data/repository/repository.dart';
 import 'package:foodapp/pages/home_page.dart';
 import 'package:foodapp/components/review_dialog.dart';
 import 'dart:math' as math;
@@ -11,7 +9,6 @@ import '../data/model/requestdetail.dart';
 
 class OrderSuccess extends StatefulWidget {
   final Customer customer;
-  final List<CostFactor> costFactors;
   final List<Services> services;
   final dynamic mainMessage;
   final dynamic subMessage;
@@ -23,7 +20,6 @@ class OrderSuccess extends StatefulWidget {
   const OrderSuccess({
     super.key,
     required this.customer,
-    required this.costFactors,
     required this.services,
     this.mainMessage,
     this.subMessage,
@@ -121,7 +117,6 @@ class _OrderSuccessState extends State<OrderSuccess>
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => HomePage(
           customer: widget.customer,
-          costFactor: widget.costFactors,
           services: widget.services,
           token: widget.token,
           refreshToken: widget.refreshToken,

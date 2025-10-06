@@ -1,6 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/requestdetail.dart';
 import 'package:foodapp/data/model/payment_response.dart';
@@ -17,7 +16,6 @@ import '../data/repository/repository.dart';
 class PaymentPage extends StatefulWidget {
   final num amount;
   final Customer customer;
-  final List<CostFactor> costFactors;
   final List<Services> services;
   final RequestDetail requestDetail;
   final Requests request;
@@ -29,7 +27,6 @@ class PaymentPage extends StatefulWidget {
     super.key,
     required this.amount,
     required this.customer,
-    required this.costFactors,
     required this.services,
     required this.requestDetail,
     required this.token,
@@ -109,7 +106,6 @@ class _PaymentPageState extends State<PaymentPage> {
           MaterialPageRoute(
             builder: (context) => OrderSuccess(
               customer: widget.customer,
-              costFactors: widget.costFactors,
               services: widget.services,
               requestDetails: [widget.requestDetail],
               token: widget.token,
@@ -192,7 +188,6 @@ class _PaymentPageState extends State<PaymentPage> {
             MaterialPageRoute(
               builder: (context) => OrderSuccess(
                 customer: widget.customer,
-                costFactors: widget.costFactors,
                 services: widget.services,
                 requestDetails: [widget.requestDetail],
                 token: widget.token,
@@ -232,7 +227,6 @@ class _PaymentPageState extends State<PaymentPage> {
             MaterialPageRoute(
               builder: (context) => OrderSuccess(
                 customer: widget.customer,
-                costFactors: widget.costFactors,
                 services: widget.services,
                 requestDetails: [widget.requestDetail],
                 token: widget.token,
@@ -259,7 +253,6 @@ class _PaymentPageState extends State<PaymentPage> {
           MaterialPageRoute(
             builder: (context) => OrderSuccess(
               customer: widget.customer,
-              costFactors: widget.costFactors,
               services: widget.services,
               requestDetails: [widget.requestDetail],
               token: widget.token,

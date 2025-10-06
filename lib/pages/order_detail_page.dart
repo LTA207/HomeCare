@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/customer.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/service.dart';
@@ -7,7 +6,6 @@ import 'package:foodapp/pages/center_support_page.dart';
 import 'package:foodapp/pages/payment_detail_page.dart';
 import 'package:foodapp/pages/rating_page.dart';
 import 'package:foodapp/pages/services_order.dart';
-import 'package:foodapp/pages/support_page.dart';
 import 'package:foodapp/components/review_dialog.dart';
 import 'package:intl/intl.dart';
 import '../data/model/request.dart';
@@ -21,7 +19,6 @@ class OrderDetailPage extends StatefulWidget {
   final List<Helper> helpers;
   final List<Services> services;
   final Customer customer;
-  final List<CostFactor> costFactors;
   final String token;
   final String refreshToken;
   final String deviceToken;
@@ -33,7 +30,6 @@ class OrderDetailPage extends StatefulWidget {
     required this.helpers,
     required this.services,
     required this.customer,
-    required this.costFactors,
     required this.token,
     required this.refreshToken,
     required this.deviceToken,
@@ -1334,7 +1330,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     builder: (context) => ServicesOrder(
                       customer: widget.customer,
                       service: reorderService,
-                      costFactors: widget.costFactors,
                       services: widget.services,
                       token: widget.token,
                       refreshToken: widget.refreshToken,

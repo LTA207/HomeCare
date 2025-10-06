@@ -9,7 +9,6 @@ import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/customer.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/service.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/TimeOff.dart';
 import 'package:foodapp/pages/review_order_page.dart';
 import 'package:foodapp/data/repository/repository.dart';
@@ -17,7 +16,6 @@ import 'package:foodapp/data/repository/repository.dart';
 class HelperList extends StatefulWidget {
   final Customer customer;
   final Requests request;
-  final List<CostFactor> costFactors;
   final List<DateTime> listDate;
   final bool isOnDemand;
   final List<Services> services;
@@ -32,7 +30,6 @@ class HelperList extends StatefulWidget {
     required this.request,
     required this.listDate,
     required this.isOnDemand,
-    required this.costFactors,
     required this.services,
     required this.service, required this.token, required this.refreshToken, required this.deviceToken,
   });
@@ -112,7 +109,6 @@ class _HelperListState extends State<HelperList> {
                     builder: (context) => ReviewOrderPage(
                       customer: widget.customer,
                       request: widget.request,
-                      costFactors: widget.costFactors,
                       services: widget.services,
                       service: widget.service,
                       token: widget.token,
@@ -278,7 +274,6 @@ class _HelperListState extends State<HelperList> {
           customer: widget.customer,
           helper: null,
           request: widget.request,
-          costFactors: widget.costFactors,
           services: widget.services,
           service: widget.service,
           token: widget.token,

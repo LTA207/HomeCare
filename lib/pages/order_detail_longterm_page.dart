@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/customer.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/service.dart';
-import 'package:foodapp/pages/center_support_page.dart';
-import 'package:foodapp/pages/feedback_complaint_page.dart';
-import 'package:foodapp/pages/payment_detail_page.dart';
 import 'package:foodapp/pages/payment_page.dart';
-import 'package:foodapp/pages/rating_page.dart';
-import 'package:foodapp/pages/services_order.dart';
-import 'package:foodapp/pages/support_page.dart';
 import 'package:intl/intl.dart';
 import '../data/model/request.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -24,7 +17,6 @@ class OrderDetailLongTermPage extends StatefulWidget {
   final List<Helper> helpers;
   final List<Services> services;
   final Customer customer;
-  final List<CostFactor> costFactors;
   final String token;
   final String refreshToken;
   final String deviceToken;
@@ -35,7 +27,6 @@ class OrderDetailLongTermPage extends StatefulWidget {
     required this.helpers,
     required this.services,
     required this.customer,
-    required this.costFactors,
     required this.request,
     required this.token,
     required this.refreshToken,
@@ -137,7 +128,6 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                       amount: request.totalCost,
                       // Tổng chi phí
                       customer: widget.customer,
-                      costFactors: widget.costFactors,
                       services: widget.services,
                       requestDetail: widget.requestDetail[0],
                       token: widget.token,
@@ -513,7 +503,6 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                   builder: (context) => PaymentPage(
                     amount: detail.cost ?? 0,
                     customer: widget.customer,
-                    costFactors: widget.costFactors,
                     services: widget.services,
                     requestDetail: detail,
                     token: widget.token,
@@ -559,7 +548,6 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
                   helpers: widget.helpers,
                   services: widget.services,
                   customer: widget.customer,
-                  costFactors: widget.costFactors,
                   token: widget.token,
                   refreshToken: widget.refreshToken,
                   deviceToken: widget.deviceToken,

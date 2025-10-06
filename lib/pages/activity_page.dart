@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:foodapp/components/Confirm_day.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/pages/order_detail_longterm_page.dart';
@@ -22,7 +21,6 @@ import '../data/repository/repository.dart';
 
 class ActivityPage extends StatefulWidget {
   final Customer customer;
-  final List<CostFactor> costFactors;
   final List<Services> services;
   final String token;
   final String refreshToken;
@@ -31,7 +29,6 @@ class ActivityPage extends StatefulWidget {
   const ActivityPage({
     Key? key,
     required this.customer,
-    required this.costFactors,
     required this.services,
     required this.token,
     required this.refreshToken,
@@ -221,7 +218,6 @@ class _ActivityPageState extends State<ActivityPage>
                         requests: requestCustomer ?? [],
                         key: const ValueKey('on_demand'),
                         customer: widget.customer,
-                        costFactors: widget.costFactors,
                         services: widget.services,
                         helperList: helperList!,
                         requestDetail: requestDetails,
@@ -234,7 +230,6 @@ class _ActivityPageState extends State<ActivityPage>
                         requests: requestCustomer ?? [],
                         key: const ValueKey('long_term'),
                         customer: widget.customer,
-                        costFactors: widget.costFactors,
                         services: widget.services,
                         helperList: helperList!,
                         refreshData: loadRequestData,
@@ -283,7 +278,6 @@ class _ActivityPageState extends State<ActivityPage>
 class OnDemand extends StatefulWidget {
   final List<Requests> requests;
   final Customer customer;
-  final List<CostFactor> costFactors;
   final List<Services> services;
   final List<Helper> helperList;
   final List<RequestDetail> requestDetail;
@@ -296,7 +290,6 @@ class OnDemand extends StatefulWidget {
     super.key,
     required this.requests,
     required this.customer,
-    required this.costFactors,
     required this.services,
     required this.helperList,
     required this.refreshData,
@@ -603,7 +596,6 @@ class _OnDemandState extends State<OnDemand> {
                     builder: (context) => PaymentPage(
                       amount: request.totalCost,
                       customer: widget.customer,
-                      costFactors: widget.costFactors,
                       services: widget.services,
                       requestDetail: request.schedules.first,
                       token: widget.token,
@@ -698,7 +690,6 @@ class _OnDemandState extends State<OnDemand> {
                 builder: (context) => ServicesOrder(
                   customer: widget.customer,
                   service: reorderService,
-                  costFactors: widget.costFactors,
                   services: widget.services,
                   token: widget.token,
                   refreshToken: widget.refreshToken,
@@ -737,7 +728,6 @@ class _OnDemandState extends State<OnDemand> {
               helpers: widget.helperList,
               services: widget.services,
               customer: widget.customer,
-              costFactors: widget.costFactors,
               token: widget.token,
               refreshToken: widget.refreshToken,
               deviceToken: widget.deviceToken,
@@ -977,7 +967,6 @@ class _OnDemandState extends State<OnDemand> {
 class LongTerm extends StatefulWidget {
   final List<Requests> requests;
   final Customer customer;
-  final List<CostFactor> costFactors;
   final List<Services> services;
   final List<Helper> helperList;
   final List<RequestDetail> requestDetail;
@@ -990,7 +979,6 @@ class LongTerm extends StatefulWidget {
       {super.key,
       required this.requests,
       required this.customer,
-      required this.costFactors,
       required this.services,
       required this.helperList,
       required this.refreshData,
@@ -1501,7 +1489,6 @@ class _LongTermState extends State<LongTerm> {
                                                   context,
                                                   request,
                                                   widget.customer,
-                                                  widget.costFactors,
                                                   widget.services,
                                                   widget.token,
                                                   widget.refreshToken,
@@ -1553,8 +1540,6 @@ class _LongTermState extends State<LongTerm> {
                                                               widget.customer,
                                                           service:
                                                               reorderService,
-                                                          costFactors: widget
-                                                              .costFactors,
                                                           services:
                                                               widget.services,
                                                           selectedTab: 1,
@@ -1600,7 +1585,6 @@ class _LongTermState extends State<LongTerm> {
                                             request: request,
                                             helpers: widget.helperList,
                                             services: widget.services,
-                                            costFactors: widget.costFactors,
                                             customer: widget.customer,
                                             requestDetail:
                                                 groupedDetails[request.id] ??

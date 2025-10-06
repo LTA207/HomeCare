@@ -4,7 +4,6 @@ import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:foodapp/components/feature_helper_list.dart';
 import 'package:foodapp/components/service_list_menu.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/pages/activity_page.dart';
 import 'package:foodapp/pages/all_reward_page.dart';
 import 'package:foodapp/pages/all_service_page.dart';
@@ -29,14 +28,11 @@ class HomePage extends StatefulWidget {
   final String refreshToken;
   final String deviceToken;
 
-  final List<CostFactor> costFactor;
-
   const HomePage({
     super.key,
     this.customer,
     required this.services,
     this.requests,
-    required this.costFactor,
     required this.token,
     required this.refreshToken,
     required this.deviceToken,
@@ -58,14 +54,12 @@ class _HomePageState extends State<HomePage> {
       HomeContent(
         customer: widget.customer,
         services: widget.services,
-        costFactors: widget.costFactor,
         token: widget.token,
         refreshToken: widget.refreshToken,
         deviceToken: widget.deviceToken,
       ),
       ActivityPage(
         customer: widget.customer,
-        costFactors: widget.costFactor,
         services: widget.services,
         token: widget.token,
         refreshToken: widget.refreshToken,
@@ -139,7 +133,6 @@ class _HomePageState extends State<HomePage> {
 class HomeContent extends StatefulWidget {
   final Customer customer;
   final List<Services> services;
-  final List<CostFactor> costFactors;
   final String token;
   final String refreshToken;
   final String deviceToken;
@@ -148,7 +141,6 @@ class HomeContent extends StatefulWidget {
     super.key,
     required this.customer,
     required this.services,
-    required this.costFactors,
     required this.token,
     required this.refreshToken,
     required this.deviceToken,
@@ -300,7 +292,6 @@ class _HomeContentState extends State<HomeContent> {
                     MaterialPageRoute(
                       builder: (context) => AllServicesPage(
                         services: widget.services,
-                        costFactors: widget.costFactors,
                         customer: widget.customer,
                         token: widget.token,
                         refreshToken: widget.refreshToken,
@@ -763,7 +754,6 @@ class _HomeContentState extends State<HomeContent> {
                                 builder: (context) => ServicesOrder(
                                   customer: widget.customer,
                                   service: widget.services[index],
-                                  costFactors: widget.costFactors,
                                   services: widget.services,
                                   token: widget.token,
                                   refreshToken: widget.refreshToken,
@@ -891,7 +881,6 @@ class _HomeContentState extends State<HomeContent> {
     return ServiceListMenu(
       customer: widget.customer,
       services: widget.services,
-      costFactors: widget.costFactors,
       token: widget.token,
       refreshToken: widget.refreshToken,
       deviceToken: widget.deviceToken,

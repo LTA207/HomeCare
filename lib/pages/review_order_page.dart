@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/pages/helper_detail_page.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +13,6 @@ class ReviewOrderPage extends StatefulWidget {
   final Customer customer;
   final Helper? helper;
   final Requests request;
-  final List<CostFactor> costFactors;
   final List<Services> services;
   final Services service;
   final String token;
@@ -26,7 +24,6 @@ class ReviewOrderPage extends StatefulWidget {
     required this.customer,
     this.helper,
     required this.request,
-    required this.costFactors,
     required this.services,
     required this.service,
     required this.token,
@@ -321,14 +318,6 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        // _buildInfoRow(
-                        //   'Giá cơ bản',
-                        //   '${widget.request.service.cost} VNĐ',
-                        // ),
-                        // _buildInfoRow(
-                        //   'Hệ số dịch vụ cơ bản',
-                        //   '${widget.costFactors.firstWhere((costFactor) => costFactor.title == 'Hệ số lương cho dịch vụ').coefficientList.firstWhere((coefficient) => coefficient.title == 'Dịch vụ dọn dẹp').value}',
-                        // ),
                         _buildInfoRow(
                           'Số giờ làm hành chính',
                           _formatTime((costData['workingTime'] -
@@ -339,46 +328,16 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
                             'Giá cơ bản',
                             _formatCurrency(costData['basicPrice'].toDouble() *
                                 costData['basicCoefficient'].toDouble())),
-                        // _buildInfoRow(
-                        //   'Hệ số ngoài giờ',
-                        //   '${widget.costFactors.firstWhere((costFactor) => costFactor.title == 'Hệ số khác').coefficientList.firstWhere((coefficient) => coefficient.title == 'Hệ số ngoài giờ').value}',
-                        // ),
                         _buildInfoRow(
                           'Số giờ làm ngoài giờ',
                           // '${costData['overTimeHours']} giờ',
                           _formatTime(costData['overTimeHours'].toDouble()),
                         ),
-                        // _buildInfoRow(
-                        //   'Hệ số ngoài giờ',
-                        //   '${widget.costFactors.firstWhere((costFactor) => costFactor.title == 'Hệ số khác').coefficientList.firstWhere((coefficient) => coefficient.title == 'Hệ số ngoài giờ').value}',
-                        // ),
                         _buildInfoRow(
                           'Giá dịch vụ ngoài giờ',
                           // '${costData['overTimeCost']}'),
                           _formatCurrency(costData['overtimeCost'].toDouble()),
                         ),
-                        // _buildInfoRow('Dịch vụ thêm', '' ?? '0'),
-
-                        // _buildInfoRow(
-                        //   'Hệ số làm việc ngày cuối tuần',
-                        //   '${widget.costFactors.firstWhere((costFactor) => costFactor.title == 'Hệ số khác').coefficientList.firstWhere((coefficient) => coefficient.title == 'Hệ số làm việc ngày cuối tuần').value}',
-                        // ),
-                        // _buildInfoRow(
-                        //   'Hệ số lễ',
-                        //   '${widget.costFactors.firstWhere((costFactor) => costFactor.title == 'Hệ số khác').coefficientList.firstWhere((coefficient) => coefficient.title == 'Hệ số lễ').value}',
-                        // ),
-                        // _buildInfoRow(
-                        //   'Hệ số noel',
-                        //   '${widget.costFactors.firstWhere((costFactor) => costFactor.title == 'Hệ số khác').coefficientList.firstWhere((coefficient) => coefficient.title == 'Hệ số noel').value}',
-                        // ),
-                        // _buildInfoRow(
-                        //   'Hệ số Tết',
-                        //   '${widget.costFactors.firstWhere((costFactor) => costFactor.title == 'Hệ số khác').coefficientList.firstWhere((coefficient) => coefficient.title == 'Hệ số tết').value}',
-                        // ),
-                        // _buildInfoRow(
-                        //   'Tất cả hệ số',
-                        //   '${widget.costFactors.firstWhere((costFactor) => costFactor.title == 'Hệ số khác').coefficientList.map((coefficient) => coefficient.title).join(', ')}',
-                        // ),
                         Divider(
                           height: 24,
                           color: Colors.grey.shade200,
@@ -690,7 +649,6 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => HomePage(
           customer: widget.customer,
-          costFactor: widget.costFactors,
           services: widget.services,
           token: widget.token,
           refreshToken: widget.refreshToken,

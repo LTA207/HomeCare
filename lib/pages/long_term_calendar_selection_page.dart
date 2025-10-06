@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/components/my_button.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/pages/review_order_page.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +13,6 @@ class CustomCalendar extends StatefulWidget {
   final DateTime? maxDate;
   final Customer customer;
   final Requests request;
-  final List<CostFactor> costFactors;
   final List<Services> services;
   final Services service;
   final String token;
@@ -28,7 +26,6 @@ class CustomCalendar extends StatefulWidget {
     this.maxDate,
     required this.customer,
     required this.request,
-    required this.costFactors,
     required this.services,
     required this.service,
     required this.token,
@@ -259,7 +256,6 @@ class _CustomCalendarState extends State<CustomCalendar> {
                     builder: (context) => ReviewOrderPage(
                       customer: widget.customer,
                       request: widget.request,
-                      costFactors: widget.costFactors,
                       services: widget.services,
                       service: widget.service,
                       token: widget.token,

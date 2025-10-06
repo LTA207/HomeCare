@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/service.dart';
 import 'package:foodapp/pages/services_order.dart';
 
 class AllServicesPage extends StatelessWidget {
   final dynamic customer;
   final List<Services> services;
-  final List<CostFactor> costFactors;
   final String token;
   final String refreshToken;
   final String deviceToken;
@@ -15,7 +13,6 @@ class AllServicesPage extends StatelessWidget {
     Key? key,
     required this.customer,
     required this.services,
-    required this.costFactors,
     required this.token,
     required this.refreshToken,
     required this.deviceToken,
@@ -300,7 +297,6 @@ class AllServicesPage extends StatelessWidget {
         builder: (context) => ServicesOrder(
           customer: customer,
           service: services[0],
-          costFactors: costFactors,
           services: services,
           token: token,
           refreshToken: refreshToken,

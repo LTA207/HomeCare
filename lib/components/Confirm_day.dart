@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/requestdetail.dart';
 import 'package:foodapp/data/model/service.dart';
@@ -13,7 +12,6 @@ import '../data/model/customer.dart';
 class ConfirmLongTermDay extends StatefulWidget {
   final Requests requests;
   final Customer customer;
-  final List<CostFactor> costFactors;
   final List<Services> services;
   final String token;
   final String refreshToken;
@@ -23,7 +21,6 @@ class ConfirmLongTermDay extends StatefulWidget {
       {super.key,
       required this.requests,
       required this.customer,
-      required this.costFactors,
       required this.services,
       required this.token,
       required this.refreshToken,
@@ -156,7 +153,6 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
                       builder: (context) => PaymentPage(
                         amount: widget.requests.totalCost,
                         customer: widget.customer,
-                        costFactors: widget.costFactors,
                         services: widget.services,
                         requestDetail: widget.requests.schedules.first,
                         request: widget.requests,
@@ -185,14 +181,13 @@ class _ConfirmLongTermDayState extends State<ConfirmLongTermDay> {
 
 // Function to show the dialog
 void showConfirmLongTermDayDialog(BuildContext context, Requests requests,
-    Customer customer, List<CostFactor> costFactors, List<Services> services, String token, String refreshToken, String deviceToken) {
+    Customer customer, List<Services> services, String token, String refreshToken, String deviceToken) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return ConfirmLongTermDay(
         requests: requests,
         customer: customer,
-        costFactors: costFactors,
         services: services,
         token: token,
         refreshToken: refreshToken,

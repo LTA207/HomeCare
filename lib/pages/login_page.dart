@@ -178,7 +178,6 @@ class _LoginPageState extends State<LoginPage>
                 customer: customer,
                 requests: requestsCustomer,
                 services: services,
-                costFactor: costFactor,
                 token: token,
                 refreshToken: refreshToken,
                 deviceToken: widget.deviceToken,
