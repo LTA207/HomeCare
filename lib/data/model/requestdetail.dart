@@ -1,15 +1,15 @@
-import 'package:foodapp/data/model/request.dart'; // Assuming you have a Comment model
+import 'package:foodapp/data/model/request.dart';
 
 class RequestDetail {
   Comment comment;
   String id;
-  String workingDate; // Changed to DateTime
+  String workingDate;
   String helperID;
   String status;
   num? cost;
   num helperCost;
-  DateTime startTime; // Changed to DateTime
-  DateTime endTime; // Changed to DateTime
+  DateTime startTime;
+  DateTime endTime;
   num? totalCost;
 
   RequestDetail(

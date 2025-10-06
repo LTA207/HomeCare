@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodapp/components/my_button.dart';
 import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/request.dart';
+import 'package:foodapp/pages/review_order_page.dart';
+import 'package:intl/intl.dart';
 import '../data/model/customer.dart';
 import 'package:foodapp/pages/helper_list_page.dart';
 import '../data/model/service.dart';
@@ -248,14 +250,15 @@ class _CustomCalendarState extends State<CustomCalendar> {
             child: MyButton(
               text: 'Xác nhận',
               onTap: () {
+                widget.request.startDate = _selectedDates
+                    .map((date) => DateFormat('yyyy-MM-dd').format(date))
+                    .join(',');
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => HelperList(
+                    builder: (context) => ReviewOrderPage(
                       customer: widget.customer,
                       request: widget.request,
-                      listDate: _selectedDates,
-                      isOnDemand: false,
                       costFactors: widget.costFactors,
                       services: widget.services,
                       service: widget.service,

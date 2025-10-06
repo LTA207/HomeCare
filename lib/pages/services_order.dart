@@ -4,6 +4,7 @@ import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/coefficient.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/pages/long_term_calendar_selection_page.dart';
+import 'package:foodapp/pages/review_order_page.dart';
 import 'package:intl/intl.dart';
 
 import '../../data/model/customer.dart';
@@ -509,11 +510,9 @@ class _ServicesOrderState extends State<ServicesOrder>
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => HelperList(
+                  builder: (context) => ReviewOrderPage(
                     customer: widget.customer,
                     request: request,
-                    listDate: List.generate(1, (index) => startDate!),
-                    isOnDemand: true,
                     costFactors: widget.costFactors,
                     services: widget.services,
                     service: widget.service,
@@ -521,6 +520,7 @@ class _ServicesOrderState extends State<ServicesOrder>
                     refreshToken: widget.refreshToken,
                     deviceToken: widget.deviceToken,
                   ),
+
                 ),
               );
             } else {

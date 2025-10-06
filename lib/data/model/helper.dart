@@ -21,7 +21,6 @@ class Helper {
   String? educationLevel;
   num? height;
   num? weight;
-  // bool deleted;
 
   Helper({
     required this.id,
