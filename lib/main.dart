@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:foodapp/auth/login_or_register.dart';
 import 'package:foodapp/components/spashscreen.dart';
 import 'package:foodapp/themes/theme_provider.dart';
+import 'package:foodapp/providers/auth_provider.dart';
 import 'package:foodapp/services/firebase_messaging_service.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'firebase_options.dart'; // Thêm import này
@@ -81,6 +82,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => RequestProvider()),
+        ChangeNotifierProvider(create: (context) => AuthProvider()),
       ],
       child: MyApp(deviceToken: deviceToken,),
     ),
