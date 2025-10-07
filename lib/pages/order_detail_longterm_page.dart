@@ -233,21 +233,21 @@ class _OrderDetailLongTermPageState extends State<OrderDetailLongTermPage> {
   }
 
   String _formatDate(String dateStr) {
-    DateTime dateTime = DateTime.parse(dateStr).toLocal();
+    DateTime dateTime = DateTime.parse(dateStr);
     return DateFormat("EEEE, dd 'Tháng' MM, yyyy - HH:mm", "vi_VN")
         .format(dateTime);
   }
 
   String _formatSimpleDate(String dateStr) {
-    DateTime dateTime = DateTime.parse(dateStr).toLocal();
+    DateTime dateTime = DateTime.parse(dateStr);
     return DateFormat("dd/MM/yyyy", "vi_VN").format(dateTime);
   }
 
   String _formatTime(String isoTime) {
     try {
       DateTime dateTime =
-          DateTime.parse(isoTime).toLocal(); // Chuyển về giờ địa phương
-      return DateFormat('HH:mm').format(dateTime); // Định dạng thành HH:mm
+          DateTime.parse(isoTime);
+      return DateFormat('HH:mm').format(dateTime);
     } catch (e) {
       return "N/A"; // Xử lý lỗi
     }

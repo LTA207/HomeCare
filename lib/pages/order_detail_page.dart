@@ -92,7 +92,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   String _formatDate(String dateStr) {
-    DateTime dateTime = DateTime.parse(dateStr).toLocal();
+    DateTime dateTime = DateTime.parse(dateStr);
     return DateFormat("EEEE, dd 'Tháng' MM, yyyy - HH:mm", "vi_VN")
         .format(dateTime);
   }
