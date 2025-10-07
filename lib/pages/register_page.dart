@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:foodapp/auth/login_or_register.dart';
 import 'package:foodapp/components/my_button.dart';
 import 'package:foodapp/components/my_textfield.dart';
 import 'package:foodapp/components/warning_dialog.dart';
-import 'package:foodapp/data/model/customer.dart';
-import 'package:foodapp/pages/authen_page.dart';
-import 'package:foodapp/pages/login_page.dart';
 import 'package:provider/provider.dart';
 import 'package:foodapp/providers/auth_provider.dart';
 import 'package:lottie/lottie.dart';
@@ -13,7 +9,6 @@ import 'package:lottie/lottie.dart';
 import '../components/city_selected.dart';
 import '../components/spashscreen.dart';
 import '../data/model/location.dart';
-import '../data/repository/repository.dart';
 
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;

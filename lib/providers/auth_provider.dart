@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:foodapp/data/model/customer.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/service.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/location.dart';
 import '../data/repository/repository.dart';
 
@@ -17,7 +16,6 @@ class AuthProvider extends ChangeNotifier {
   String _refreshToken = '';
   List<Requests> _requestsCustomer = [];
   List<Services> _services = [];
-  List<CostFactor> _costFactor = [];
   List<Location> _locations = [];
   List<Customer> _customers = [];
 
@@ -38,7 +36,6 @@ class AuthProvider extends ChangeNotifier {
   String get refreshToken => _refreshToken;
   List<Requests> get requestsCustomer => _requestsCustomer;
   List<Services> get services => _services;
-  List<CostFactor> get costFactor => _costFactor;
   List<Location> get locations => _locations;
   List<Customer> get customers => _customers;
 
@@ -93,10 +90,8 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final servicesData = await _repository.loadServices();
-      final costFactorData = await _repository.loadCostFactor();
 
       _services = servicesData ?? [];
-      _costFactor = costFactorData ?? [];
     } catch (e) {
       _generalError = 'Không thể tải dữ liệu: $e';
     } finally {

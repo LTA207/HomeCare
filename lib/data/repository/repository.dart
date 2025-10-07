@@ -1,16 +1,13 @@
 import 'package:foodapp/data/model/Authen.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/F.A.Q.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/customer.dart';
-import 'package:foodapp/data/model/message.dart';
 import 'package:foodapp/data/model/Policy.dart';
 import 'package:foodapp/data/model/payment_response.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/requestdetail.dart';
 
 import '../model/TimeOff.dart';
-import '../model/coefficient.dart';
 import '../model/location.dart';
 import '../model/service.dart';
 import 'package:foodapp/data/source/source.dart';
@@ -52,14 +49,6 @@ abstract interface class Repository {
   Future<void> doneConfirmRequest(String id, String token);
 
   Future<void> sendMessage(String phone);
-
-  Future<List<Message>?> loadMessage(Message message);
-
-  Future<List<CostFactor>?> loadCostFactor();
-
-  Future<CoefficientOther?> loadCoefficientOther();
-
-  Future<List<CoefficientOther>?> loadCoefficientService();
 
   Future<Map<String, dynamic>?> calculateCost(
       String service, String startTime, String endTime, String startDate);
@@ -139,18 +128,8 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<List<Message>?> loadMessage(Message message) async {
-    return await remoteDataSource.loadMessageData(message);
-  }
-
-  @override
   Future<void> sendMessage(String phone) async {
     return await remoteDataSource.sendMessage(phone);
-  }
-
-  @override
-  Future<List<CostFactor>?> loadCostFactor() async {
-    return await remoteDataSource.loadCostFactorData();
   }
 
   @override
@@ -183,16 +162,6 @@ class DefaultRepository implements Repository {
       String endTime, String startDate) async {
     return await remoteDataSource.calculateCost(
         service, startTime, endTime, startDate);
-  }
-
-  @override
-  Future<CoefficientOther?> loadCoefficientOther() async {
-    return await remoteDataSource.loadCoefficientOther();
-  }
-
-  @override
-  Future<List<CoefficientOther>?> loadCoefficientService() async {
-    return await remoteDataSource.loadCoefficientService();
   }
 
   @override

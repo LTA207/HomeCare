@@ -2,16 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foodapp/components/my_button.dart';
 import 'package:foodapp/components/my_textfield.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
-import 'package:foodapp/data/model/customer.dart';
-import 'package:foodapp/data/model/request.dart';
-import 'package:foodapp/data/model/service.dart';
 import 'package:foodapp/pages/home_page.dart';
 import 'package:foodapp/pages/register_page.dart';
 import 'package:provider/provider.dart';
 import 'package:foodapp/providers/auth_provider.dart';
-import 'package:lottie/lottie.dart';
-import '../data/repository/repository.dart';
 
 class LoginPage extends StatefulWidget {
   final void Function()? onTap;

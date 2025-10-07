@@ -4,12 +4,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:foodapp/data/model/Authen.dart';
-import 'package:foodapp/data/model/CostFactor.dart';
 import 'package:foodapp/data/model/F.A.Q.dart';
-import 'package:foodapp/data/model/coefficient.dart';
 import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/location.dart';
-import 'package:foodapp/data/model/message.dart';
 import 'package:foodapp/data/model/payment_response.dart';
 import 'package:foodapp/data/model/requestdetail.dart';
 
@@ -52,15 +49,7 @@ abstract interface class DataSource {
 
   Future<List<TimeOff>?> loadTimeOffData();
 
-  Future<List<Message>?> loadMessageData(Message message);
-
   Future<void> sendMessage(String phone);
-
-  Future<List<CostFactor>?> loadCostFactorData();
-
-  Future<CoefficientOther?> loadCoefficientOther();
-
-  Future<List<CoefficientOther>?> loadCoefficientService();
 
   Future<void> sendCustomerRegisterRequest(Customer customer);
 
@@ -509,27 +498,6 @@ class RemoteDataSource implements DataSource {
   }
 
   @override
-  Future<List<Message>?> loadMessageData(Message message) async {
-    final url = Uri.parse(
-        'https://homecareapi.vercel.app/message?phone=${message.phone}');
-    try {
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final bodyContent = json.decode(response.body);
-        final List<dynamic> messageList = jsonDecode(bodyContent);
-        return messageList.map((message) => Message.fromJson(message)).toList();
-      } else {
-        print('Failed to load message. Status code: ${response.statusCode}');
-        return null;
-      }
-    } catch (e) {
-      print('Error occurred: $e');
-      return null;
-    }
-  }
-
-  @override
   Future<void> sendMessage(String phone) async {
     const url = 'https://homecareapi.vercel.app/message';
     final uri = Uri.parse(url);
@@ -548,29 +516,6 @@ class RemoteDataSource implements DataSource {
       }
     } catch (e) {
       print('Error posting requests: $e');
-    }
-  }
-
-  @override
-  Future<List<CostFactor>?> loadCostFactorData() async {
-    final url = "https://homecareapi.vercel.app/costFactor";
-    final uri = Uri.parse(url);
-    try {
-      final response = await http.get(uri);
-      if (response.statusCode == 200) {
-        final bodyContent = utf8.decode(response.bodyBytes);
-        final List<dynamic> costFactorList = jsonDecode(bodyContent);
-        return costFactorList
-            .map((costFactor) => CostFactor.fromJson(costFactor))
-            .toList();
-      } else {
-        print(
-            'Failed to load request data. Status code: ${response.statusCode}');
-        return null;
-      }
-    } catch (e) {
-      print('Error loading CostFactor data: $e');
-      return null;
     }
   }
 
@@ -606,55 +551,6 @@ class RemoteDataSource implements DataSource {
     } catch (e) {
       print('Error posting requests calculation: $e');
       return null;
-    }
-  }
-
-  @override
-  Future<CoefficientOther?> loadCoefficientOther() async {
-    final url = "https://homecareapi.vercel.app/costFactor/other";
-    final uri = Uri.parse(url);
-
-    try {
-      final response = await http.get(uri);
-
-      if (response.statusCode == 200) {
-        final bodyContent = utf8.decode(response.bodyBytes);
-        final Map<String, dynamic> coefficientOtherMap =
-            jsonDecode(bodyContent);
-
-        return CoefficientOther.fromJson(coefficientOtherMap);
-      } else {
-        print('Failed to load data. Status code: ${response.statusCode}');
-        return null;
-      }
-    } catch (e) {
-      print('Error loading CostFactor data: $e');
-      return null;
-    }
-  }
-
-  @override
-  Future<List<CoefficientOther>?> loadCoefficientService() async {
-    const String url =
-        "https://homecareapi.vercel.app/costFactor/service"; // Thay bằng URL API thực tế
-    final Uri uri = Uri.parse(url);
-
-    try {
-      final response = await http.get(uri);
-
-      if (response.statusCode == 200) {
-        final bodyContent = utf8.decode(response.bodyBytes);
-        final List<dynamic> coefficientServiceList = jsonDecode(bodyContent);
-        return coefficientServiceList
-            .map((coefficient) => CoefficientOther.fromJson(coefficient))
-            .toList();
-      } else {
-        print('Failed to load data. Status code: ${response.statusCode}');
-        return [];
-      }
-    } catch (e) {
-      print('Error loading CostFactor data: $e');
-      return [];
     }
   }
 

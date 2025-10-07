@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/components/time_selection.dart';
-import 'package:foodapp/data/model/coefficient.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/pages/long_term_calendar_selection_page.dart';
 import 'package:foodapp/pages/review_order_page.dart';
@@ -12,9 +11,7 @@ import '../../data/repository/repository.dart';
 import '../components/city_selected.dart';
 import '../components/my_button.dart';
 import '../components/warning_dialog.dart';
-import '../data/model/CostFactor.dart';
 import '../data/model/service.dart';
-import 'helper_list_page.dart';
 
 class ServicesOrder extends StatefulWidget {
   final Customer customer;
@@ -42,7 +39,6 @@ class _ServicesOrderState extends State<ServicesOrder>
   // late TabController _tabController;
   List<Location> locations = [];
   List<Customer> customers = [];
-  List<CoefficientOther>? coefficientService = [];
   num basicCoefficient = 0;
   bool isLoading = true;
   String orderType = 'Ngắn hạn';
@@ -86,12 +82,10 @@ class _ServicesOrderState extends State<ServicesOrder>
     var repository = DefaultRepository();
     var dataLocation = await repository.loadLocation();
     var dataCustomer = await repository.loadCustomer('');
-    var dataCoefficient = await repository.loadCoefficientService();
     if (mounted) {
       setState(() {
         locations = dataLocation ?? [];
         customers = dataCustomer ?? [];
-        coefficientService = dataCoefficient ?? [];
         isLoading = false;
       });
     }
@@ -110,16 +104,6 @@ class _ServicesOrderState extends State<ServicesOrder>
 
   @override
   Widget build(BuildContext context) {
-    if (coefficientService!.isNotEmpty) {
-      final coefficientList = coefficientService!.first.coefficientList;
-      final coefficient = coefficientList.firstWhere(
-        (coefficientId) => coefficientId.id == widget.service.coefficientId,
-        orElse: () => coefficientList.isNotEmpty
-            ? coefficientList.first
-            : Coefficient(id: '', value: 1.0, title: '', description: '', deleted: false, status: ''),
-      );
-      basicCoefficient = coefficient.value;
-    }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
