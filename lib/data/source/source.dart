@@ -67,6 +67,8 @@ abstract interface class DataSource {
   Future<void> registerDeviceToken(String phone, String deviceToken);
 
   Future<PaymentResponse?> getPaymentLink(String requestId);
+
+  Future<Requests?> getRequestById(String id, String token);
 }
 
 class RemoteDataSource implements DataSource {
@@ -732,6 +734,33 @@ class RemoteDataSource implements DataSource {
       });
     } catch (e) {
       print('Error creating payment link: $e');
+      return Future.error(e);
+    }
+  }
+
+  @override
+  Future<Requests?> getRequestById(String id, String token) {
+    final url = 'https://homecareapi.vercel.app/request/detail/$id';
+    final uri = Uri.parse(url);
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'token $token',
+    };
+    try {
+      return http.get(uri, headers: headers).then((response) {
+        if (response.statusCode == 200) {
+          final bodyContent = utf8.decode(response.bodyBytes);
+          final Map<String, dynamic> requestMap = jsonDecode(bodyContent);
+          final Requests request = Requests.fromJson(requestMap);
+          return request;
+        } else {
+          print('Failed to load request by ID. Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+          return Future.error('Failed to load request by ID');
+        }
+      });
+    } catch (e) {
+      print('Error loading request by ID: $e');
       return Future.error(e);
     }
   }

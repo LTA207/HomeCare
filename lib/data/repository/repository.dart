@@ -44,8 +44,6 @@ abstract interface class Repository {
 
   Future<void> canceledRequest(String id, String token);
 
-  Future<void> payRequest(String id, String token);
-
   Future<void> doneConfirmRequest(String id, String token);
 
   Future<void> sendMessage(String phone);
@@ -66,6 +64,8 @@ abstract interface class Repository {
   Future<void> registerDeviceToken(String phone, String deviceToken);
 
   Future<PaymentResponse?> getPaymentLink(String requestId);
+
+  Future<Requests?> getRequestById(String id, String token);
 }
 
 class DefaultRepository implements Repository {
@@ -148,11 +148,6 @@ class DefaultRepository implements Repository {
   }
 
   @override
-  Future<void> payRequest(String id, String token) async {
-    return await remoteDataSource.paymentRequest(id, token);
-  }
-
-  @override
   Future<void> doneConfirmRequest(String id, String token) async {
     return await remoteDataSource.paymentRequest(id, token);
   }
@@ -200,5 +195,10 @@ class DefaultRepository implements Repository {
   @override
   Future<PaymentResponse?> getPaymentLink(String requestId) async{
     return await remoteDataSource.getPaymentLink(requestId);
+  }
+
+  @override
+  Future<Requests?> getRequestById(String id, String token) {
+    return remoteDataSource.getRequestById(id, token);
   }
 }

@@ -6,13 +6,11 @@ import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/pages/order_detail_longterm_page.dart';
 import 'package:foodapp/pages/order_detail_page.dart';
-import 'package:foodapp/pages/order_success_page.dart';
 import 'package:foodapp/pages/payment_page.dart';
 import 'package:foodapp/pages/services_order.dart';
 import 'package:foodapp/services/firebase_messaging_service.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import 'package:web_socket_channel/io.dart';
 
 import '../data/model/customer.dart';
 import '../data/model/requestdetail.dart';
@@ -75,7 +73,6 @@ class _ActivityPageState extends State<ActivityPage>
   Future<void> loadHelperData() async {
     var repository = DefaultRepository();
     var data = await repository.loadCleanerData();
-    // Chỉ cập nhật data, không setState ở đây
     helperList = data ?? [];
   }
 

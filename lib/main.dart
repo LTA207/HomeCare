@@ -5,7 +5,6 @@ import 'package:foodapp/data/model/customer.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/service.dart';
 import 'package:provider/provider.dart';
-import 'package:foodapp/auth/login_or_register.dart';
 import 'package:foodapp/components/spashscreen.dart';
 import 'package:foodapp/themes/theme_provider.dart';
 import 'package:foodapp/providers/auth_provider.dart';
@@ -112,7 +111,7 @@ class MyApp extends StatelessWidget {
 //   String fullName = 'Nguyen Van A';
 //   String password = '123456';
 //   String email = 'trongc71@gmail.com';
-//   String requestId = "68b82aa004156d82fcf4b453";
+//   String requestId = "68e3d1c93e63520fb948c5db";
 //   // Addresses address = Addresses(
 //   //   province: 'Hà Nội',
 //   //   district: 'Hà Đông',
@@ -123,7 +122,7 @@ class MyApp extends StatelessWidget {
 //   var repository = DefaultRepository();
 //   var data = await repository.loginCustomer(phone, password);
 //   print('Login data: ${data.toString()}');
-//   var locationData = await repository.getPaymentLink(requestId);
+//   var locationData = await repository.getRequestById(requestId, data!.accessToken);
 //   print('Location data: ${locationData.toString()}');
 //   // var requestData = await repository.loadCustomerRequest(phone, data!.accessToken);
 //   // print('Request data: ${requestData?.first.schedules.toString()}');

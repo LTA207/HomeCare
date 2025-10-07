@@ -12,6 +12,8 @@ class FirebaseMessagingService {
 
   // Callback để thông báo cho UI cần refresh data
   static Function()? onDataChanged;
+  // Callback để xử lý orderId từ FCM notification
+  static Function(String orderId)? onOrderIdReceived;
 
   Future<void> initialize() async {
     try {
@@ -74,6 +76,15 @@ class FirebaseMessagingService {
       print('Data: ${message.data}');
     }
 
+    // Kiểm tra nếu có orderId trong data
+    if (message.data.containsKey('orderId')) {
+      String orderId = message.data['orderId'];
+      print('📦 Received orderId: $orderId');
+
+      // Gọi callback để xử lý orderId
+      onOrderIdReceived?.call(orderId);
+    }
+
     // Kiểm tra nếu là thông báo cập nhật trạng thái
     if (message.data.containsKey('type') && message.data['type'] == 'status_update') {
       String status = message.data['status'] ?? '';
@@ -113,6 +124,15 @@ class FirebaseMessagingService {
       print('Data: ${message.data}');
     }
 
+    // Kiểm tra nếu có orderId trong data
+    if (message.data.containsKey('orderId')) {
+      String orderId = message.data['orderId'];
+      print('📦 Received orderId from background: $orderId');
+
+      // Gọi callback để xử lý orderId
+      onOrderIdReceived?.call(orderId);
+    }
+
     // Trigger refresh data callback khi app được mở từ notification
     onDataChanged?.call();
   }
@@ -131,8 +151,18 @@ class FirebaseMessagingService {
     onDataChanged = callback;
   }
 
+  // Method để đăng ký callback cho orderId
+  static void setOrderIdCallback(Function(String) callback) {
+    onOrderIdReceived = callback;
+  }
+
   // Method để hủy đăng ký callback
   static void clearDataChangeCallback() {
     onDataChanged = null;
+  }
+
+  // Method để hủy đăng ký callback orderId
+  static void clearOrderIdCallback() {
+    onOrderIdReceived = null;
   }
 }

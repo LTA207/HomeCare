@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/auth/login_or_register.dart';
-import 'package:foodapp/data/model/customer.dart';
-import 'package:foodapp/data/model/request.dart';
-import 'package:foodapp/data/model/service.dart';
-import 'package:foodapp/data/repository/repository.dart';
-import 'package:foodapp/pages/profile_page.dart';
-import 'package:foodapp/test_page.dart';
 
 class SplashScreen extends StatefulWidget {
   final String deviceToken;
