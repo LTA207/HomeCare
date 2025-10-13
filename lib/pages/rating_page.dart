@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/data/model/helper.dart';
 
+import '../data/repository/repository.dart';
+
 class RatingHelperPage extends StatefulWidget {
   final Helper helper;
+  final String detailId;
+  final String token;
+  final String refreshToken;
 
   const RatingHelperPage({
     super.key,
-    required this.helper,
+    required this.helper, required this.detailId, required this.token, required this.refreshToken,
   });
 
   @override
@@ -21,9 +26,6 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
   final List<Map<String, dynamic>> _reportIssues = [
     {'name': 'Đi trễ', 'isSelected': false},
     {'name': 'Không đến', 'isSelected': false},
-    {'name': 'Thái độ không tốt', 'isSelected': false},
-    {'name': 'Làm việc không đúng yêu cầu', 'isSelected': false},
-    {'name': 'Không sạch sẽ', 'isSelected': false},
     {'name': 'Khác', 'isSelected': false},
   ];
 
@@ -50,36 +52,117 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
       _isSubmitting = true;
     });
 
-    // Simulate network request
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      // Get the selected issue (only one since we're using radio buttons)
+      String? selectedIssue = _reportIssues
+          .firstWhere((issue) => issue['isSelected'], orElse: () => {'name': null})['name'];
 
-    // Create report data object
-    final reportData = {
-      'helperId': widget.helper.id,
-      'issues': _reportIssues.where((issue) => issue['isSelected']).map((issue) => issue['name']).toList(),
-      'description': _descriptionController.text,
-      'timestamp': DateTime.now().toIso8601String(),
-    };
+      // Prepare report data
+      String description = _descriptionController.text.trim();
 
-    // TODO: Send the report data to your backend
-    print('Submitted report: $reportData');
+      // Call API to submit report with single issue
+      var repository = DefaultRepository();
+      bool isSuccess = await repository.submitHelperReport(widget.detailId, selectedIssue ?? '', description, widget.token);
 
-    setState(() {
-      _isSubmitting = false;
-    });
-
-    // Show success message
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Báo cáo đã được gửi thành công!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      // Go back to previous screen after successful submission
-      Navigator.of(context).pop(true);
+      if (mounted) {
+        _showSuccessDialog();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          contentPadding: const EdgeInsets.all(24),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.green.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.check_circle,
+                  color: Colors.green.shade600,
+                  size: 50,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Báo cáo thành công!',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Quicksand',
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Báo cáo của bạn đã được gửi thành công.\nChúng tôi sẽ xem xét và xử lý trong thời gian sớm nhất.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontFamily: 'Quicksand',
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+                    Navigator.of(context).pop(true); // Go back to previous screen
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade600,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Đóng',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Quicksand',
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -195,7 +278,7 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
         ),
         const SizedBox(height: 8),
         const Text(
-          'Chọn các vấn đề bạn gặp phải với helper này:',
+          'Chọn một vấn đề bạn gặp phải với người giúp việc này:',
           style: TextStyle(
             fontSize: 14,
             fontFamily: 'Quicksand',
@@ -222,11 +305,20 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
-                    Checkbox(
-                      value: issue['isSelected'],
-                      onChanged: (bool? value) {
+                    Radio<String>(
+                      value: issue['name'],
+                      groupValue: _reportIssues.firstWhere(
+                        (item) => item['isSelected'],
+                        orElse: () => {'name': null}
+                      )['name'],
+                      onChanged: (String? value) {
                         setState(() {
-                          issue['isSelected'] = value ?? false;
+                          // Reset all selections
+                          for (var item in _reportIssues) {
+                            item['isSelected'] = false;
+                          }
+                          // Set the selected one
+                          issue['isSelected'] = true;
                         });
                       },
                       activeColor: Colors.red,

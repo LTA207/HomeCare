@@ -71,6 +71,8 @@ abstract interface class DataSource {
   Future<Requests?> getRequestById(String id, String token);
 
   Future<List<RequestDetail>?> loadHelperRequestDetail(String id, String token);
+
+  Future<bool> submitHelperReport(String detailId, String type, String description, String token);
 }
 
 class RemoteDataSource implements DataSource {
@@ -791,6 +793,34 @@ class RemoteDataSource implements DataSource {
       });
     } catch (e) {
       print('Error loading request detail by ID: $e');
+      return Future.error(e);
+    }
+  }
+
+  @override
+  Future<bool> submitHelperReport(String detailId, String type, String description, String token) {
+    final url = 'https://homecareapi.vercel.app/requestDetail/send-report';
+    final uri = Uri.parse(url);
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'token $token'
+    };
+    final body = jsonEncode({"detailId": detailId, "type": type, "description": description});
+    try {
+      return http.post(uri, headers: headers, body: body).then((response) {
+        if (response.statusCode == 200) {
+          if (kDebugMode) {
+            print('Report submitted successfully!');
+          }
+          return true;
+        } else {
+          print('Failed to submit report. Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+          return false;
+        }
+      });
+    } catch (e) {
+      print('Error submitting report: $e');
       return Future.error(e);
     }
   }

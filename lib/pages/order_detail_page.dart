@@ -1242,6 +1242,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   MaterialPageRoute(
                     builder: (context) => RatingHelperPage(
                       helper: requestHelpers.first,
+                      detailId: widget.requestDetail.id,
+                      token: widget.token,
+                      refreshToken: widget.refreshToken,
                     ),
                   ),
                 );

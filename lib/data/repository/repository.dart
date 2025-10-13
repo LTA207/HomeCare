@@ -68,6 +68,8 @@ abstract interface class Repository {
   Future<Requests?> getRequestById(String id, String token);
 
   Future<List<RequestDetail>?> loadHelperRequestDetail(String helperId, String token);
+
+  Future<bool> submitHelperReport(String detailId, String type, String description, String token);
 }
 
 class DefaultRepository implements Repository {
@@ -207,5 +209,10 @@ class DefaultRepository implements Repository {
   @override
   Future<List<RequestDetail>?> loadHelperRequestDetail(String helperId, String token) async {
     return await remoteDataSource.loadHelperRequestDetail(helperId, token);
+  }
+
+  @override
+  Future<bool> submitHelperReport(String detailId, String type, String description, String token) async{
+    return await remoteDataSource.submitHelperReport(detailId, type, description, token);
   }
 }
