@@ -11,6 +11,7 @@ class RequestDetail {
   DateTime startTime;
   DateTime endTime;
   num? totalCost;
+  String? serviceTitle;
 
   RequestDetail(
       {required this.id,
@@ -22,29 +23,8 @@ class RequestDetail {
       required this.comment,
       required this.startTime,
       required this.endTime,
-      required this.totalCost});
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RequestDetail &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          workingDate == other.workingDate &&
-          helperID == other.helperID &&
-          status == other.status &&
-          cost == other.cost &&
-          helperCost == other.helperCost &&
-          totalCost == other.totalCost;
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      workingDate.hashCode ^
-      helperID.hashCode ^
-      status.hashCode ^
-      helperCost.hashCode ^
-      totalCost.hashCode;
+      required this.totalCost,
+      this.serviceTitle});
 
   factory RequestDetail.fromJson(Map<String, dynamic> map) {
     return RequestDetail(
@@ -66,7 +46,9 @@ class RequestDetail {
             ? DateTime.parse(map['endTime'])
             : DateTime.now(),
         // Parsing to DateTime with null safety
-        totalCost: map['totalCost'] ?? 0);
+        totalCost: map['totalCost'] ?? 0,
+        serviceTitle: map['service'] ?? ''
+    );
   }
 
   @override

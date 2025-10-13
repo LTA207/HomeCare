@@ -40,7 +40,7 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vui lòng chọn vấn đề hoặc mô tả chi tiết'),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.orange,
         ),
       );
       return;

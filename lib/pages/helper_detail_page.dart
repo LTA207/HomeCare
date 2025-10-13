@@ -35,38 +35,36 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
   Future<void> loadData() async {
     String helperId = "68b9077dc29b592b8c405d3b";
     var repository = DefaultRepository();
-    var requestData = await repository.loadCustomerRequest('0987654321', widget.token);
+    var requestDetailData = await repository.loadHelperRequestDetail(helperId, widget.token);
 
-    var listDetail = requestData
-        ?.expand((loc) => loc.schedules)
-        .where((e) => e.helperID == helperId)
-        .toList();
-
-    // Group reviews by service title from the parent request
+    // Group reviews by service title directly from RequestDetail
     Map<String, List<RequestDetail>> reviewsByService = {};
-    if (requestData != null) {
-      for (var request in requestData) {
-        var requestReviews = request.schedules
-            .where((detail) => detail.helperID == helperId && detail.comment.review.isNotEmpty)
-            .toList();
-
-        if (requestReviews.isNotEmpty) {
-          String serviceTitle = request.service.title;
+    if (requestDetailData != null) {
+      for (var detail in requestDetailData) {
+        if (detail.comment.review.isNotEmpty) {
+          String serviceTitle = detail.serviceTitle ?? 'Dịch vụ khác';
           if (reviewsByService[serviceTitle] == null) {
             reviewsByService[serviceTitle] = [];
           }
-          reviewsByService[serviceTitle]!.addAll(requestReviews);
+          reviewsByService[serviceTitle]!.add(detail);
         }
       }
     }
 
+    // Get unique service titles from request details to match with widget.services
+    var serviceIds = requestDetailData
+        ?.map((detail) => detail.serviceTitle)
+        .where((title) => title != null)
+        .toSet()
+        .toList() ?? [];
+
     var servicesData = widget.services
-        .where((service) => requestData!.any((req) => req.service.title == service.title))
+        .where((service) => serviceIds.contains(service.title))
         .toList();
 
     if (mounted) {
       setState(() {
-        helperListDetail = listDetail;
+        helperListDetail = requestDetailData;
         helperServices = servicesData;
         serviceReviews = reviewsByService;
       });
@@ -903,7 +901,7 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
 
     // Calculate total reviews across all services
     int totalReviews = serviceReviews.values.fold(0, (sum, reviews) => sum + reviews.length);
-    int totalCompleted = helperListDetail!.where((d) => d.status == 'completed').length;
+    int totalCompleted = helperListDetail!.length;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1021,14 +1019,14 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: detail.status == 'completed' ? Colors.green.shade100 : Colors.orange.shade100,
+                  color: Colors.green.shade100,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  detail.status == 'completed' ? 'Hoàn thành' : detail.status,
+                  'Hoàn thành',
                   style: TextStyle(
                     fontSize: 11,
-                    color: detail.status == 'completed' ? Colors.green.shade800 : Colors.orange.shade800,
+                    color: Colors.green.shade800,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'Quicksand',
                   ),

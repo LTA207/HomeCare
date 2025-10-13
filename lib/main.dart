@@ -124,13 +124,13 @@ class MyApp extends StatelessWidget {
 //   var repository = DefaultRepository();
 //   var data = await repository.loginCustomer(phone, password);
 //   print('Login data: ${data.toString()}');
-//   var locationData = await repository.loadCustomerRequest(phone, data!.accessToken);
+//   var locationData = await repository.loadHelperRequestDetail(helperId, data!.accessToken);
 //   print('Location data: ${locationData?.length}');
-//   var listDetail = locationData
-//       ?.expand((loc) => loc.schedules)
-//       .where((e) => e.helperID == helperId)
-//       .toList();
-//   print('Location data: ${listDetail?.length}');
+//   // var listDetail = locationData
+//   //     ?.expand((loc) => loc.schedules)
+//   //     .where((e) => e.helperID == helperId)
+//   //     .toList();
+//   // print('Location data: ${listDetail?.length}');
 //   // var requestData = await repository.loadCustomerRequest(phone, data!.accessToken);
 //   // print('Request data: ${requestData?.first.schedules.toString()}');
 //   // var registerData = await repository.registerCustomer(
