@@ -819,7 +819,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                     );
                                   },
                                   icon: const Icon(
-                                    Icons.phone_rounded,
+                                    Icons.insert_drive_file_outlined,
                                     size: 16,
                                     color: Colors.green,
                                   ),
@@ -1250,10 +1250,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.star_border_rounded, color: Colors.amber.shade600),
+                  Icon(Icons.warning_outlined, color: Colors.amber.shade600),
                   const SizedBox(width: 12),
                   const Text(
-                    'Đánh giá',
+                    'Báo cáo',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

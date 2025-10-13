@@ -23,6 +23,8 @@ class HelperDetailPage extends StatefulWidget {
 
 class _HelperDetailPageState extends State<HelperDetailPage> {
   List<RequestDetail>? helperListDetail;
+  List<Services> helperServices = [];
+  Map<String, List<RequestDetail>> serviceReviews = {}; // Add this to store reviews by service
 
   @override
   void initState(){
@@ -33,14 +35,40 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
   Future<void> loadData() async {
     String helperId = "68b9077dc29b592b8c405d3b";
     var repository = DefaultRepository();
-    var data = await repository.loadCustomerRequest('0987654321', widget.token);
-    var listDetail = data
+    var requestData = await repository.loadCustomerRequest('0987654321', widget.token);
+
+    var listDetail = requestData
         ?.expand((loc) => loc.schedules)
         .where((e) => e.helperID == helperId)
         .toList();
+
+    // Group reviews by service title from the parent request
+    Map<String, List<RequestDetail>> reviewsByService = {};
+    if (requestData != null) {
+      for (var request in requestData) {
+        var requestReviews = request.schedules
+            .where((detail) => detail.helperID == helperId && detail.comment.review.isNotEmpty)
+            .toList();
+
+        if (requestReviews.isNotEmpty) {
+          String serviceTitle = request.service.title;
+          if (reviewsByService[serviceTitle] == null) {
+            reviewsByService[serviceTitle] = [];
+          }
+          reviewsByService[serviceTitle]!.addAll(requestReviews);
+        }
+      }
+    }
+
+    var servicesData = widget.services
+        .where((service) => requestData!.any((req) => req.service.title == service.title))
+        .toList();
+
     if (mounted) {
       setState(() {
         helperListDetail = listDetail;
+        helperServices = servicesData;
+        serviceReviews = reviewsByService;
       });
     }
   }
@@ -619,13 +647,18 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
                 color: Colors.green.shade700,
               ),
               const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green.shade800,
-                  fontFamily: 'Quicksand',
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green.shade800,
+                    fontFamily: 'Quicksand',
+                  ),
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                  maxLines: 2,
                 ),
               ),
             ],
@@ -868,13 +901,9 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
       );
     }
 
-    // Group comments by services
-    List<Services> helperServices = widget.services;
-
-    // Filter comments that have review content
-    List<RequestDetail> commentsWithReviews = helperListDetail!
-        .where((detail) => detail.comment.review.isNotEmpty)
-        .toList();
+    // Calculate total reviews across all services
+    int totalReviews = serviceReviews.values.fold(0, (sum, reviews) => sum + reviews.length);
+    int totalCompleted = helperListDetail!.where((d) => d.status == 'completed').length;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -890,12 +919,12 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
               children: [
                 _buildInfoRow(
                   'Tổng đánh giá',
-                  '${commentsWithReviews.length}',
+                  '$totalReviews',
                   Icons.comment_outlined,
                 ),
                 _buildInfoRow(
                   'Hoàn thành',
-                  '${helperListDetail!.where((d) => d.status == 'completed').length}',
+                  '$totalCompleted',
                   Icons.check_circle_outline,
                 ),
               ],
@@ -903,15 +932,15 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
           ),
 
           // Comments grouped by services
-          if (commentsWithReviews.isNotEmpty) ...[
+          if (serviceReviews.isNotEmpty) ...[
             const SizedBox(height: 16),
             ...helperServices.map((service) {
-              List<RequestDetail> serviceComments = commentsWithReviews;
+              List<RequestDetail> serviceComments = serviceReviews[service.title] ?? [];
 
               return Column(
                 children: [
                   _buildCardSection(
-                    service.title,
+                    '${service.title} (${serviceComments.length} đánh giá)',
                     Icons.star_outline,
                     Column(
                       children: serviceComments.isEmpty
@@ -935,6 +964,23 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
                 ],
               );
             }).toList(),
+          ] else ...[
+            const SizedBox(height: 16),
+            _buildCardSection(
+              'Đánh giá',
+              Icons.star_outline,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  'Chưa có đánh giá nào cho helper này',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                    fontFamily: 'Quicksand',
+                  ),
+                ),
+              ),
+            ),
           ],
 
           const SizedBox(height: 80),

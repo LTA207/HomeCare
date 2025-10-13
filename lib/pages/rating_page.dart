@@ -14,29 +14,32 @@ class RatingHelperPage extends StatefulWidget {
 }
 
 class _RatingHelperPageState extends State<RatingHelperPage> {
-  int _rating = 0;
-  final TextEditingController _commentController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   bool _isSubmitting = false;
 
-  // Example rating criteria
-  final List<Map<String, dynamic>> _criteriaList = [
-    {'name': 'Thái độ phục vụ', 'rating': 0},
-    {'name': 'Kỹ năng chuyên môn', 'rating': 0},
-    {'name': 'Đúng giờ', 'rating': 0},
-    {'name': 'Sạch sẽ', 'rating': 0},
+  // Report issues list
+  final List<Map<String, dynamic>> _reportIssues = [
+    {'name': 'Đi trễ', 'isSelected': false},
+    {'name': 'Không đến', 'isSelected': false},
+    {'name': 'Thái độ không tốt', 'isSelected': false},
+    {'name': 'Làm việc không đúng yêu cầu', 'isSelected': false},
+    {'name': 'Không sạch sẽ', 'isSelected': false},
+    {'name': 'Khác', 'isSelected': false},
   ];
 
   @override
   void dispose() {
-    _commentController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
-  void _submitRating() async {
-    if (_rating == 0) {
+  void _submitReport() async {
+    bool hasSelectedIssue = _reportIssues.any((issue) => issue['isSelected']);
+
+    if (!hasSelectedIssue && _descriptionController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Vui lòng đánh giá số sao'),
+          content: Text('Vui lòng chọn vấn đề hoặc mô tả chi tiết'),
           backgroundColor: Colors.red,
         ),
       );
@@ -50,17 +53,16 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
     // Simulate network request
     await Future.delayed(const Duration(seconds: 1));
 
-    // Create rating data object
-    final ratingData = {
+    // Create report data object
+    final reportData = {
       'helperId': widget.helper.id,
-      'overallRating': _rating,
-      'criteria': _criteriaList,
-      'comment': _commentController.text,
+      'issues': _reportIssues.where((issue) => issue['isSelected']).map((issue) => issue['name']).toList(),
+      'description': _descriptionController.text,
       'timestamp': DateTime.now().toIso8601String(),
     };
 
-    // TODO: Send the rating data to your backend
-    print('Submitted rating: $ratingData');
+    // TODO: Send the report data to your backend
+    print('Submitted report: $reportData');
 
     setState(() {
       _isSubmitting = false;
@@ -70,7 +72,7 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cảm ơn bạn đã đánh giá!'),
+          content: Text('Báo cáo đã được gửi thành công!'),
           backgroundColor: Colors.green,
         ),
       );
@@ -85,13 +87,13 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Đánh giá dịch vụ',
+          'Báo cáo Helper',
           style: TextStyle(
             fontFamily: 'Quicksand',
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.red,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -102,11 +104,9 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
           children: [
             _buildHelperCard(),
             const SizedBox(height: 24),
-            _buildOverallRating(),
+            _buildReportIssues(),
             const SizedBox(height: 24),
-            _buildDetailedRatings(),
-            const SizedBox(height: 24),
-            _buildCommentSection(),
+            _buildDescriptionSection(),
             const SizedBox(height: 40),
           ],
         ),
@@ -181,12 +181,12 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
     );
   }
 
-  Widget _buildOverallRating() {
+  Widget _buildReportIssues() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Đánh giá tổng quan',
+          'Vấn đề gặp phải',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -194,81 +194,12 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
           ),
         ),
         const SizedBox(height: 8),
-        Center(
-          child: Column(
-            children: [
-              const Text(
-                'Bạn đánh giá dịch vụ thế nào?',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Quicksand',
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  5,
-                  (index) => GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _rating = index + 1;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Icon(
-                        index < _rating ? Icons.star : Icons.star_border,
-                        color: Colors.amber,
-                        size: 40,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _getRatingText(),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Quicksand',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _getRatingText() {
-    switch (_rating) {
-      case 1:
-        return 'Rất tệ';
-      case 2:
-        return 'Tệ';
-      case 3:
-        return 'Bình thường';
-      case 4:
-        return 'Tốt';
-      case 5:
-        return 'Xuất sắc';
-      default:
-        return 'Chưa đánh giá';
-    }
-  }
-
-  Widget _buildDetailedRatings() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
         const Text(
-          'Đánh giá chi tiết',
+          'Chọn các vấn đề bạn gặp phải với helper này:',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontSize: 14,
             fontFamily: 'Quicksand',
+            color: Colors.grey,
           ),
         ),
         const SizedBox(height: 16),
@@ -286,45 +217,27 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
             ],
           ),
           child: Column(
-            children: _criteriaList.map((criteria) {
+            children: _reportIssues.map((issue) {
               return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
+                    Checkbox(
+                      value: issue['isSelected'],
+                      onChanged: (bool? value) {
+                        setState(() {
+                          issue['isSelected'] = value ?? false;
+                        });
+                      },
+                      activeColor: Colors.red,
+                    ),
+                    const SizedBox(width: 8),
                     Expanded(
-                      flex: 2,
                       child: Text(
-                        criteria['name'],
+                        issue['name'],
                         style: const TextStyle(
                           fontSize: 14,
                           fontFamily: 'Quicksand',
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: List.generate(
-                          5,
-                          (index) => GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                criteria['rating'] = index + 1;
-                              });
-                            },
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
-                              child: Icon(
-                                index < criteria['rating']
-                                    ? Icons.star
-                                    : Icons.star_border,
-                                color: Colors.amber,
-                                size: 20,
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                     ),
@@ -338,12 +251,12 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
     );
   }
 
-  Widget _buildCommentSection() {
+  Widget _buildDescriptionSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Nhận xét',
+          'Mô tả chi tiết',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -364,10 +277,10 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
             ],
           ),
           child: TextField(
-            controller: _commentController,
+            controller: _descriptionController,
             maxLines: 4,
             decoration: InputDecoration(
-              hintText: 'Chia sẻ cảm nhận của bạn về dịch vụ...',
+              hintText: 'Mô tả chi tiết về vấn đề bạn gặp phải...',
               hintStyle: TextStyle(
                 color: Colors.grey[400],
                 fontFamily: 'Quicksand',
@@ -382,7 +295,7 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: Colors.green.shade300, width: 2),
+                borderSide: BorderSide(color: Colors.red.shade300, width: 2),
               ),
               contentPadding: const EdgeInsets.all(16),
             ),
@@ -391,11 +304,11 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
         const SizedBox(height: 16),
         Row(
           children: [
-            Icon(Icons.lightbulb_outline, size: 14, color: Colors.amber[700]),
+            Icon(Icons.info_outline, size: 14, color: Colors.orange[700]),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Đánh giá của bạn sẽ giúp người giúp việc cải thiện dịch vụ và giúp người dùng khác có quyết định đúng đắn.',
+                'Báo cáo của bạn sẽ được xem xét và xử lý trong thời gian sớm nhất. Vui lòng cung cấp thông tin chính xác.',
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[600],
@@ -428,9 +341,9 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
         child: SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: _isSubmitting ? null : _submitRating,
+            onPressed: _isSubmitting ? null : _submitReport,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green.shade600,
+              backgroundColor: Colors.red.shade600,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
@@ -448,7 +361,7 @@ class _RatingHelperPageState extends State<RatingHelperPage> {
                     ),
                   )
                 : const Text(
-                    'Gửi đánh giá',
+                    'Gửi báo cáo',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

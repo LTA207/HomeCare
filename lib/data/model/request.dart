@@ -200,12 +200,14 @@ class RequestService {
   num coefficientService;
   num coefficientOther;
   num cost;
+  String? id; // Add service ID to link with reviews
 
   RequestService(
       {required this.title,
         required this.coefficientService,
         required this.coefficientOther,
-        required this.cost});
+        required this.cost,
+        this.id});
 
   factory RequestService.fromJson(Map<String, dynamic> map) {
     return RequestService(
@@ -213,6 +215,7 @@ class RequestService {
       coefficientService: map['coefficient_service'] ?? 0.0,
       coefficientOther: map['coefficient_other'] ?? 0.0,
       cost: map['cost'],
+      id: map['_id'] ?? map['id'],
     );
   }
 
@@ -222,12 +225,13 @@ class RequestService {
       'coefficient_service': coefficientService,
       'coefficient_other': coefficientOther,
       'cost': cost,
+      'id': id,
     };
   }
 
   @override
   String toString() {
-    return 'RequestService{title: $title, coefficientService: $coefficientService, coefficientOther: $coefficientOther, cost: $cost}';
+    return 'RequestService{title: $title, coefficientService: $coefficientService, coefficientOther: $coefficientOther, cost: $cost, id: $id}';
   }
 }
 
