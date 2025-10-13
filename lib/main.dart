@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:foodapp/data/model/customer.dart';
+import 'package:foodapp/data/model/helper.dart';
 import 'package:foodapp/data/model/request.dart';
 import 'package:foodapp/data/model/service.dart';
 import 'package:provider/provider.dart';
@@ -112,6 +113,7 @@ class MyApp extends StatelessWidget {
 //   String password = '123456';
 //   String email = 'trongc71@gmail.com';
 //   String requestId = "68e3d1c93e63520fb948c5db";
+//   String helperId = "68b9077dc29b592b8c405d3b";
 //   // Addresses address = Addresses(
 //   //   province: 'Hà Nội',
 //   //   district: 'Hà Đông',
@@ -122,8 +124,13 @@ class MyApp extends StatelessWidget {
 //   var repository = DefaultRepository();
 //   var data = await repository.loginCustomer(phone, password);
 //   print('Login data: ${data.toString()}');
-//   var locationData = await repository.getRequestById(requestId, data!.accessToken);
-//   print('Location data: ${locationData.toString()}');
+//   var locationData = await repository.loadCustomerRequest(phone, data!.accessToken);
+//   print('Location data: ${locationData?.length}');
+//   var listDetail = locationData
+//       ?.expand((loc) => loc.schedules)
+//       .where((e) => e.helperID == helperId)
+//       .toList();
+//   print('Location data: ${listDetail?.length}');
 //   // var requestData = await repository.loadCustomerRequest(phone, data!.accessToken);
 //   // print('Request data: ${requestData?.first.schedules.toString()}');
 //   // var registerData = await repository.registerCustomer(

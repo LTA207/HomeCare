@@ -219,6 +219,8 @@ class _ReviewOrderPageState extends State<ReviewOrderPage> {
                             builder: (context) => HelperDetailPage(
                               helper: widget.helper!,
                               services: widget.services,
+                              token: widget.token,
+                              refreshToken: widget.refreshToken,
                             ),
                           ),
                         );

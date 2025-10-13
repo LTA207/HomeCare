@@ -13,6 +13,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import '../data/model/requestdetail.dart';
 import '../data/repository/repository.dart';
+import 'helper_detail_page.dart';
 
 class OrderDetailPage extends StatefulWidget {
   final Requests request;
@@ -394,9 +395,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 title: steps[i]['title']!,
                 time: i == 0
                     ? _formatDate(widget.request.oderDate)
-                    : (i <= activeStep
-                        ? 'Hoàn thành'
-                        : 'Đang chờ'),
+                    : (i <= activeStep ? 'Hoàn thành' : 'Đang chờ'),
                 isActive: i <= activeStep,
                 isFirst: i == 0,
                 isLast: i == steps.length - 1,
@@ -444,12 +443,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     Color lineColor = isCancelled
         ? Colors.red
         : (isActive ? Colors.green : Colors.grey.shade300);
-    Color titleColor = isCancelled
-        ? Colors.red
-        : (isActive ? Colors.black : Colors.grey);
-    Color timeColor = isCancelled
-        ? Colors.red
-        : (isActive ? Colors.green : Colors.grey);
+    Color titleColor =
+        isCancelled ? Colors.red : (isActive ? Colors.black : Colors.grey);
+    Color timeColor =
+        isCancelled ? Colors.red : (isActive ? Colors.green : Colors.grey);
 
     double iconScale = (isActive || isCancelled) ? 1.2 : 1.0;
     double opacity = isActive || isCancelled ? 1.0 : 0.7;
@@ -490,7 +487,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     duration: const Duration(milliseconds: 400),
                     child: Icon(
                       iconData,
-                      color: isActive || isCancelled ? Colors.white : Colors.grey,
+                      color:
+                          isActive || isCancelled ? Colors.white : Colors.grey,
                       size: 16,
                     ),
                   ),
@@ -807,14 +805,26 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 ElevatedButton.icon(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => HelperDetailPage(
+                                          helper: helper,
+                                          services: widget.services,
+                                          token: widget.token,
+                                          refreshToken: widget.refreshToken,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                   icon: const Icon(
                                     Icons.phone_rounded,
                                     size: 16,
                                     color: Colors.green,
                                   ),
                                   label: Text(
-                                    'Gọi điện',
+                                    'Thông tin',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,

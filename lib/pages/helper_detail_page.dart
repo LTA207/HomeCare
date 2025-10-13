@@ -1,17 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/data/model/helper.dart';
+import 'package:foodapp/data/model/requestdetail.dart';
+import 'package:foodapp/data/repository/repository.dart';
 import 'package:intl/intl.dart';
 import '../data/model/service.dart';
 
-class HelperDetailPage extends StatelessWidget {
+class HelperDetailPage extends StatefulWidget {
   final Helper helper;
   final List<Services> services;
+  final String token;
+  final String refreshToken;
 
   const HelperDetailPage({
     super.key,
     required this.helper,
-    required this.services,
+    required this.services, required this.token, required this.refreshToken,
   });
+
+  @override
+  State<HelperDetailPage> createState() => _HelperDetailPageState();
+}
+
+class _HelperDetailPageState extends State<HelperDetailPage> {
+  List<RequestDetail>? helperListDetail;
+
+  @override
+  void initState(){
+    super.initState();
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    String helperId = "68b9077dc29b592b8c405d3b";
+    var repository = DefaultRepository();
+    var data = await repository.loadCustomerRequest('0987654321', widget.token);
+    var listDetail = data
+        ?.expand((loc) => loc.schedules)
+        .where((e) => e.helperID == helperId)
+        .toList();
+    if (mounted) {
+      setState(() {
+        helperListDetail = listDetail;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,19 +72,12 @@ class HelperDetailPage extends StatelessWidget {
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         title: Text(
-          helper.fullName ?? 'No Name',
+          widget.helper.fullName ?? 'No Name',
           style: const TextStyle(
             fontFamily: 'Quicksand',
             fontWeight: FontWeight.bold,
             color: Colors.white,
             fontSize: 20,
-            // shadows: [
-            //   Shadow(
-            //     blurRadius: 4.0,
-            //     color: Colors.black45,
-            //     offset: Offset(0, 2),
-            //   ),
-            // ],
           ),
         ),
       ),
@@ -71,7 +96,7 @@ class HelperDetailPage extends StatelessWidget {
 
   Widget _buildProfileCard(BuildContext context) {
     List<Services> helperServices =
-        services.where((service) => helper.jobs.contains(service.id)).toList();
+        widget.services.where((service) => widget.helper.jobs.contains(service.id)).toList();
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -97,7 +122,7 @@ class HelperDetailPage extends StatelessWidget {
                 Row(
                   children: [
                     Hero(
-                      tag: 'helper_avatar_${helper.id}',
+                      tag: 'helper_avatar_${widget.helper.id}',
                       child: Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
@@ -116,10 +141,10 @@ class HelperDetailPage extends StatelessWidget {
                         child: CircleAvatar(
                           radius: 45,
                           backgroundColor: Colors.grey[200],
-                          backgroundImage: helper.avatar?.isNotEmpty == true
-                              ? NetworkImage(helper.avatar!)
+                          backgroundImage: widget.helper.avatar?.isNotEmpty == true
+                              ? NetworkImage(widget.helper.avatar!)
                               : null,
-                          child: helper.avatar?.isNotEmpty != true
+                          child: widget.helper.avatar?.isNotEmpty != true
                               ? Icon(Icons.person,
                                   size: 45, color: Colors.grey[400])
                               : null,
@@ -132,7 +157,7 @@ class HelperDetailPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            helper.fullName ?? 'No Name',
+                            widget.helper.fullName ?? 'No Name',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -149,7 +174,7 @@ class HelperDetailPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                helper.helperId ?? 'No ID',
+                                widget.helper.helperId ?? 'No ID',
                                 style: TextStyle(
                                   color: Colors.grey[700],
                                   fontFamily: 'Quicksand',
@@ -168,7 +193,7 @@ class HelperDetailPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                helper.phone ?? 'Chưa cập nhật',
+                                widget.helper.phone ?? 'Chưa cập nhật',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -230,21 +255,21 @@ class HelperDetailPage extends StatelessWidget {
       child: Row(
         children: [
           _buildStatItem(
-            '${helper.yearOfExperience}',
+            '${widget.helper.yearOfExperience}',
             'Năm KN',
             Icons.work_outline,
           ),
           _buildVerticalDivider(),
           _buildStatItem(
-            helper.workingArea.province,
+            widget.helper.workingArea.province,
             'Khu vực',
             Icons.location_on_outlined,
           ),
           _buildVerticalDivider(),
           _buildStatItem(
-            helper.startDate != null
+            widget.helper.startDate != null
                 ? DateFormat('MM/yyyy')
-                    .format(DateTime.parse(helper.startDate!))
+                    .format(DateTime.parse(widget.helper.startDate!))
                 : '-',
             'Bắt đầu',
             Icons.calendar_today_outlined,
@@ -308,7 +333,7 @@ class HelperDetailPage extends StatelessWidget {
 
   Widget _buildTabbedContent(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Column(
         children: [
           Container(
@@ -329,14 +354,10 @@ class HelperDetailPage extends StatelessWidget {
                 fontSize: 14,
                 fontFamily: 'Quicksand',
               ),
-
               indicatorSize: TabBarIndicatorSize.tab,
               indicatorPadding: EdgeInsets.zero,
-
               indicatorColor: Colors.transparent,
-
               padding: const EdgeInsets.all(4),
-              // Define tab style
               tabs: const [
                 Tab(
                   text: 'Cơ bản',
@@ -350,8 +371,11 @@ class HelperDetailPage extends StatelessWidget {
                   text: 'Chi tiết',
                   height: 36,
                 ),
+                Tab(
+                  text: 'Đánh giá',
+                  height: 36,
+                ),
               ],
-
               dividerColor: Colors.transparent,
             ),
           ),
@@ -362,6 +386,7 @@ class HelperDetailPage extends StatelessWidget {
                 _buildBasicTab(),
                 _buildExperienceTab(),
                 _buildDetailsTab(),
+                _buildReviewsTab(),
               ],
             ),
           ),
@@ -384,34 +409,34 @@ class HelperDetailPage extends StatelessWidget {
               children: [
                 _buildInfoRow(
                   'Ngày bắt đầu',
-                  helper.startDate != null
+                  widget.helper.startDate != null
                       ? DateFormat('dd/MM/yyyy')
-                          .format(DateTime.parse(helper.startDate!))
+                          .format(DateTime.parse(widget.helper.startDate!))
                       : 'Chưa cập nhật',
                   Icons.calendar_today_outlined,
                 ),
                 _buildInfoRow(
                   'Mã nhân viên',
-                  helper.helperId ?? 'Chưa cập nhật',
+                  widget.helper.helperId ?? 'Chưa cập nhật',
                   Icons.badge_outlined,
                 ),
                 _buildInfoRow(
                   'Tỉnh/TP',
-                  helper.workingArea.province,
+                  widget.helper.workingArea.province,
                   Icons.location_city_outlined,
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
-          if (helper.workingArea.districts.isNotEmpty)
+          if (widget.helper.workingArea.districts.isNotEmpty)
             _buildCardSection(
               'Khu vực làm việc',
               Icons.map_outlined,
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: helper.workingArea.districts
+                children: widget.helper.workingArea.districts
                     .map((district) => _buildChip(district))
                     .toList(),
               ),
@@ -424,7 +449,7 @@ class HelperDetailPage extends StatelessWidget {
 
   Widget _buildExperienceTab() {
     List<Services> helperServices =
-        services.where((service) => helper.jobs.contains(service.id)).toList();
+        widget.services.where((service) => widget.helper.jobs.contains(service.id)).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -439,13 +464,13 @@ class HelperDetailPage extends StatelessWidget {
               children: [
                 _buildInfoRow(
                   'Tổng kinh nghiệm',
-                  '${helper.yearOfExperience} năm',
+                  '${widget.helper.yearOfExperience} năm',
                   Icons.event_note_outlined,
                 ),
               ],
             ),
           ),
-          if (helper.jobs.isNotEmpty) ...[
+          if (widget.helper.jobs.isNotEmpty) ...[
             const SizedBox(height: 16),
             _buildCardSection(
               'Kỹ năng',
@@ -459,7 +484,7 @@ class HelperDetailPage extends StatelessWidget {
               ),
             ),
           ],
-          if (helper.experienceDescription != null) ...[
+          if (widget.helper.experienceDescription != null) ...[
             const SizedBox(height: 16),
             _buildCardSection(
               'Mô tả chi tiết',
@@ -467,7 +492,7 @@ class HelperDetailPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
-                  helper.experienceDescription!,
+                  widget.helper.experienceDescription!,
                   style: TextStyle(
                     color: Colors.grey[700],
                     fontSize: 15,
@@ -497,30 +522,30 @@ class HelperDetailPage extends StatelessWidget {
               children: [
                 _buildInfoRow(
                   'Ngày sinh',
-                  helper.birthDay != null
+                  widget.helper.birthDay != null
                       ? DateFormat('dd/MM/yyyy')
-                          .format(DateTime.parse(helper.birthDay!))
+                          .format(DateTime.parse(widget.helper.birthDay!))
                       : 'Chưa cập nhật',
                   Icons.cake_outlined,
                 ),
                 _buildInfoRow(
                   'Nơi sinh',
-                  helper.birthPlace ?? 'Chưa cập nhật',
+                  widget.helper.birthPlace ?? 'Chưa cập nhật',
                   Icons.home_outlined,
                 ),
                 _buildInfoRow(
                   'Địa chỉ',
-                  helper.address ?? 'Chưa cập nhật',
+                  widget.helper.address ?? 'Chưa cập nhật',
                   Icons.location_on_outlined,
                 ),
                 _buildInfoRow(
                   'Giới tính',
-                  helper.gender ?? 'Chưa cập nhật',
+                  widget.helper.gender ?? 'Chưa cập nhật',
                   Icons.wc_outlined,
                 ),
                 _buildInfoRow(
                   'Quốc tịch',
-                  helper.nationality ?? 'Chưa cập nhật',
+                  widget.helper.nationality ?? 'Chưa cập nhật',
                   Icons.flag_outlined,
                 ),
               ],
@@ -534,18 +559,18 @@ class HelperDetailPage extends StatelessWidget {
               children: [
                 _buildInfoRow(
                   'Chiều cao',
-                  '${helper.height} cm',
+                  '${widget.helper.height} cm',
                   Icons.height_outlined,
                 ),
                 _buildInfoRow(
                   'Cân nặng',
-                  '${helper.weight} kg',
+                  '${widget.helper.weight} kg',
                   Icons.monitor_weight_outlined,
                 ),
               ],
             ),
           ),
-          if (helper.healthCertificates.isNotEmpty) ...[
+          if (widget.helper.healthCertificates.isNotEmpty) ...[
             const SizedBox(height: 16),
             _buildCertificateSection(),
           ],
@@ -557,7 +582,7 @@ class HelperDetailPage extends StatelessWidget {
               children: [
                 _buildInfoRow(
                   'Trình độ',
-                  helper.educationLevel ?? 'Chưa cập nhật',
+                  widget.helper.educationLevel ?? 'Chưa cập nhật',
                   Icons.grade_outlined,
                 ),
               ],
@@ -681,7 +706,7 @@ class HelperDetailPage extends StatelessWidget {
             height: 120,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: helper.healthCertificates.length,
+              itemCount: widget.helper.healthCertificates.length,
               itemBuilder: (context, index) => Padding(
                 padding: const EdgeInsets.only(right: 12),
                 child: GestureDetector(
@@ -705,7 +730,7 @@ class HelperDetailPage extends StatelessWidget {
                       child: Stack(
                         children: [
                           Image.network(
-                            helper.healthCertificates[index],
+                            widget.helper.healthCertificates[index],
                             width: 120,
                             height: 120,
                             fit: BoxFit.cover,
@@ -814,6 +839,231 @@ class HelperDetailPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildReviewsTab() {
+    if (helperListDetail == null || helperListDetail!.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.rate_review_outlined,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Chưa có đánh giá nào',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+                fontFamily: 'Quicksand',
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Group comments by services
+    List<Services> helperServices = widget.services;
+
+    // Filter comments that have review content
+    List<RequestDetail> commentsWithReviews = helperListDetail!
+        .where((detail) => detail.comment.review.isNotEmpty)
+        .toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 10),
+          // Overall stats
+          _buildCardSection(
+            'Tổng quan đánh giá',
+            Icons.analytics_outlined,
+            Column(
+              children: [
+                _buildInfoRow(
+                  'Tổng đánh giá',
+                  '${commentsWithReviews.length}',
+                  Icons.comment_outlined,
+                ),
+                _buildInfoRow(
+                  'Hoàn thành',
+                  '${helperListDetail!.where((d) => d.status == 'completed').length}',
+                  Icons.check_circle_outline,
+                ),
+              ],
+            ),
+          ),
+
+          // Comments grouped by services
+          if (commentsWithReviews.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            ...helperServices.map((service) {
+              List<RequestDetail> serviceComments = commentsWithReviews;
+
+              return Column(
+                children: [
+                  _buildCardSection(
+                    service.title,
+                    Icons.star_outline,
+                    Column(
+                      children: serviceComments.isEmpty
+                          ? [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                child: Text(
+                                  'Chưa có đánh giá cho dịch vụ này',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontStyle: FontStyle.italic,
+                                    fontFamily: 'Quicksand',
+                                  ),
+                                ),
+                              ),
+                            ]
+                          : serviceComments.map((detail) => _buildCommentItem(detail)).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              );
+            }).toList(),
+          ],
+
+          const SizedBox(height: 80),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCommentItem(RequestDetail detail) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                size: 14,
+                color: Colors.grey[600],
+              ),
+              const SizedBox(width: 4),
+              Text(
+                DateFormat('dd/MM/yyyy').format(DateTime.parse(detail.workingDate)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontFamily: 'Quicksand',
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: detail.status == 'completed' ? Colors.green.shade100 : Colors.orange.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  detail.status == 'completed' ? 'Hoàn thành' : detail.status,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: detail.status == 'completed' ? Colors.green.shade800 : Colors.orange.shade800,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Quicksand',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            detail.comment.review,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[800],
+              height: 1.4,
+              fontFamily: 'Quicksand',
+            ),
+          ),
+          if (detail.comment.loseThings || detail.comment.breakThings) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                if (detail.comment.loseThings)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.warning_outlined,
+                          size: 12,
+                          color: Colors.red.shade700,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          'Mất đồ',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.red.shade700,
+                            fontFamily: 'Quicksand',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (detail.comment.loseThings && detail.comment.breakThings)
+                  const SizedBox(width: 6),
+                if (detail.comment.breakThings)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade100,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.broken_image_outlined,
+                          size: 12,
+                          color: Colors.orange.shade700,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          'Hỏng đồ',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.orange.shade700,
+                            fontFamily: 'Quicksand',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }
