@@ -424,7 +424,7 @@ class _ServicesOrderState extends State<ServicesOrder>
                   fullName: widget.customer.name,
                   phone: widget.customer.phone,
                   address: finalAddress,
-                  usedPoint: widget.customer.points[0].point),
+                  usedPoint: 100),
               service: RequestService(
                   title: widget.service.title,
                   coefficientService: 1.0,

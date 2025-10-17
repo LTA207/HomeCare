@@ -114,33 +114,6 @@ class NotificationService {
                       ],
                     ),
                   ),
-                  // Thay nút X thành nút "Xem"
-                  Container(
-                    decoration: BoxDecoration(
-                      color: primaryGreen,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: TextButton(
-                      onPressed: () {
-                        OverlaySupportEntry.of(context)?.dismiss();
-                        onTap?.call();
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: const Text(
-                        'Xem',
-                        style: TextStyle(
-                          color: white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Quicksand',
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -265,33 +238,6 @@ class NotificationService {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    ),
-                  ),
-                  // Thay nút X thành nút "Xem"
-                  Container(
-                    decoration: BoxDecoration(
-                      color: statusColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: TextButton(
-                      onPressed: () {
-                        OverlaySupportEntry.of(context)?.dismiss();
-                        onTap?.call();
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: const Text(
-                        'Xem',
-                        style: TextStyle(
-                          color: white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Quicksand',
-                        ),
-                      ),
                     ),
                   ),
                 ],

@@ -71,7 +71,14 @@ class _HomePageState extends State<HomePage> {
         deviceToken: widget.deviceToken,
       ),
     ]);
-    loadRequestData();
+
+    // Load data first, then set up notifications
+    loadRequestData().then((_) {
+      setState(() {
+        todayRequests = getTodayRequests();
+        _showPinnedNotification = todayRequests.isNotEmpty;
+      });
+    });
 
     // Đăng ký callback FCM để xử lý thông báo
     FirebaseMessagingService.setDataChangeCallback(_handleFCMNotification);
@@ -87,29 +94,34 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _handleFCMNotification() {
+    // Load all request data fresh from server
     loadRequestData().then((_) {
-      setState(() {
-        todayRequests = getTodayRequests();
-      });
+      if (mounted) {
+        setState(() {
+          // Get today's requests with proper filtering
+          todayRequests = getTodayRequests();
+
+          // Update notification state based on filtered results
+          if (todayRequests.isNotEmpty) {
+            _showPinnedNotification = true;
+            // Reset to first request if current index is out of bounds
+            if (_currentRequestIndex >= todayRequests.length) {
+              _currentRequestIndex = 0;
+            }
+          } else {
+            _showPinnedNotification = false;
+            _currentRequestIndex = 0;
+          }
+        });
+      }
+    }).catchError((error) {
+      // Handle error silently or add proper error handling
     });
   }
 
   void _checkAndSwitchRequest(String orderId) {
-    setState(() {
-      todayRequests.removeWhere((request) => request.id == orderId);
-
-      if (todayRequests.isEmpty) {
-        _showPinnedNotification = false;
-        _currentRequestIndex = 0;
-      } else {
-        if (_currentRequestIndex >= todayRequests.length) {
-          _currentRequestIndex = todayRequests.length - 1;
-        }
-      }
-    });
-
-    print('📦 Removed request with orderId: $orderId');
-    print('📋 Remaining today requests: ${todayRequests.length}');
+    // Reload all data to ensure we have the latest status
+    _handleFCMNotification();
   }
 
   Future<void> loadRequestData() async {
@@ -118,9 +130,6 @@ class _HomePageState extends State<HomePage> {
         widget.customer.phone, widget.token);
     // Chỉ cập nhật data, không setState ở đây
     requestCustomer = data ?? [];
-    print('đã tải lại request data');
-    print(
-        'Yêu cầu của khách hàng: ${requestCustomer?.where((req) => req.id == '68ba7a9059afc945c946f477').toList()}');
   }
 
   Future<void> loadHelperData() async {
@@ -133,39 +142,57 @@ class _HomePageState extends State<HomePage> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    final list = (requestCustomer ?? []).where((request) {
-      try {
-        final startDate = DateTime.parse(request.startTime);
-        final startDay =
-            DateTime(startDate.year, startDate.month, startDate.day);
+    if (requestCustomer == null || requestCustomer!.isEmpty) {
+      return [];
+    }
 
-        return startDay == today && !startDate.isBefore(now);
-      } catch (_) {
+    final filteredRequests = requestCustomer!.where((request) {
+      try {
+        final startDateTime = DateTime.parse(request.startTime);
+        final startDate = DateTime(startDateTime.year, startDateTime.month, startDateTime.day);
+
+        // Filtering criteria:
+        // 1. Request is for today
+        final isToday = startDate == today;
+
+        // 2. Start time is in the future
+        final isFuture = startDateTime.isAfter(now);
+
+        // 3. Status is pending (case insensitive)
+        final isPending = request.status.toLowerCase() == 'pending';
+
+        final shouldInclude = isToday && isFuture && isPending;
+
+        return shouldInclude;
+      } catch (e) {
         return false;
       }
     }).toList();
 
-    list.sort((a, b) {
-      final aTime = DateTime.parse(a.startTime);
-      final bTime = DateTime.parse(b.startTime);
-      return aTime.compareTo(bTime);
+    // Sort by start time (earliest first)
+    filteredRequests.sort((a, b) {
+      try {
+        final aTime = DateTime.parse(a.startTime);
+        final bTime = DateTime.parse(b.startTime);
+        return aTime.compareTo(bTime);
+      } catch (e) {
+        return 0;
+      }
     });
 
-    return list;
+    return filteredRequests;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (todayRequests.isEmpty) {
-      todayRequests = getTodayRequests();
-    }
+    // Remove this condition - let initState handle the initialization
+    // if (todayRequests.isEmpty) {
+    //   todayRequests = getTodayRequests();
+    // }
 
-    final hasValidRequest =
-        todayRequests.isNotEmpty && _currentRequestIndex < todayRequests.length;
-    final currentRequest =
-        hasValidRequest ? todayRequests[_currentRequestIndex] : null;
+    final hasValidRequest = todayRequests.isNotEmpty && _currentRequestIndex < todayRequests.length;
+    final currentRequest = hasValidRequest ? todayRequests[_currentRequestIndex] : null;
 
-    print('Yêu cầu hôm nay: $todayRequests');
     return Scaffold(
       body: _pages[_selectedIndex.clamp(0, _pages.length - 1)],
       bottomNavigationBar: Column(
@@ -223,18 +250,54 @@ class _HomePageState extends State<HomePage> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            'Nhấn để xem chi tiết',
-                            style: TextStyle(
-                              color: Colors.green.shade600,
-                              fontSize: 11,
-                              fontFamily: 'Quicksand',
-                              fontStyle: FontStyle.italic,
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                'Nhấn để xem chi tiết',
+                                style: TextStyle(
+                                  color: Colors.green.shade600,
+                                  fontSize: 11,
+                                  fontFamily: 'Quicksand',
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                              if (todayRequests.length > 1) ...[
+                                const Spacer(),
+                                Text(
+                                  '${_currentRequestIndex + 1}/${todayRequests.length}',
+                                  style: TextStyle(
+                                    color: Colors.green.shade600,
+                                    fontSize: 10,
+                                    fontFamily: 'Quicksand',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ],
                       ),
                     ),
+                    if (todayRequests.length > 1) ...[
+                      IconButton(
+                        icon: const Icon(Icons.navigate_before, color: Colors.green, size: 22),
+                        onPressed: _currentRequestIndex > 0 ? () {
+                          setState(() {
+                            _currentRequestIndex--;
+                          });
+                        } : null,
+                        tooltip: 'Đơn hàng trước',
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.navigate_next, color: Colors.green, size: 22),
+                        onPressed: _currentRequestIndex < todayRequests.length - 1 ? () {
+                          setState(() {
+                            _currentRequestIndex++;
+                          });
+                        } : null,
+                        tooltip: 'Đơn hàng tiếp theo',
+                      ),
+                    ],
                     IconButton(
                       icon:
                           const Icon(Icons.close, color: Colors.grey, size: 22),

@@ -24,8 +24,7 @@ class HelperDetailPage extends StatefulWidget {
 class _HelperDetailPageState extends State<HelperDetailPage> {
   List<RequestDetail>? helperListDetail;
   List<Services> helperServices = [];
-  Map<String, List<RequestDetail>> serviceReviews = {};
-  Map<String, bool> serviceExpanded = {}; // Add this to track expanded state
+  Map<String, List<RequestDetail>> serviceReviews = {}; // Add this to store reviews by service
 
   @override
   void initState(){
@@ -888,7 +887,7 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Chưa có lịch sử làm việc nào',
+              'Chưa có đánh giá nào',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[600],
@@ -900,11 +899,9 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
       );
     }
 
-    // Calculate total work history and reviews
-    int totalWorkHistory = helperListDetail!.length;
-    int totalReviews = helperListDetail!
-        .where((detail) => detail.comment.review.isNotEmpty)
-        .length;
+    // Calculate total reviews across all services
+    int totalReviews = serviceReviews.values.fold(0, (sum, reviews) => sum + reviews.length);
+    int totalCompleted = helperListDetail!.length;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -914,34 +911,53 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
           const SizedBox(height: 10),
           // Overall stats
           _buildCardSection(
-            'Tổng quan',
+            'Tổng quan đánh giá',
             Icons.analytics_outlined,
             Column(
               children: [
                 _buildInfoRow(
-                  'Tổng công việc',
-                  '$totalWorkHistory',
-                  Icons.work_outline,
-                ),
-                _buildInfoRow(
-                  'Có đánh giá',
+                  'Tổng đánh giá',
                   '$totalReviews',
                   Icons.comment_outlined,
+                ),
+                _buildInfoRow(
+                  'Hoàn thành',
+                  '$totalCompleted',
+                  Icons.check_circle_outline,
                 ),
               ],
             ),
           ),
 
-          // Work history grouped by services
+          // Comments grouped by services
           if (serviceReviews.isNotEmpty) ...[
             const SizedBox(height: 16),
             ...helperServices.map((service) {
-              List<RequestDetail> serviceHistory = serviceReviews[service.title] ?? [];
-              bool isExpanded = serviceExpanded[service.title] ?? false;
+              List<RequestDetail> serviceComments = serviceReviews[service.title] ?? [];
 
               return Column(
                 children: [
-                  _buildExpandableServiceSection(service, serviceHistory, isExpanded),
+                  _buildCardSection(
+                    '${service.title} (${serviceComments.length} đánh giá)',
+                    Icons.star_outline,
+                    Column(
+                      children: serviceComments.isEmpty
+                          ? [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                child: Text(
+                                  'Chưa có đánh giá cho dịch vụ này',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontStyle: FontStyle.italic,
+                                    fontFamily: 'Quicksand',
+                                  ),
+                                ),
+                              ),
+                            ]
+                          : serviceComments.map((detail) => _buildCommentItem(detail)).toList(),
+                    ),
+                  ),
                   const SizedBox(height: 16),
                 ],
               );
@@ -949,12 +965,12 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
           ] else ...[
             const SizedBox(height: 16),
             _buildCardSection(
-              'Lịch sử làm việc',
-              Icons.history,
+              'Đánh giá',
+              Icons.star_outline,
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Text(
-                  'Chưa có lịch sử làm việc nào',
+                  'Chưa có đánh giá nào cho helper này',
                   style: TextStyle(
                     color: Colors.grey[600],
                     fontStyle: FontStyle.italic,
@@ -971,107 +987,7 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
     );
   }
 
-  Widget _buildExpandableServiceSection(Services service, List<RequestDetail> serviceHistory, bool isExpanded) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 3.0,
-            blurRadius: 5.0,
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Header with expand/collapse button
-          InkWell(
-            onTap: () {
-              setState(() {
-                serviceExpanded[service.title] = !isExpanded;
-              });
-            },
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.history,
-                    size: 20,
-                    color: Colors.green.shade700,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '${service.title} (${serviceHistory.length} công việc)',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green.shade800,
-                        fontFamily: 'Quicksand',
-                      ),
-                    ),
-                  ),
-                  AnimatedRotation(
-                    turns: isExpanded ? 0.5 : 0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(
-                      Icons.keyboard_arrow_down,
-                      color: Colors.green.shade700,
-                      size: 24,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Expandable content
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            height: isExpanded ? null : 0,
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: isExpanded ? 1.0 : 0.0,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Column(
-                  children: [
-                    Divider(
-                      height: 0,
-                      color: Colors.grey.shade300,
-                    ),
-                    const SizedBox(height: 16),
-                    serviceHistory.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: Text(
-                              'Chưa có lịch sử cho dịch vụ này',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontStyle: FontStyle.italic,
-                                fontFamily: 'Quicksand',
-                              ),
-                            ),
-                          )
-                        : Column(
-                            children: serviceHistory.map((detail) => _buildWorkHistoryItem(detail)).toList(),
-                          ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWorkHistoryItem(RequestDetail detail) {
+  Widget _buildCommentItem(RequestDetail detail) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -1091,18 +1007,15 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
                 color: Colors.grey[600],
               ),
               const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  DateFormat('dd/MM/yyyy').format(DateTime.parse(detail.workingDate)),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontFamily: 'Quicksand',
-                  ),
-                  overflow: TextOverflow.ellipsis,
+              Text(
+                DateFormat('dd/MM/yyyy').format(DateTime.parse(detail.workingDate)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontFamily: 'Quicksand',
                 ),
               ),
-              const SizedBox(width: 8),
+              const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -1121,18 +1034,16 @@ class _HelperDetailPageState extends State<HelperDetailPage> {
               ),
             ],
           ),
-          if (detail.comment.review.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              detail.comment.review,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[800],
-                height: 1.4,
-                fontFamily: 'Quicksand',
-              ),
+          const SizedBox(height: 8),
+          Text(
+            detail.comment.review,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[800],
+              height: 1.4,
+              fontFamily: 'Quicksand',
             ),
-          ],
+          ),
           if (detail.comment.loseThings || detail.comment.breakThings) ...[
             const SizedBox(height: 8),
             Row(
