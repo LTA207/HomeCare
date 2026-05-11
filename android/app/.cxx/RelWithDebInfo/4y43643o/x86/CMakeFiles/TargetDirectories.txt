@@ -1,0 +1,2 @@
+D:/AndroidStudioProjects/HomeCareV5/android/app/.cxx/RelWithDebInfo/4y43643o/x86/CMakeFiles/edit_cache.dir
+D:/AndroidStudioProjects/HomeCareV5/android/app/.cxx/RelWithDebInfo/4y43643o/x86/CMakeFiles/rebuild_cache.dir

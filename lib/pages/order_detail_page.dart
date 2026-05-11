@@ -160,7 +160,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       // _buildCustomerInfoCard(),
                       // const SizedBox(height: 16),
                       if (requestHelpers.isNotEmpty) _buildHelperInfoCard(),
-                      if (requestHelpers.isNotEmpty) const SizedBox(height: 16),
+                      // if (requestHelpers.isNotEmpty) const SizedBox(height: 16),
                       _buildServiceDetailsCard(),
                       const SizedBox(height: 16),
                       _buildPaymentDetailsCard(),

@@ -1,0 +1,1 @@
+D:\AndroidStudioProjects\HomeCareV5\build\app\intermediates\cxx\RelWithDebInfo\4y43643o\obj\x86_64
